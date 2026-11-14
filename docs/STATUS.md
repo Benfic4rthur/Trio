@@ -1,16 +1,16 @@
 # Estado do Trio
 
-Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.0, build 7.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.1, build 8.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.1.0, build 7**, instalada em `/Applications/Trio.app`. |
+| Versão atual | **0.1.1, build 8**, instalada em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`, **1.842.643 bytes**, com instalador, guia e app empacotados localmente. |
-| Integridade do ZIP | SHA-256 `79e9cb7cc3560ee10cf2b9c4b0209948881c73c4d177d188a41d6f28a7d0ef74`. |
+| Pacote | `Trio-macOS-universal.zip`, **1.848.889 bytes**, com instalador, guia 0.1.1 e app Universal; extração e assinatura conferidas localmente. |
+| Integridade do ZIP | SHA-256 `e94b36feed23a6fb76e251bb4f50a95c15e00eb4401134d998310bb0ba90a5be`; pacote, checksum e metadados atualizados juntos. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
@@ -20,12 +20,14 @@ Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e fu
 
 | Item | Estado e evidência |
 | --- | --- |
-| Geometria | **17 testes passaram**, cobrindo tamanho, obstáculos, dimensões inválidas, coordenadas negativas e oclusão concêntrica dos discos originais. |
+| Testes | **25 testes passaram**, cobrindo geometria, limites, obstáculos, dimensões inválidas, coordenadas negativas, oclusão concêntrica e identidade de janelas coincidentes. |
+| Janelas coincidentes | Build 8: **15 janelas com a mesma geometria e 16 trocas de foco passaram**, com painel alinhado e comprovação AX dos três controles. O critério não aceita apenas PID e bounds. |
+| Cores e preferência | Cores explícitas em sRGB: vermelho `#FF5F57`, amarelo `#FFBC2E`, verde `#28C840`, sem branqueamento. A preferência existente de **1,3×** foi preservada; o padrão continua **1,5×**. |
 | Região dos controles | Da borda esquerda até **5 pt após o verde original**; base concêntrica, com tamanho ajustado à área segura. Codex medido: 16 pt → 24 pt, **1,5×**. |
 | Fundo | Círculos opacos cobrem os discos originais; área ao redor com 1,5% de opacidade, sem retângulo sólido. Estados de hover e barras diferentes precisam de revisão visual por aplicativo. |
 | Vermelho + Smart Close | Caminho real do NSButton Trio ao clique HID original passou na fixture, incluindo a build 7. A fixture encerrou e o Trio permaneceu ativo. `AXPress` direto não teve o mesmo resultado. [Detalhes](SMART-CLOSE.md). |
 | Amarelo | Minimização passou pelo controle ampliado, com fixture viva. |
-| Verde | Maximizar e restaurar passaram, com destino na área útil, restauração exata e ausência de fullscreen. A build 7 registrou 15 e 14 geometrias distintas na maximização/restauração. |
+| Verde | Build 8: dois cliques no mesmo ID entre 15 janelas coincidentes restauraram a 900×620 e maximizaram na área útil, com frames CG/AX iguais, sem fullscreen ou amostras de painel visível desalinhado. |
 | Arrasto e estabilidade | Rodada final da build 7: dez passos de arrasto e pausa pressionada; painel oculto durante movimento, sem amostras visíveis fora da âncora, alinhado novamente aos 150/300 ms após soltar. Três ativações e cliques no conteúdo mantiveram o painel acima da janela. |
 | Menu e organização | Hover, saída para vermelho, saída do menu e organização em metades passaram na build 6. A rodada representativa da build 7 não repetiu amplamente todos esses caminhos. |
 | Auto-maximização | Preferência implementada, com exceções por aplicativo. A janela inicial da fixture foi maximizada em ensaio; cobertura de alertas, diálogos e aplicativos diferentes segue na matriz de compatibilidade. |
@@ -33,7 +35,7 @@ Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e fu
 | Codex e Finder | Sobreposição observada. Indicadores de compartilhamento ou ferramentas ocupando a faixa podem levar à recusa segura sem solicitar novas permissões. |
 | Identidade visual | ICNS instalado corresponde ao do projeto; símbolos ×, − e setas conferidos. [Prévia em tamanhos reais](branding/trio-icon-final.png). |
 
-As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) identificam as builds e os processos de cada rodada. Resultados antigos não são atribuídos automaticamente a binários posteriores. O teste final foi representativo e restrito à fixture própria; não certifica todos os aplicativos ou dispositivos de entrada.
+As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) identificam as builds e os processos de cada rodada. Resultados antigos não são atribuídos automaticamente a binários posteriores. O ensaio de identidade da build 8 foi restrito à fixture própria; dois cliques no verde restauraram e maximizaram a mesma janela entre as 15, com frames CG/AX iguais e sem fullscreen ou painel visível desalinhado. Esses resultados não certificam todos os aplicativos ou dispositivos de entrada.
 
 ## Cobertura ainda a ampliar
 

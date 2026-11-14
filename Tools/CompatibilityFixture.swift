@@ -46,7 +46,10 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                          extra: ["x": event.locationInWindow.x, "y": event.locationInWindow.y])
             return event
         }
-        let count = arguments.contains("--two-windows") ? 2 : 1
+        let requestedCount: Int? = arguments.firstIndex(of: "--window-count").flatMap { index in
+            arguments.indices.contains(index+1) ? Int(arguments[index+1]) : nil
+        }
+        let count = requestedCount.map { min(15,max(1,$0)) } ?? (arguments.contains("--two-windows") ? 2 : 1)
         for index in 0..<count { makeWindow(index: index) }
         record("launched", extra: ["customTitlebar": arguments.contains("--custom-titlebar"), "windowCount": windows.count])
         NSApp.activate()

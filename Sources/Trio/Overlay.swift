@@ -158,11 +158,14 @@ final class ControlHitButton: NSButton {
             // The enlarged light remains inside the measured safe mask. At the
             // two ends it moves inward rather than extending onto a toolbar.
             let r = visualCircle(i)
-            let color = [NSColor(calibratedRed: 1, green: 95/255, blue: 87/255, alpha: 1),
-                         NSColor(calibratedRed: 1, green: 188/255, blue: 46/255, alpha: 1),
-                         NSColor(calibratedRed: 40/255, green: 200/255, blue: 64/255, alpha: 1)][i]
+            // Match the native traffic-light RGB values in an explicit sRGB
+            // space. Generic calibrated RGB made these look washed out beside
+            // the system controls on wide-gamut displays.
+            let color = [NSColor(srgbRed: 1, green: 95/255, blue: 87/255, alpha: 1),
+                         NSColor(srgbRed: 1, green: 188/255, blue: 46/255, alpha: 1),
+                         NSColor(srgbRed: 40/255, green: 200/255, blue: 64/255, alpha: 1)][i]
             let shape = NSBezierPath(ovalIn: r)
-            NSGradient(starting: color.blended(withFraction: 0.015, of: .white)!, ending: color)!.draw(in: shape, angle: 90)
+            color.setFill(); shape.fill()
             NSColor.black.withAlphaComponent(0.12).setStroke(); shape.lineWidth = 0.7; shape.stroke()
             drawSymbol(i, in: r)
         }

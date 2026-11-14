@@ -2,7 +2,7 @@
 
 [Português](#português) · [English](#english) · [Español](#español)
 
-Guia da versão **0.1.0, build 7**, preparado em 14/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
+Guia da versão **0.1.1, build 8**, preparado em 14/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
 
 O pacote e o código-fonte são públicos e gratuitos. O ZIP é distribuído pela pasta `distribution/` do repositório; esse caminho não é uma GitHub Release. Não é necessário compilar o app para instalá-lo.
 
@@ -108,8 +108,8 @@ Trio-macOS-universal/
   INSTALLATION.md
 ```
 
-Publicar também um checksum SHA-256 do ZIP em um arquivo separado. O pacote pronto não contém Xcode, SwiftPM ou uma etapa de build remota. A criação do pacote e sua instalação por este script ainda precisam de ensaio antes do download público.
+Publicar também um checksum SHA-256 do ZIP em um arquivo separado. O pacote pronto não contém Xcode, SwiftPM ou uma etapa de build remota. O pacote é criado localmente, com assinatura e checksum verificados. A execução do instalador em outro Mac, incluindo a primeira aprovação do Gatekeeper, ainda precisa de ensaio.
 
 ## Validação deste material
 
-O script recebeu revisão estática e verificação de sintaxe com `/bin/bash -n`. **Não foi executado para instalar, substituir ou encerrar o Trio durante essa preparação**, preservando o aplicativo em uso. Testar cópia, preservação da versão anterior, rollback e primeira abertura em um Mac com Gatekeeper ativo permanece obrigatório antes de publicar o instalador.
+O script recebeu revisão estática e verificação de sintaxe com `/bin/bash -n`. **Não foi executado para instalar, substituir ou encerrar o Trio durante essa preparação**, preservando o aplicativo em uso. Cópia, preservação da versão anterior, rollback e primeira abertura em outro Mac com Gatekeeper ativo permanecem na matriz de testes; a revisão estática não comprova esses caminhos em outro computador.

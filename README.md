@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.0 · build 7</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.1 · build 8</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -29,9 +29,9 @@ O instalador não pede administrador, não remove a quarentena nem desativa prot
 | Mouse sobre o verde | Abre opções para maximizar, organizar em metades ou centralizar. |
 | Botão direito | Abre o menu com **Abrir Trio**, sem executar uma ação da janela. |
 
-Fechar e minimizar exigem clique. O tamanho solicitado pode ser configurado entre **1× e 5×**, com ajuste ao espaço disponível. A preferência inicial é **1,5×**; no Codex medido, os controles de 16 pontos passam a 24 pontos. A área termina até cinco pontos depois do verde original, preservando ferramentas próximas.
+Fechar e minimizar exigem clique. O tamanho solicitado pode ser configurado entre **1× e 5×**, com ajuste ao espaço disponível. A preferência inicial é **1,5×**, e atualizações preservam o tamanho já escolhido; no Codex medido, os controles de 16 pontos passam a 24 pontos. A área termina até cinco pontos depois do verde original, preservando ferramentas próximas.
 
-Os círculos em repouso ficam nos centros dos controles originais e cobrem os botões pequenos. A área ao redor é quase transparente. Durante movimento que não possa ser acompanhado com segurança, o Trio oculta os controles e os reapresenta após confirmar a posição.
+Os círculos em repouso ficam nos centros dos controles originais e cobrem os botões pequenos. O desenho usa cores explícitas em sRGB: vermelho `#FF5F57`, amarelo `#FFBC2E` e verde `#28C840`, sem a mistura branca usada em iterações anteriores. A área ao redor é quase transparente. Durante movimento que não possa ser acompanhado com segurança, o Trio oculta os controles e os reapresenta após confirmar a posição.
 
 ## Silencioso durante o uso
 
@@ -45,18 +45,19 @@ Dock e barra de menus vêm desativados para o uso em segundo plano e podem ser h
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
-| **0.1.0** | **7** | **14/11/2026** | Controles ampliados, onda de hover, menu de organização, Smart Close, exceções de maximização automática e início silencioso. |
+| **0.1.1** | **8** | **14/11/2026** | Identidade de janelas coincidentes, troca segura de foco e cores explícitas em sRGB. |
+| 0.1.0 | 7 | 14/11/2026 | Controles ampliados, onda de hover, menu de organização, Smart Close, exceções de maximização automática e início silencioso. |
 
-A build 7 corrigiu o rastro dos controles durante arrasto e animação: o painel fica oculto enquanto a posição não está confirmada e retorna alinhado. O auxiliar de início passou a ter bundle próprio e registro por `SMAppService.loginItem`. [Histórico completo](CHANGELOG.md).
+A build 8 corrige a seleção de janelas do mesmo aplicativo com a mesma geometria, situação comum ao abrir várias janelas maximizadas. O Trio só aceita essa identificação após comprovar por Acessibilidade os três controles da janela ativa. Um ensaio com 15 janelas coincidentes e 16 trocas de foco confirmou o alinhamento e a identidade. O início silencioso continua usando `SMAppService.loginItem`. [Histórico completo](CHANGELOG.md).
 
 O ZIP em [`distribution/`](distribution/) é o pacote real compilado localmente, com [checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) e [metadados de versão](distribution/release.json). É uma distribuição pública pelo repositório; não é uma GitHub Release. O código-fonte é público e não usa GitHub Actions ou builds remotos.
 
 ## Validação e compatibilidade
 
-- **17 testes de geometria passaram.** Incluem limites de espaço, obstáculos, dimensões inválidas, coordenadas negativas e cobertura concêntrica dos controles originais.
-- **Build 7 instalada e exercitada** em macOS 27.2.1, M1 Pro. O pacote e o auxiliar contêm arm64 e x86_64; hardware Intel ainda não foi testado.
+- **25 testes passaram.** Incluem geometria, limites de espaço, obstáculos, dimensões inválidas, coordenadas negativas, cobertura concêntrica e identificação conservadora de janelas coincidentes.
+- **Build 8 instalada e exercitada** em macOS 27.2.1, M1 Pro. O pacote e o auxiliar contêm arm64 e x86_64; hardware Intel ainda não foi testado.
 - **Smart Close 0.4.2:** o clique real no controle Trio chegou ao botão original e encerrou a fixture. `AXPress` direto teve comportamento diferente, mantendo o processo vivo. [Ensaio documentado](docs/SMART-CLOSE.md).
-- **Verde e amarelo:** maximização sem tela cheia, restauração exata e minimização passaram pela sobreposição. A rodada final mediu arrasto, cliques no conteúdo e animação sem amostras visíveis desalinhadas. [Resultados e escopo](docs/PIPELINE-VALIDATION.md).
+- **Janelas coincidentes:** 15 janelas da fixture própria e 16 trocas de foco passaram, com painel alinhado e identidade AX dos três controles. Dois cliques no verde da build 8 restauraram e maximizaram a mesma janela entre as 15, com CG e AX concordando, sem fullscreen ou painel visível desalinhado. Os testes de vermelho, amarelo e arrasto das builds anteriores permanecem identificados separadamente. [Resultados e escopo](docs/PIPELINE-VALIDATION.md).
 - **Início silencioso:** o registro por LoginItem abriu a instância do Trio sem configurações, em modo acessório, preservando a autorização de Acessibilidade. Uma sessão completa de sair/entrar no macOS ainda não foi exercitada.
 - A sobreposição foi observada no **Codex** e no **Finder**. Regiões ocupadas por indicadores de compartilhamento ou ferramentas próximas podem ser recusadas.
 

@@ -1,5 +1,16 @@
 # Histórico do Trio
 
+## 0.1.1 — build 8 · 14/11/2026
+
+| Área | Mudança |
+| --- | --- |
+| Janelas coincidentes | Corrige a recusa de várias janelas do mesmo aplicativo com bounds idênticos. A seleção exige comprovação pública AX dos três controles da janela ativa; PID e geometria sozinhos não bastam. |
+| Troca de foco | Verifica novamente a identidade e a posição antes de apresentar controles ou encaminhar ações, preservando a recusa de alvos ambíguos. |
+| Cores | Vermelho `#FF5F57`, amarelo `#FFBC2E` e verde `#28C840` em sRGB explícito, sem o branqueamento de iterações anteriores. |
+| Preferências | A atualização preserva o tamanho já salvo. O padrão de uma instalação nova continua sendo 1,5×. |
+
+**Validação da build 8:** 25 testes passaram. O ensaio com 15 janelas coincidentes e 16 trocas de foco verificou alinhamento e identidade AX dos três botões. Dois cliques no verde restauraram e maximizaram a mesma janela entre as 15, com frames CG/AX iguais, sem fullscreen nem painel visível desalinhado. [Ensaios de execução](docs/PIPELINE-VALIDATION.md) mantém os resultados de cada build separados.
+
 ## 0.1.0 — build 7 · 14/11/2026
 
 Aplicativo gratuito para macOS, com pacote Universal para Apple Silicon e Intel. [Baixar a versão atual](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação PT/EN/ES](docs/INSTALLATION.md).

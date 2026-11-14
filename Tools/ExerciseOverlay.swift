@@ -102,8 +102,8 @@ if args.contains("--activate-fixture"), !fixtureIsFront() {
 guard fixtureIsFront(), fixture.isActive else { abort("Fixture is not frontmost; no activation attempted") }
 let axApp = AXUIElementCreateApplication(fixturePID)
 AXUIElementSetMessagingTimeout(axApp, 0.25)
-guard let windows = value(axApp, kAXWindowsAttribute) as? [AXUIElement], (1...2).contains(windows.count),
-      windows.allSatisfy({ pid($0) == fixturePID && value($0,kAXRoleAttribute) as? String == kAXWindowRole && (value($0,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole || value($0,kAXMinimizedAttribute) as? Bool == true) }) else { abort("Fixture must expose one or two owned standard windows") }
+guard let windows = value(axApp, kAXWindowsAttribute) as? [AXUIElement], (1...15).contains(windows.count),
+      windows.allSatisfy({ pid($0) == fixturePID && value($0,kAXRoleAttribute) as? String == kAXWindowRole && (value($0,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole || value($0,kAXMinimizedAttribute) as? Bool == true) }) else { abort("Fixture must expose one through fifteen owned standard windows") }
 report["fixtureWindowCount"] = windows.count
 if args.contains("--restore-minimized-fixture") {
     for owned in windows where value(owned,kAXMinimizedAttribute) as? Bool == true {
@@ -147,8 +147,24 @@ guard native.count == 3, nativeFrames.count == 3,
       nativeFrames.allSatisfy({ windowFrame.contains($0) }) else { abort("Fixture native controls unavailable or disabled; no event posted") }
 let nativeUnion = nativeFrames.dropFirst().reduce(nativeFrames[0]) { $0.union($1) }
 var rows = visibleRows()
-let fixtureCG = rows.filter { $0.pid == fixturePID && $0.layer == 0 && close($0.frame, windowFrame) }
-guard fixtureCG.count == 1 else { abort("Fixture CG window identity is ambiguous") }
+let fixtureMatches = rows.filter { $0.pid == fixturePID && $0.layer == 0 && close($0.frame, windowFrame) }
+let fixtureCG: [CGRow]
+if fixtureMatches.count == 1 { fixtureCG = fixtureMatches }
+else if fixtureMatches.count > 1, let top = fixtureMatches.first {
+    let proof = zip(native,nativeFrames).allSatisfy { button,rect in
+        let point = CGPoint(x:rect.midX,y:rect.midY)
+        var ownedHit: AXUIElement?
+        return AXUIElementCopyElementAtPosition(axApp,Float(point.x),Float(point.y),&ownedHit) == .success &&
+            ownedHit.map { CFEqual($0,button) } == true &&
+            rows.first(where: { $0.layer == 0 && $0.frame.contains(point) })?.id == top.id
+    }
+    guard proof, element(axApp,kAXFocusedWindowAttribute).map({CFEqual($0,window)}) == true,
+          frame(window).map({close($0,windowFrame)}) == true else { abort("Coincident owned windows lack complete app-scoped AX/topmost CG proof") }
+    fixtureCG = [top]
+    report["coincidentFixtureCandidateCount"] = fixtureMatches.count
+    report["coincidentFixtureAppHitProof"] = true
+} else { abort("Fixture CG window identity is unavailable") }
+report["fixtureCGWindowIDBefore"] = fixtureCG[0].id
 func matchingOverlays(_ candidates: [CGRow]) -> [CGRow] { candidates.filter { row in
     row.pid == trioPID && row.layer == 3 && windowFrame.contains(row.frame) && row.frame.contains(nativeUnion) &&
     row.frame.minX >= windowFrame.minX && row.frame.maxX <= nativeFrames[2].maxX+5.5 &&
@@ -411,6 +427,7 @@ if ["snap-left","snap-right","center"].contains(action) {
 }
 report["fixtureStillFront"] = fixtureIsFront()
 report["fixtureProcessRunningAfter"] = NSRunningApplication(processIdentifier: fixturePID).map { !$0.isTerminated } ?? false
+report["fixtureWindowCountAfter"] = (value(axApp,kAXWindowsAttribute) as? [AXUIElement])?.count ?? -1
 report["trioProcessRunningAfter"] = NSRunningApplication(processIdentifier: trioPID).map { !$0.isTerminated } ?? false
 if let after = frame(window) { report["windowAfter"] = rect(after) }
 if let minimized = value(window, kAXMinimizedAttribute) as? Bool { report["minimizedAfter"] = minimized }

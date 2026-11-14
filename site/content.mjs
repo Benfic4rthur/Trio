@@ -118,7 +118,8 @@ export const content = {
       "title": "Versões e novidades",
       "current": "Versão atual",
       "date": "14 de novembro de 2026",
-      "summary": "Primeira versão com controles ampliados, onda ao passar o mouse, maximizar e restaurar, integração com Smart Close e exceções por aplicativo.",
+      "summary": "Correção para janelas do mesmo aplicativo maximizadas no mesmo lugar, com validação em quinze janelas. Cores dos controles mais vivas e ajustes no menu da demonstração.",
+      "initialSummary": "Primeira versão com controles ampliados, onda ao passar o mouse, maximizar e restaurar, integração com Smart Close e exceções por aplicativo.",
       "free": "Gratuito, para usar no seu Mac."
     }
   },
@@ -240,7 +241,8 @@ export const content = {
       "title": "Versions and updates",
       "current": "Current version",
       "date": "November 14, 2026",
-      "summary": "The first release includes larger controls, hover magnification, maximize and restore, Smart Close integration, and per-app exceptions.",
+      "summary": "Fixed detection of same-app windows maximized in the same position, verified with fifteen windows. More vivid control colors and fixes to the demo menu.",
+      "initialSummary": "The first release includes larger controls, hover magnification, maximize and restore, Smart Close integration, and per-app exceptions.",
       "free": "Free to use on your Mac."
     }
   },
@@ -362,7 +364,8 @@ export const content = {
       "title": "Versiones y novedades",
       "current": "Versión actual",
       "date": "14 de noviembre de 2026",
-      "summary": "La primera versión incluye controles ampliados, aumento al pasar el puntero, maximizar y restaurar, integración con Smart Close y excepciones por aplicación.",
+      "summary": "Corregida la detección de ventanas de una misma app maximizadas en la misma posición, verificada con quince ventanas. Colores más vivos y ajustes en el menú de la demostración.",
+      "initialSummary": "La primera versión incluye controles ampliados, aumento al pasar el puntero, maximizar y restaurar, integración con Smart Close y excepciones por aplicación.",
       "free": "Gratis, para usar en tu Mac."
     }
   }

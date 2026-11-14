@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import TrioCore
 
 enum AX {
     static func value(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
@@ -34,6 +35,11 @@ enum AX {
     static func at(_ point: CGPoint) -> AXUIElement? {
         var hit: AXUIElement?
         guard AXUIElementCopyElementAtPosition(AXUIElementCreateSystemWide(), Float(point.x), Float(point.y), &hit) == .success else { return nil }
+        return hit
+    }
+    static func at(_ point: CGPoint, in application: AXUIElement) -> AXUIElement? {
+        var hit: AXUIElement?
+        guard AXUIElementCopyElementAtPosition(application, Float(point.x), Float(point.y), &hit) == .success else { return nil }
         return hit
     }
     static func setFrame(_ frame: CGRect, on element: AXUIElement) -> Bool {
@@ -112,13 +118,31 @@ struct WindowTarget {
         }) else { return nil }
         let rects = buttons.compactMap { AX.rect($0) }
         guard rects.count == 3 else { return nil }
-        let matches = SystemWindow.visible().filter { $0.pid == app.processIdentifier && $0.layer == 0 && SystemWindow.close($0.bounds, frame) }
-        guard matches.count == 1 else { return nil }
+        let visible = SystemWindow.visible().filter { $0.layer == 0 }
+        let matches = visible.filter { $0.pid == app.processIdentifier && SystemWindow.close($0.bounds, frame) }
+        var verifiedControls = false
+        if matches.count > 1 {
+            // Public application-scoped AX hit testing ignores our own panel
+            // and identifies the app's topmost controls. Do not infer identity
+            // from equal geometry or use the private AXWindowNumber attribute.
+            verifiedControls = zip(buttons, rects).allSatisfy { button, rect in
+                let center = CGPoint(x: rect.midX, y: rect.midY)
+                return AX.at(center, in: axApp).map { AX.same($0, button) } ?? false
+            }
+            guard verifiedControls,
+                  AX.element(axApp, kAXFocusedWindowAttribute).map({ AX.same($0, window) }) == true,
+                  AX.rect(window).map({ SystemWindow.close($0, frame, tolerance: 1) }) == true else { return nil }
+        }
+        guard let windowID = WindowIdentity.resolve(
+            windows: visible.map { VisibleWindowIdentity(id: $0.id, pid: $0.pid, frame: $0.bounds) },
+            pid: app.processIdentifier, frame: frame,
+            controlCenters: rects.map { CGPoint(x: $0.midX, y: $0.midY) }, ignoredPID: getpid(),
+            coincidentControlsVerified: verifiedControls) else { return nil }
         // Fail closed for sheets, fullscreen windows, and inaccessible window geometry.
         guard let children = AX.value(window, kAXChildrenAttribute) as? [AXUIElement],
               !children.contains(where: { AX.string($0, kAXRoleAttribute) == kAXSheetRole }) else { return nil }
         guard let screen = screen(for: frame), !SystemWindow.close(frame, toAX(screen.frame), tolerance: 1) else { return nil }
-        return WindowTarget(pid: app.processIdentifier, window: window, id: matches[0].id, frame: frame,
+        return WindowTarget(pid: app.processIdentifier, window: window, id: windowID, frame: frame,
                             buttons: buttons, buttonFrames: rects, name: app.localizedName ?? "Aplicativo")
     }
 

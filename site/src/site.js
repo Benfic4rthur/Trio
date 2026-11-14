@@ -52,8 +52,12 @@ document.querySelectorAll('[data-demo]').forEach(windowElement => {
   let previousPosition = '';
   const closeMenu = () => {
     clearTimeout(menuOpenTimer); clearTimeout(menuCloseTimer);
-    menu?.remove(); menu = null;
+    // Removing a focused menu fires focusout synchronously. Clear ownership
+    // first so that the focus handler can safely dismiss it again.
+    const oldMenu = menu;
+    menu = null;
     green.setAttribute('aria-expanded', 'false');
+    oldMenu?.remove();
   };
   const reset = () => {
     clearTimeout(returnTimer); closeMenu(); state = 'normal';
