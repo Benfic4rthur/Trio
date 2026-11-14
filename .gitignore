@@ -6,3 +6,6 @@ build/
 *.log
 *.jsonl
 local-notes/
+node_modules/
+site/dist/
+site/qa/artifacts/

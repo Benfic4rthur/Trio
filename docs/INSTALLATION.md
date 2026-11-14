@@ -2,7 +2,9 @@
 
 [Português](#português) · [English](#english) · [Español](#español)
 
-Guia preparado em 14/11/2026. **O pacote público ainda não foi publicado.** Estas instruções destinam-se a um pacote local validado ou recebido diretamente de uma origem conhecida. O código-fonte continua no repositório privado; este documento não anuncia um download disponível.
+Guia da versão **0.1.0, build 7**, preparado em 14/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
+
+O pacote e o código-fonte são públicos e gratuitos. O ZIP é distribuído pela pasta `distribution/` do repositório; esse caminho não é uma GitHub Release. Não é necessário compilar o app para instalá-lo.
 
 ## Português
 
@@ -87,15 +89,15 @@ No se necesita Grabación de Pantalla para obtener la geometría. El inicio de s
 
 **Ocultar Trio** mantiene activo el auxiliar. Abre la app instalada para volver a la configuración; **Salir de Trio** lo termina.
 
-## Contrato para o futuro download no site
+## Distribuição e metadados do site
 
-O site só deve oferecer instalação depois da validação e publicação do pacote. O repositório de código `Benfic4rthur/Trio` permanece privado. Uma URL privada de release exige autenticação e não serve como botão de download público; o site não deve incluir tokens nem depender da sessão GitHub do visitante.
+O proprietário tornou `Benfic4rthur/Trio` público. O pacote real da versão atual fica em `distribution/`, com URL raw acessível sem autenticação, checksum e `release.json`. O site não inclui tokens nem depende da sessão GitHub do visitante.
 
-Enquanto não existir um artefato público acessível sem autenticação, o estado do download será **Em validação**, sem URL de instalação. As imagens aprovadas podem ser copiadas para o bundle público de prévia do site; isso não publica o código-fonte nem o aplicativo.
+A consulta do site tenta uma GitHub Release válida; se não houver uma, usa os metadados públicos de `distribution/`. Como última alternativa, a prévia do site inclui o mesmo ZIP real e seus metadados, conferidos durante o build. Falha de rede não deve inventar uma versão nem uma publicação em Releases.
 
-Quando autorizado, um release público separado ou a hospedagem do próprio site poderá servir o pacote. A URL `latest` só será usada depois de verificada sem login. Um ZIP incluído na hospedagem pode servir de fallback se tiver exatamente a mesma versão e hash; não usar um link privado ou um caminho local como fallback.
+O endereço estável de `distribution/` aponta para a versão atual e deve ser atualizado junto com o pacote e o checksum. Uma futura GitHub Release pode usar a URL `latest` depois de seus arquivos serem publicados e conferidos. O histórico identifica as versões, sem simular releases anteriores.
 
-O contrato de metadados do site deve registrar versão, build, arquiteturas, destino mínimo, ambiente realmente testado, assinatura local, `notarized: false`, URL pública do ZIP, URL do checksum e este guia nos três idiomas. Sem publicação, as duas URLs ficam vazias. Não anunciar aprovação Apple ou compatibilidade universal.
+Os metadados registram versão, build, arquiteturas, destino mínimo, assinatura local, `notarized: false`, URL pública do ZIP e checksum. `publicRelease: false` distingue essa distribuição de uma GitHub Release. Isso não indica que o download seja privado. Não anunciar aprovação Apple ou compatibilidade universal.
 
 Estrutura esperada do ZIP:
 

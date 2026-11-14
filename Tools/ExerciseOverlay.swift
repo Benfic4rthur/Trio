@@ -61,7 +61,7 @@ func close(_ a: CGRect, _ b: CGRect) -> Bool {
     abs(a.minX-b.minX) < 2 && abs(a.minY-b.minY) < 2 && abs(a.width-b.width) < 2 && abs(a.height-b.height) < 2
 }
 func settle(_ seconds: Double) { RunLoop.current.run(until: Date().addingTimeInterval(seconds)) }
-guard ["inspect", "hover-green", "hover-red", "hover-popup", "move-away", "content-clicks", "drag-window", "resize-window", "click-green", "click-yellow", "click-red"].contains(action) else { abort("Unsupported action") }
+guard ["inspect", "hover-green", "hover-red", "hover-popup", "move-away", "content-clicks", "drag-window", "resize-window", "snap-left", "snap-right", "center", "click-green", "click-yellow", "click-red"].contains(action) else { abort("Unsupported action") }
 report["accessibilityTrusted"] = AXIsProcessTrusted()
 report["postEventAccess"] = CGPreflightPostEventAccess()
 guard AXIsProcessTrusted() else { abort("Accessibility not already authorized; no permission requested") }
@@ -103,8 +103,15 @@ guard fixtureIsFront(), fixture.isActive else { abort("Fixture is not frontmost;
 let axApp = AXUIElementCreateApplication(fixturePID)
 AXUIElementSetMessagingTimeout(axApp, 0.25)
 guard let windows = value(axApp, kAXWindowsAttribute) as? [AXUIElement], (1...2).contains(windows.count),
-      windows.allSatisfy({ pid($0) == fixturePID && value($0,kAXRoleAttribute) as? String == kAXWindowRole && value($0,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole }) else { abort("Fixture must expose one or two owned standard windows") }
+      windows.allSatisfy({ pid($0) == fixturePID && value($0,kAXRoleAttribute) as? String == kAXWindowRole && (value($0,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole || value($0,kAXMinimizedAttribute) as? Bool == true) }) else { abort("Fixture must expose one or two owned standard windows") }
 report["fixtureWindowCount"] = windows.count
+if args.contains("--restore-minimized-fixture") {
+    for owned in windows where value(owned,kAXMinimizedAttribute) as? Bool == true {
+        guard AXUIElementSetAttributeValue(owned,kAXMinimizedAttribute as CFString,kCFBooleanFalse) == .success else { abort("Cannot restore minimized owned fixture for test setup") }
+    }
+    _ = fixture.activate(options:[.activateAllWindows])
+    settle(0.45)
+}
 if args.contains("--arrange-fixture-pair") {
     guard windows.count == 2 else { abort("Two owned fixture windows required for pair setup") }
     for (index,owned) in windows.enumerated() {
@@ -116,12 +123,21 @@ if args.contains("--arrange-fixture-pair") {
     }
     settle(0.45)
 }
+if args.contains("--small-fixture") {
+    guard let owned = element(axApp,kAXFocusedWindowAttribute), windows.contains(where:{CFEqual($0,owned)}), value(owned,kAXMinimizedAttribute) as? Bool == false else { abort("No owned fixture for small setup") }
+    var point = CGPoint(x:320,y:260), size = CGSize(width:900,height:620)
+    guard let p = AXValueCreate(.cgPoint,&point), let v = AXValueCreate(.cgSize,&size),
+          AXUIElementSetAttributeValue(owned,kAXPositionAttribute as CFString,p) == .success,
+          AXUIElementSetAttributeValue(owned,kAXSizeAttribute as CFString,v) == .success else { abort("Cannot prepare small owned fixture") }
+    settle(0.35)
+}
 if args.contains("--focus-other-fixture") {
     guard let focused = element(axApp,kAXFocusedWindowAttribute), let other = windows.first(where:{ !CFEqual($0,focused) }),
           AXUIElementPerformAction(other,kAXRaiseAction as CFString) == .success else { abort("Could not raise second owned fixture window") }
     settle(0.45)
 }
 guard let window = element(axApp,kAXFocusedWindowAttribute), windows.contains(where:{CFEqual($0,window)}),
+      value(window,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole,
       value(window,kAXMinimizedAttribute) as? Bool == false, let windowFrame = frame(window) else { abort("Fixture must have one owned unminimized focused standard window") }
 let nativeAttributes = [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute, kAXZoomButtonAttribute]
 let native = nativeAttributes.compactMap { element(window, $0) }
@@ -189,16 +205,81 @@ report["reduceMotion"] = NSWorkspace.shared.accessibilityDisplayShouldReduceMoti
 func postMove(_ point: CGPoint) {
     guard CGWarpMouseCursorPosition(point) == .success else { abort("Cannot align real pointer with verified fixture/Trio event point") }
     guard let event = CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left) else { abort("Cannot construct move") }
-    event.flags = []; event.post(tap: .cghidEventTap)
+    event.flags = []
+    if let owned = visibleRows().first(where: { ($0.layer == 0 || $0.layer == 3) && $0.frame.contains(point) }), [fixturePID,trioPID].contains(owned.pid) {
+        event.setIntegerValueField(.mouseEventWindowUnderMousePointer,value:Int64(owned.id))
+        event.setIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent,value:Int64(owned.id))
+    }
+    event.post(tap: .cghidEventTap)
 }
 func postClick(_ point: CGPoint) {
     guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left),
           let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left) else { abort("Cannot construct click") }
     down.flags = []; up.flags = []
+    if let owned = visibleRows().first(where: { ($0.layer == 0 || $0.layer == 3) && $0.frame.contains(point) }), [fixturePID,trioPID].contains(owned.pid) {
+        for event in [down,up] {
+            event.setIntegerValueField(.mouseEventWindowUnderMousePointer,value:Int64(owned.id))
+            event.setIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent,value:Int64(owned.id))
+        }
+        report["postedClickWindowUnderPointer"] = owned.id
+    }
     down.setIntegerValueField(.mouseEventClickState, value: 1); up.setIntegerValueField(.mouseEventClickState, value: 1)
     down.post(tap: .cghidEventTap); settle(0.045); up.post(tap: .cghidEventTap)
 }
-if action == "drag-window" || action == "resize-window" {
+func sampleWindowAnimation() {
+let began = ProcessInfo.processInfo.systemUptime
+var samples: [[String: Any]] = []
+var distinct: Set<String> = [], earlyDistinct: Set<String> = []
+repeat {
+    let t = ProcessInfo.processInfo.systemUptime-began
+    if let current = frame(window) {
+        var sample: [String: Any] = ["t":t,"frame":rect(current)]
+        let cg = visibleRows()
+        if let owned = cg.first(where: { $0.id == fixtureCG[0].id }) {
+            sample["cgWindow"] = rect(owned.frame)
+            if let light = cg.first(where: { $0.id == overlay.id }) {
+                let dx = light.frame.minX-owned.frame.minX-(overlay.frame.minX-fixtureCG[0].frame.minX)
+                let dy = light.frame.minY-owned.frame.minY-(overlay.frame.minY-fixtureCG[0].frame.minY)
+                sample["panelVisible"] = true; sample["panel"] = light.json
+                sample["anchorErrorX"] = dx; sample["anchorErrorY"] = dy
+                sample["aligned"] = abs(dx)<=2 && abs(dy)<=2
+            } else { sample["panelVisible"] = false }
+        }
+        samples.append(sample)
+        let key = [current.minX,current.minY,current.width,current.height].map { String(format:"%.1f",Double($0)) }.joined(separator:",")
+        distinct.insert(key)
+        if t <= 0.3 { earlyDistinct.insert(key) }
+    }
+    settle(0.01)
+} while ProcessInfo.processInfo.systemUptime-began < 0.45
+report["animationSamples"] = samples
+report["animationVisibleMisalignedSamples"] = samples.filter { $0["panelVisible"] as? Bool == true && $0["aligned"] as? Bool != true }.count
+report["animationHiddenSamples"] = samples.filter { $0["panelVisible"] as? Bool != true }.count
+report["distinctGeometryCount"] = distinct.count
+report["distinctGeometryFirst300ms"] = earlyDistinct.count
+settle(0.25)
+}
+if ["snap-left","snap-right","center"].contains(action) {
+    guard CGPreflightPostEventAccess() else { abort("Posting not authorized") }
+    let green = controlPoints[2]!
+    guard fixtureIsFront(), let current = frame(window), close(current,windowFrame), let node = hit(green), knownLabel(node)==2 else { abort("Cannot safely hover own green control before arranging") }
+    postMove(green); settle(0.38)
+    guard let menu = visibleRows().first(where: { $0.pid == trioPID && $0.layer == 3 && $0.id != overlay.id && abs($0.frame.width-200)<2 && abs($0.frame.height-160)<2 }) else { abort("Own arrangement panel did not open") }
+    let tag = action == "snap-left" ? 1 : action == "snap-right" ? 2 : 3
+    let expected = ["Maximizar / restaurar","Metade esquerda","Metade direita","Centralizar"][tag]
+    let point = CGPoint(x:menu.frame.midX,y:menu.frame.minY+20+CGFloat(tag)*29)
+    guard let row = hit(point), pid(row)==trioPID, value(row,kAXRoleAttribute) as? String == kAXButtonRole,
+          [kAXTitleAttribute,kAXDescriptionAttribute].contains(where: { value(row,$0) as? String == expected }),
+          visibleRows().first(where: { ($0.layer==0 || $0.layer==3) && $0.frame.contains(point) })?.id == menu.id,
+          fixtureIsFront(), let current = frame(window), close(current,windowFrame) else { abort("Own arrangement row identity could not be proven") }
+    postMove(point); settle(0.04)
+    report["arrangementRow"] = expected
+    let result = AXUIElementPerformAction(row,kAXPressAction as CFString)
+    report["ownMenuAXPressResult"] = result.rawValue
+    guard result == .success else { abort("Own menu row rejected AXPress") }
+    report["posted"] = "Hover own green, verify floating own popup + row, AXPress only own Trio menu row"
+    sampleWindowAnimation()
+} else if action == "drag-window" || action == "resize-window" {
     guard CGPreflightPostEventAccess() else { abort("Posting not authorized") }
     let startPoint = action == "drag-window"
         ? CGPoint(x: windowFrame.maxX-120, y: nativeUnion.midY)
@@ -229,6 +310,10 @@ if action == "drag-window" || action == "resize-window" {
         event.setIntegerValueField(.mouseEventDeltaX,value:dx); event.setIntegerValueField(.mouseEventDeltaY,value:dy)
         event.setIntegerValueField(.mouseEventWindowUnderMousePointer,value:Int64(fixtureCG[0].id))
         event.setIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent,value:Int64(fixtureCG[0].id))
+        if type == .leftMouseDown {
+            report["postedMotionDownWindowUnderPointer"] = event.getIntegerValueField(.mouseEventWindowUnderMousePointer)
+            report["postedMotionDownWindowThatCanHandle"] = event.getIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent)
+        }
         event.post(tap:.cghidEventTap)
     }
     postMove(startPoint); settle(0.04)
@@ -243,6 +328,7 @@ if action == "drag-window" || action == "resize-window" {
         settle(0.02); motionSnapshot("drag-\(step)")
     }
     let end = CGPoint(x:startPoint.x+delta.x,y:startPoint.y+delta.y)
+    settle(0.12); motionSnapshot("held-120ms")
     motionEvent(.leftMouseUp,end)
     settle(0.07); motionSnapshot("quiet-70ms")
     settle(0.08); motionSnapshot("quiet-150ms")
@@ -319,37 +405,7 @@ if action == "drag-window" || action == "resize-window" {
         postClick(point)
         report["posted"] = "mouseMoved + physical-path leftMouseDown/leftMouseUp into Trio"
         if action == "click-green" {
-            let began = ProcessInfo.processInfo.systemUptime
-            var samples: [[String: Any]] = []
-            var distinct: Set<String> = [], earlyDistinct: Set<String> = []
-            repeat {
-                let t = ProcessInfo.processInfo.systemUptime-began
-                if let current = frame(window) {
-                    var sample: [String: Any] = ["t":t,"frame":rect(current)]
-                    let cg = visibleRows()
-                    if let owned = cg.first(where: { $0.id == fixtureCG[0].id }) {
-                        sample["cgWindow"] = rect(owned.frame)
-                        if let light = cg.first(where: { $0.id == overlay.id }) {
-                            let dx = light.frame.minX-owned.frame.minX-(overlay.frame.minX-fixtureCG[0].frame.minX)
-                            let dy = light.frame.minY-owned.frame.minY-(overlay.frame.minY-fixtureCG[0].frame.minY)
-                            sample["panelVisible"] = true; sample["panel"] = light.json
-                            sample["anchorErrorX"] = dx; sample["anchorErrorY"] = dy
-                            sample["aligned"] = abs(dx)<=2 && abs(dy)<=2
-                        } else { sample["panelVisible"] = false }
-                    }
-                    samples.append(sample)
-                    let key = [current.minX,current.minY,current.width,current.height].map { String(format:"%.1f",Double($0)) }.joined(separator:",")
-                    distinct.insert(key)
-                    if t <= 0.3 { earlyDistinct.insert(key) }
-                }
-                settle(0.01)
-            } while ProcessInfo.processInfo.systemUptime-began < 0.45
-            report["animationSamples"] = samples
-            report["animationVisibleMisalignedSamples"] = samples.filter { $0["panelVisible"] as? Bool == true && $0["aligned"] as? Bool != true }.count
-            report["animationHiddenSamples"] = samples.filter { $0["panelVisible"] as? Bool != true }.count
-            report["distinctGeometryCount"] = distinct.count
-            report["distinctGeometryFirst300ms"] = earlyDistinct.count
-            settle(0.25)
+            sampleWindowAnimation()
         } else { settle(0.65) }
     } else { report["posted"] = "mouseMoved only; no click"; settle(0.65) }
 }

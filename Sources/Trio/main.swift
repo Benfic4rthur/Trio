@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import ServiceManagement
 import Darwin
 
 private let reopenNotification = Notification.Name("com.allm4.Trio.showSettings")
@@ -174,6 +175,34 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 MainActor.assumeIsolated {
+    if CommandLine.arguments.contains("--diagnose-startup") {
+        let status: String
+        switch LoginRegistration.service.status {
+        case .enabled: status = "enabled"
+        case .notRegistered: status = "notRegistered"
+        case .requiresApproval: status = "requiresApproval"
+        case .notFound: status = "notFound"
+        @unknown default: status = "unknown"
+        }
+        let preferences = SettingsStore()
+        let result: [String: Any] = [
+            "version": Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
+            "build": Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "",
+            "loginItemStatus": status,
+            "startupWanted": UserDefaults.standard.bool(forKey: LoginRegistration.wantedKey),
+            "accessibilityTrusted": AXIsProcessTrusted(),
+            "postEventAccess": CGPreflightPostEventAccess(),
+            "controlsEnabled": preferences.enabled,
+            "preferredScale": preferences.scale,
+            "autoMaximizeNewWindows": preferences.autoMaximizeNewWindows,
+            "autoMaximizeExcludedBundleIDs": preferences.autoMaximizeExcludedBundleIDs,
+            "showInMenuBar": preferences.showInMenuBar,
+            "keepInDock": preferences.keepInDock
+        ]
+        if let data = try? JSONSerialization.data(withJSONObject: result, options: [.sortedKeys]),
+           let text = String(data: data, encoding: .utf8) { print(text) }
+        exit(EXIT_SUCCESS)
+    }
     guard let lease = InstanceLease() else {
         if !CommandLine.arguments.contains("--background") {
             DistributedNotificationCenter.default().postNotificationName(reopenNotification,

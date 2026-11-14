@@ -89,3 +89,57 @@ Nesta rodada foi medido o deslocamento efetivo do painel em relação aos bounds
 A função dos cliques verde e a geometria final foram confirmadas; o acompanhamento visual durante a interpolação **não foi aprovado nesta build**. A recomendação transmitida à sessão principal foi ocultar o painel durante movimento que não possa ser acompanhado de forma confirmada e reapresentá-lo após a posição final segura. O usuário havia autorizado esse comportamento para movimento/redimensionamento manual. O resultado programático permanece uma observação separada: um fallback apenas manual não comprova correção da interpolação do verde.
 
 A sessão principal interrompeu a rodada para instalar uma versão seguinte do auxiliar/inicialização e do fallback manual. Nenhuma aprovação destes resultados se transfere a essa versão futura sem novo ensaio. Os testes de snap esquerda/direita/centralizar desta rodada não chegaram a ser executados antes da interrupção. A fixture foi deixada viva e oculta; não há ensaio ativo. O agente não parou o Trio.
+
+## Regressão da build 6: processo 27923
+
+Esta é a rodada posterior ao fallback que oculta os controles durante mudanças de geometria. O aplicativo foi instalado e iniciado pela sessão principal, com sua própria autorização de Acessibilidade. Os testes abaixo não alteraram login, permissões, assinatura, auxiliar de início nem exclusões de aplicativos.
+
+### Movimento manual e pausa com botão pressionado
+
+Foram enviados mouseDown, dez passos mouseDragged e mouseUp exclusivamente para a barra ou canto inferior direito da fixture. Antes do mouseUp, houve uma pausa adicional de 120 ms, ainda com o arrasto pressionado.
+
+- **Arrasto:** a janela mudou de `(359,359,1044,710)` para `(538,458,1044,710)`. O painel ficou oculto em 11 amostras e permaneceu oculto durante a pausa pressionada de 120 ms. Houve **uma amostra inicial visível com erro de âncora de 18×10 px**, antes da ocultação. Aos 70 ms após soltar ainda estava oculto; aos 150 e 300 ms reapareceu exatamente alinhado. Isso melhora o rastro anterior, mas não constitui aprovação do critério estrito de zero amostra visível desalinhada. Evidência: `build/build6-drag.json`.
+- **Resize inferior direito:** a janela passou de 1044×710 a 1188×800, mesma origem `(538,458)`. O painel ficou oculto durante a sequência e durante a pausa pressionada, sem amostras visíveis desalinhadas. Ainda oculto aos 70 ms, alinhado aos 150/300 ms. Evidência: `build/build6-resize.json`.
+
+### Geometria programática, controles e menu
+
+| Ensaio | Resultado observado | Evidência |
+|---|---|---|
+| Verde maximiza e restaura | 15/14 geometrias distintas; destino na área útil e restauração exata a `(538,458,1188,800)`; sem fullscreen; zero amostras visíveis fora da âncora porque o painel fica oculto durante a interpolação | `build/build6-green-maximize.json`, `build/build6-green-restore.json` |
+| Metade esquerda pelo menu Trio | Frame final `(0,49,1312,1567)`; AXPress aceito na própria linha comprovada do menu; 13 geometrias e zero amostras visíveis desalinhadas | `build/build6-snap-left.json` |
+| Verde a partir da metade esquerda | Maximiza a `(0,49,2624,1567)` e restaura exatamente à metade esquerda; 13/14 geometrias, sem fullscreen, zero amostras visíveis desalinhadas | `build/build6-half-green-max.json`, `build/build6-half-green-restore.json` |
+| Metade direita pelo menu Trio | Frame final `(1312,49,1312,1567)`; 14 geometrias, sem fullscreen, zero amostras visíveis desalinhadas | `build/build6-snap-right.json` |
+| Centralizar pelo menu Trio | Mesmo tamanho de metade, origem final `(656,50)`; 14 geometrias, sem fullscreen, zero amostras visíveis desalinhadas | `build/build6-center.json` |
+| Três AXRaise e três cliques no conteúdo | Painel presente e acima da janela em todas as 33 amostras | `build/build6-content-clicks.json` |
+| Hover verde e entrada no popup | Dois painéis Trio permaneceram presentes, com a fixture ativa; não houve fechamento, minimização ou organização apenas por hover | `build/build6-hover-green.json`, `build/build6-hover-popup.json` |
+| Verde para vermelho, sem clique | Menu fechou, painel de controles permaneceu, fixture viva e geometria preservada | `build/build6-menu-before-red-hover.json`, `build/build6-red-hover.json` |
+| Sair da área do menu | Menu fechou e o painel dos controles permaneceu | `build/build6-menu-before-away.json`, `build/build6-away.json` |
+| Amarelo | Janela minimizada e fixture viva | `build/build6-click-yellow.json` |
+| Vermelho | Fixture encerrou; Trio 27923 permaneceu vivo | `build/build6-click-red.json` |
+
+Para os snaps, o harness abriu o popup pelo verde e aplicou `AXPress` **somente à linha NSButton do próprio Trio**, após comprovar PID, rótulo, geometria e nível flutuante. Não pressionou controles AX de outros aplicativos. O clique vermelho continuou usando o caminho físico completo até o botão Trio e seu encaminhamento HID original, preservando SmartClose.
+
+O ensaio de menu passou depois de o harness preencher os campos públicos CG que identificam a janela sob o mouse em seus eventos mouseMoved. As leituras confirmam identidade, presença, ordem e geometria dos painéis; não equivalem a uma inspeção pixel a pixel do desenho dos círculos.
+
+Após minimizar, o AppKit expôs a janela minimizada da fixture com subrole `AXDialog`. Um guarda inicial do harness abortou antes do vermelho. O guarda foi ajustado para permitir somente janelas **próprias minimizadas** como acompanhantes; a janela alvo focada continua obrigatoriamente padrão, não minimizada e com os três controles comprovados. A repetição do vermelho passou sem relaxar a identidade do aplicativo alvo.
+
+Ao terminar, uma nova fixture foi criada apenas para ficar viva e oculta, conforme solicitado pela sessão principal. Nenhum ensaio permanece ativo. O Trio não foi encerrado pelo agente. Estes resultados se referem ao processo 27923/build 6; uma alteração posterior do binário precisa de validação própria.
+
+## Regressão final representativa: build 7, processo 28619
+
+A build 7 acrescentou a ocultação antecipada no mouseDown comprovadamente situado na barra vazia ou borda da janela alvo. Esta rodada foi restrita à fixture 28211 e ao Trio instalado. O harness informou explicitamente os campos públicos CG de identificação da janela sob o mouse para reproduzir esse caminho de entrada; os valores enviados ao mouseDown do arrasto foram **1643 e 1643**, o ID CG real da fixture. Isso valida o percurso sintético com esses campos corretos; **não estabelece que todo mouse ou aplicativo físico forneça os mesmos metadados**.
+
+| Ensaio final | Resultado observado | Evidência |
+|---|---|---|
+| Arrasto, dez passos e pausa pressionada de 120 ms | Movimento real de `(320,260)` a `(499,359)`; zero amostras visíveis desalinhadas; painel oculto durante o arrasto e o hold. Ainda oculto aos 70 ms após soltar, visível e exatamente alinhado aos 150/300 ms. | `build/build7-drag.json` |
+| Três AXRaise e três cliques no conteúdo | Mesma geometria da janela, painel presente e acima da janela alvo em todas as amostras. Os eventos de clique também identificaram a janela própria nos campos CG. | `build/build7-content-clicks.json` |
+| Verde maximiza | 15 geometrias distintas, destino `(0,49,2624,1567)`, sem fullscreen; painel oculto durante interpolação, sem amostras visíveis fora da âncora. | `build/build7-green-maximize.json` |
+| Verde restaura | 14 geometrias distintas; restauração exata a `(499,359,900,620)`, sem fullscreen e sem rastro visível medido. | `build/build7-green-restore.json` |
+| Amarelo | Fixture minimizada, processo vivo. | `build/build7-click-yellow.json` |
+| Vermelho após restaurar somente a fixture | Caminho real NSButton Trio → encaminhamento HID ao original → SmartClose. Fixture encerrou e Trio 28619 permaneceu vivo. | `build/build7-click-red.json` |
+
+A restauração após o amarelo foi apenas preparação da fixture própria por setter AX de minimização; não substituiu o clique vermelho nem o seu encaminhamento. Nenhum aplicativo do usuário recebeu cliques, movimentos, ações AX ou ativação.
+
+O resize inferior direito e os menus/snaps foram validados na build 6 conforme seção anterior; não foram reexecutados amplamente nesta rodada representativa da build 7. A build 7 foi liberada para congelamento após os resultados acima. A última ação vermelha encerrou a própria fixture; nenhum ensaio permanece executando e o agente não parou o Trio. As verificações do registro real de login e da autorização própria do aplicativo foram realizadas separadamente pela sessão principal.
+
+Esta validação cobre os cenários e metadados descritos. Não é uma certificação universal de aplicativos, dispositivos de entrada, monitores ou Spaces; a revisão física do usuário e os testes de cobertura adicionais continuam distintos dos ensaios sintéticos registrados aqui.

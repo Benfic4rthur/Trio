@@ -1,49 +1,53 @@
-# Estado do protótipo
+# Estado do Trio
 
-Atualizado em **14/11/2026**, horário de São Paulo. **Protótipo em validação**, sem release pública.
+Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.0, build 7.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
-## Implementação e evidências
+## Versão, distribuição e instalação
+
+| Item | Estado verificado |
+| --- | --- |
+| Versão atual | **0.1.0, build 7**, instalada em `/Applications/Trio.app`. |
+| Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
+| Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
+| Pacote | `Trio-macOS-universal.zip`, **1.842.643 bytes**, com instalador, guia e app empacotados localmente. |
+| Integridade do ZIP | SHA-256 `79e9cb7cc3560ee10cf2b9c4b0209948881c73c4d177d188a41d6f28a7d0ef74`. |
+| Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
+| Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
+| Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
+| Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Funcionalidade e evidências
 
 | Item | Estado e evidência |
 | --- | --- |
-| Pasta inicial | Vazia; nenhum arquivo anterior sobrescrito. |
-| Ambiente | macOS 27.2.1 (26B131), Apple M1 Pro, Swift 6.4.2. |
-| APIs públicas | Documentação Apple e headers do SDK consultados; [pesquisa registrada](API-RESEARCH.md). |
-| Build instalada | `/Applications/Trio.app`, versão **0.1.0**, build **2**. O executável instalado contém **arm64 e x86_64**, verificado com `lipo`. Aplicativo e auxiliar têm build local Universal; Intel físico não testado. |
-| Geometria | **17 testes passaram**: ajustes de tamanho, obstáculos, dimensões inválidas, coordenadas negativas, região reservada e cobertura concêntrica dos discos nativos. |
-| Tamanho escolhido | Preferência inicial **1,5×**, configurável entre 1× e 5×. O tamanho efetivo depende do espaço da janela. |
-| Região reservada | Da borda esquerda da janela até **5 pt após a borda direita do verde original**. Crescimento vertical simétrico à linha original, dentro da janela e sem obstáculos. A base mantém os centros nativos. |
-| Controles originais e fundo | Círculos opacos concêntricos cobrem os discos originais em repouso. A área ao redor tem **1,5% de opacidade**; não há fundo retangular sólido. Geometria real do Codex: 16 pt → 24 pt, **1,5×**. Hover, sombras e barras personalizadas exigem conferência visual. |
-| Smart Close instalado | 0.4.2 build 10, ativo durante os ensaios; fonte correspondente e imports investigados. Preferências preservadas. |
-| Comparação A/B de clique | **Passou na fixture descartável:** `AXPress` fechou a janela sem terminar o processo; clique HID no botão original terminou o aplicativo. [Evidência e limites](SMART-CLOSE.md#validação-runtime-na-fixture-14112026). |
-| Encaminhamento pelo Trio | **Passou em uma build anterior**, pela fixture e pelos controles ampliados: vermelho encerrou a fixture com Smart Close; amarelo minimizou; verde maximizou e restaurou. Há revalidação da janela e hit-test antes do HID. A repetição da build atual está em andamento. [Detalhes](SMART-CLOSE.md#validação-completa-pelo-botão-ampliado-trio). |
-| Animação de janelas | Implementação curta e limitada para maximizar/restaurar, com cancelamento e respeito a **Reduzir Movimento**. Código integrado; ensaios de execução em andamento, sem resultado final declarado. |
-| Configurações | AppKit; typecheck arm64 e x86_64; renderização offscreen sem cortes. Pausar, esconder e encerrar são ações distintas. |
-| Presença e instância | Abertura manual, reabertura, lock de instância, início silencioso, Dock e menu opcionais implementados. A build atual está instalada. Login após uma sessão completa e matriz de esconder/reabrir/encerrar ainda pendentes. |
-| Novas janelas maximizadas | Preferência implementada e ativada por padrão. O motor observa criação de janelas e preserva diálogos e janelas sem redimensionamento permitido; teste real pendente. |
-| Codex e Finder | Sobreposição observada no Codex e em janela comum do Finder. A faixa ocupada por indicador de compartilhamento em outra janela do Finder levou à recusa segura, sem pedir novas permissões. Isso não estabelece cobertura geral desses aplicativos. |
-| Identidade visual | Ícone PNG 1024, ICNS com ×, − e setas, template vetorial de menu e banner criados localmente. ICNS instalado e do projeto com SHA-256 idêntico; [prévia final em 256/128/64 px](branding/trio-icon-final.png). |
-| Backup | Repositório privado; checkpoint `ae5f38c` salvo e conferido por MCP do GitHub. Novo checkpoint final aguarda os ensaios e ajustes atuais. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+| Geometria | **17 testes passaram**, cobrindo tamanho, obstáculos, dimensões inválidas, coordenadas negativas e oclusão concêntrica dos discos originais. |
+| Região dos controles | Da borda esquerda até **5 pt após o verde original**; base concêntrica, com tamanho ajustado à área segura. Codex medido: 16 pt → 24 pt, **1,5×**. |
+| Fundo | Círculos opacos cobrem os discos originais; área ao redor com 1,5% de opacidade, sem retângulo sólido. Estados de hover e barras diferentes precisam de revisão visual por aplicativo. |
+| Vermelho + Smart Close | Caminho real do NSButton Trio ao clique HID original passou na fixture, incluindo a build 7. A fixture encerrou e o Trio permaneceu ativo. `AXPress` direto não teve o mesmo resultado. [Detalhes](SMART-CLOSE.md). |
+| Amarelo | Minimização passou pelo controle ampliado, com fixture viva. |
+| Verde | Maximizar e restaurar passaram, com destino na área útil, restauração exata e ausência de fullscreen. A build 7 registrou 15 e 14 geometrias distintas na maximização/restauração. |
+| Arrasto e estabilidade | Rodada final da build 7: dez passos de arrasto e pausa pressionada; painel oculto durante movimento, sem amostras visíveis fora da âncora, alinhado novamente aos 150/300 ms após soltar. Três ativações e cliques no conteúdo mantiveram o painel acima da janela. |
+| Menu e organização | Hover, saída para vermelho, saída do menu e organização em metades passaram na build 6. A rodada representativa da build 7 não repetiu amplamente todos esses caminhos. |
+| Auto-maximização | Preferência implementada, com exceções por aplicativo. A janela inicial da fixture foi maximizada em ensaio; cobertura de alertas, diálogos e aplicativos diferentes segue na matriz de compatibilidade. |
+| Início e instância | Registro por **SMAppService.loginItem** efetivamente abriu o Trio em modo acessório, sem configurações, com uma instância e Acessibilidade preservada. Migração remove o antigo agente próprio e respeita a preferência desligada. Logout/login completo ainda pendente. |
+| Codex e Finder | Sobreposição observada. Indicadores de compartilhamento ou ferramentas ocupando a faixa podem levar à recusa segura sem solicitar novas permissões. |
+| Identidade visual | ICNS instalado corresponde ao do projeto; símbolos ×, − e setas conferidos. [Prévia em tamanhos reais](branding/trio-icon-final.png). |
 
-## Testes ainda necessários
+As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) identificam as builds e os processos de cada rodada. Resultados antigos não são atribuídos automaticamente a binários posteriores. O teste final foi representativo e restrito à fixture própria; não certifica todos os aplicativos ou dispositivos de entrada.
+
+## Cobertura ainda a ampliar
 
 | Cenário | Situação |
 | --- | --- |
-| Sobreposição no Codex | Geometria e presença já observadas; repetição de alinhamento, hover, cobertura dos originais e ferramentas próximas na build atual em andamento. |
-| Barras padrão e personalizadas | Fixture disponível; matriz de compatibilidade real ainda pendente. |
-| Vermelho ampliado + Smart Close | Ciclo completo passou na fixture em build anterior; repetir após as mudanças atuais. Múltiplas janelas e outros aplicativos ainda pendentes. |
-| Clique direito | Confirmar que o menu abre sem fechar, minimizar ou maximizar. |
-| Amarelo e verde | Minimizar, maximizar na área útil e restaurar passaram na fixture em build anterior. Repetir na build atual e conferir animação, término da geometria e cancelamento. |
-| Novas janelas | Confirmar maximização apenas das janelas elegíveis, com exclusão de alertas e diálogos. |
-| Movimento, resize e troca de foco | Confirmar que o painel acompanha ou desaparece sem permanecer sobre outra janela. |
-| Monitores e Spaces | Pendente. Apenas um monitor conectado durante a inspeção inicial. |
-| Sessão e reabertura | Validar login silencioso, abertura manual da instância existente e comportamento de esconder/encerrar. |
-| Intel físico e versões anteriores | Não testados. O destino mínimo declarado é macOS 13. |
+| Barras padrão e personalizadas | Aplicativos reais adicionais e versões diferentes precisam entrar na matriz. |
+| Smart Close com múltiplas janelas | Testar regras de primeira/última janela e mais aplicativos. |
+| Monitores e Spaces | Monitores adicionais, transições de Spaces, Mission Control e Stage Manager ainda não têm cobertura física completa. |
+| Início de sessão | O lançamento real pelo LoginItem passou; sair e entrar novamente na sessão ainda pendente. |
+| Intel físico e macOS anterior | Não testados. macOS 13 é o destino mínimo de compilação, não uma certificação de todas as versões. |
+| Instalação em outro Mac | Validar o pacote baixado, primeira abertura via Gatekeeper, renovação de Acessibilidade e rollback do instalador. |
 
-## Limites atuais
+## Limites de compatibilidade
 
-A cobertura inicial é a janela ativa. Janelas com controles ausentes, geometria ambígua ou ferramentas próximas sem área segura permanecem com os controles originais. A área quase transparente evita impor uma cor de barra ao aplicativo; os círculos opacos em repouso fazem a cobertura dos discos originais. Controles personalizados, sombras e estados de hover ainda exigem avaliação visual por aplicativo. O valor configurável de 5× é um limite solicitado, e não um tamanho real validado nas janelas comuns deste protótipo.
+O Trio atende à **janela ativa compatível**. Controles ausentes, identidade ambígua, ferramentas próximas ou informações de Acessibilidade incompletas levam à preservação dos controles originais. A preferência de 5× é um limite solicitado e pode ser reduzida pelo espaço; não foi validada como tamanho efetivo em janelas comuns.
 
-O Trio usa APIs públicas, sem injeção de código ou alteração de proteções do macOS. O botão vermelho encaminha um clique ao controle original; não usa encerramento direto para reproduzir as regras do Smart Close.
-
-Downloads públicos e uma futura página no catálogo ALLM4 dependem dos próximos ensaios. Nenhum site ou release pública foi criado nesta etapa.
+As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. O vermelho não usa encerramento direto ou fallback silencioso por AXPress para imitar o Smart Close.

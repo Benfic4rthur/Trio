@@ -1,0 +1,11 @@
+{
+  "name": "trio-site-qa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "qa": "node run.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.1"
+  }
+}

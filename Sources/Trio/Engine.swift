@@ -127,12 +127,13 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                 }
             })
         }
-        // Observe only an active drag and its release. Ordinary content clicks
-        // must never remove or rebuild a stable panel.
-        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDragged, .leftMouseUp]) { [weak self] event in
+        // Mouse-down is predictive only on verified native title-bar background
+        // or a resize edge. Content and toolbar controls remain untouched.
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
             MainActor.assumeIsolated {
                 guard let self, self.running, !self.forwarding, self.animatingWindow == nil else { return }
-                if event.type == .leftMouseDragged { self.scheduleDragFollow() }
+                if event.type == .leftMouseDown { self.anticipateNativeGeometryDrag(event) }
+                else if event.type == .leftMouseDragged { self.scheduleDragFollow() }
                 else {
                     self.dragFollowWork?.cancel(); self.dragFollowWork = nil
                     let wasManual = self.manualGeometryInteraction != nil
@@ -270,6 +271,46 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         dragFollowWork = work
         DispatchQueue.main.asyncAfter(deadline: .now()+delay, execute: work)
+    }
+
+    private func anticipateNativeGeometryDrag(_ event: NSEvent) {
+        guard settings.enabled, let current = target, panel.isVisible,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid,
+              let cgEvent = event.cgEvent,
+              cgEvent.getIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent) == Int64(current.id) else { return }
+        let point = cgEvent.location
+        guard !WindowTarget.toAX(panel.frame).contains(point),
+              let reserved = TrioLayout.availableRegion(window: current.frame, controls: current.buttonFrames),
+              !reserved.contains(point) else { return }
+        let nativeRow = current.buttonFrames.dropFirst().reduce(current.buttonFrames[0]) { $0.union($1) }
+        let titleHeight = min(current.frame.height, max(0, 2*(nativeRow.midY-current.frame.minY)))
+        let onTitle = point.x > current.buttonFrames[2].maxX+5 &&
+            point.x < current.frame.maxX && point.y >= current.frame.minY &&
+            point.y <= current.frame.minY+titleHeight
+        let onEdge = current.frame.insetBy(dx: -3, dy: -3).contains(point) &&
+            !current.frame.insetBy(dx: 3, dy: 3).contains(point)
+        guard onTitle || onEdge, let hit = AX.at(point), AX.pid(hit) == current.pid,
+              let role = AX.string(hit, kAXRoleAttribute) else { return }
+        let interactive: Set<String> = [kAXButtonRole, kAXTextFieldRole, kAXTextAreaRole,
+            kAXSliderRole, kAXMenuButtonRole, kAXPopUpButtonRole, NSAccessibility.Role.link.rawValue,
+            kAXCheckBoxRole, kAXRadioButtonRole, kAXComboBoxRole]
+        guard !interactive.contains(role) else { return }
+        let windowBackground = role == kAXWindowRole && AX.same(hit, current.window)
+        let staticTitle = role == kAXStaticTextRole &&
+            (AX.element(current.window, kAXTitleUIElementAttribute).map { AX.same($0, hit) } ?? false)
+        let titleBackground = onTitle && (windowBackground || role == kAXGroupRole || role == kAXToolbarRole || staticTitle)
+        guard titleBackground || (onEdge && windowBackground) else { return }
+        // Some custom toolbar elements expose a generic Group role but still
+        // have a click action. They must retain their ordinary behavior.
+        var actions: CFArray?
+        if AXUIElementCopyActionNames(hit, &actions) == .success,
+           let names = actions as? [String], names.contains(kAXPressAction) || names.contains(kAXShowMenuAction) { return }
+        guard let focused = AX.element(AXUIElementCreateApplication(current.pid), kAXFocusedWindowAttribute),
+              AX.same(focused, current.window),
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid else { return }
+        diagnostic("tracking predictive-geometry-hide id=\(current.id) title=\(titleBackground) edge=\(onEdge && windowBackground) role=\(role)")
+        beginManualGeometry(current)
+        settleGeometry(after: 0.07)
     }
 
     @discardableResult
