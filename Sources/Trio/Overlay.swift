@@ -158,11 +158,11 @@ final class ControlHitButton: NSButton {
             // The enlarged light remains inside the measured safe mask. At the
             // two ends it moves inward rather than extending onto a toolbar.
             let r = visualCircle(i)
-            let color = [NSColor(calibratedRed: 1, green: 0.36, blue: 0.33, alpha: 1),
-                         NSColor(calibratedRed: 1, green: 0.74, blue: 0.18, alpha: 1),
-                         NSColor(calibratedRed: 0.16, green: 0.8, blue: 0.25, alpha: 1)][i]
+            let color = [NSColor(calibratedRed: 1, green: 95/255, blue: 87/255, alpha: 1),
+                         NSColor(calibratedRed: 1, green: 188/255, blue: 46/255, alpha: 1),
+                         NSColor(calibratedRed: 40/255, green: 200/255, blue: 64/255, alpha: 1)][i]
             let shape = NSBezierPath(ovalIn: r)
-            NSGradient(starting: color.blended(withFraction: 0.12, of: .white)!, ending: color)!.draw(in: shape, angle: 90)
+            NSGradient(starting: color.blended(withFraction: 0.015, of: .white)!, ending: color)!.draw(in: shape, angle: 90)
             NSColor.black.withAlphaComponent(0.12).setStroke(); shape.lineWidth = 0.7; shape.stroke()
             drawSymbol(i, in: r)
         }

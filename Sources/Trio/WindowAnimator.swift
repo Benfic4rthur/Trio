@@ -1,5 +1,5 @@
 import AppKit
-import ApplicationServices
+@preconcurrency import ApplicationServices
 
 /// A short, bounded interpolation using only public AX setters. It does no
 /// work while idle and respects the system's Reduce Motion preference.
@@ -14,10 +14,13 @@ import ApplicationServices
 
     func animate(window: AXUIElement, from start: CGRect, to destination: CGRect,
                  canContinue: @escaping () -> Bool,
+                 onFrame: @escaping (CGRect) -> Void = { _ in },
                  completion: @escaping (Bool) -> Void) {
         cancel()
         guard !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion else {
-            completion(canContinue() && AX.setFrame(destination, on: window)); return
+            let accepted = canContinue() && AX.setFrame(destination, on: window)
+            if accepted, let actual = AX.rect(window) { onFrame(actual) }
+            completion(accepted); return
         }
         self.completion = completion
         let began = ProcessInfo.processInfo.systemUptime
@@ -36,11 +39,14 @@ import ApplicationServices
                                    height: start.height+(destination.height-start.height)*t)
                 let operationStart = ProcessInfo.processInfo.systemUptime
                 let accepted = AX.setFrame(frame, on: window)
+                if accepted, let actual = AX.rect(window) { onFrame(actual) }
                 steps += 1
                 // Slow applications get one final request instead of a queue
                 // of AX messages. No application can extend this animation.
                 if fraction >= 1 || steps >= 16 || !accepted || ProcessInfo.processInfo.systemUptime-operationStart > 0.05 {
-                    self.finish(canContinue() && AX.setFrame(destination, on: window))
+                    let finished = canContinue() && AX.setFrame(destination, on: window)
+                    if finished, let actual = AX.rect(window) { onFrame(actual) }
+                    self.finish(finished)
                 }
             }
         }

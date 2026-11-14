@@ -52,6 +52,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        TrioAppIcon.apply()
+        LoginRegistration.refreshAfterUpdate()
         configureApplicationMenu()
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(receiveReopen),
                                                             name: reopenNotification,

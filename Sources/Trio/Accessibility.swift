@@ -66,12 +66,17 @@ struct SystemWindow {
                   let pid = row[kCGWindowOwnerPID as String] as? Int32,
                   let dict = row[kCGWindowBounds as String] as? NSDictionary,
                   let bounds = CGRect(dictionaryRepresentation: dict),
-                  AX.validRect(bounds),
                   let layer = row[kCGWindowLayer as String] as? Int else {
                 // A partial list could omit a covering window. An unknown
                 // result must never become permission to draw or click.
                 return []
             }
+            // A finite zero-area window cannot cover any point. System UI
+            // creates these transiently while handling ordinary clicks.
+            if bounds.origin.x.isFinite, bounds.origin.y.isFinite,
+               bounds.size.width.isFinite, bounds.size.height.isFinite,
+               bounds.size.width == 0 || bounds.size.height == 0 { continue }
+            guard AX.validRect(bounds) else { return [] }
             windows.append(SystemWindow(id: id, pid: pid, bounds: bounds, layer: layer))
         }
         return windows

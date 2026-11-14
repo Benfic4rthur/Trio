@@ -1,5 +1,6 @@
 import AppKit
 import ServiceManagement
+import UniformTypeIdentifiers
 
 @MainActor
 final class SettingsStore: NSObject {
@@ -48,15 +49,25 @@ final class SettingsStore: NSObject {
         }
     }
 
+    var autoMaximizeExcludedBundleIDs: [String] {
+        didSet {
+            guard autoMaximizeExcludedBundleIDs != oldValue else { return }
+            defaults.set(autoMaximizeExcludedBundleIDs, forKey: "autoMaximizeExcludedBundleIDs")
+            onChange?()
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         defaults.register(defaults: ["controlsEnabled": true, "controlScale": 1.5,
                                      "showInMenuBar": false, "keepInDock": false,
-                                     "autoMaximizeNewWindows": true])
+                                     "autoMaximizeNewWindows": true,
+                                     "autoMaximizeExcludedBundleIDs": ["com.apple.ActivityMonitor", "com.apple.Terminal"]])
         enabled = defaults.bool(forKey: "controlsEnabled")
         showInMenuBar = defaults.bool(forKey: "showInMenuBar")
         keepInDock = defaults.bool(forKey: "keepInDock")
         autoMaximizeNewWindows = defaults.bool(forKey: "autoMaximizeNewWindows")
+        autoMaximizeExcludedBundleIDs = defaults.stringArray(forKey: "autoMaximizeExcludedBundleIDs") ?? []
         let savedScale = defaults.double(forKey: "controlScale")
         scale = savedScale.isFinite ? min(5, max(1, savedScale)) : 1.5
         super.init()
@@ -76,10 +87,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     private let menuCheckbox = NSButton(checkboxWithTitle: "Mostrar na barra de menus", target: nil, action: nil)
     private let dockCheckbox = NSButton(checkboxWithTitle: "Manter no Dock ao esconder", target: nil, action: nil)
     private let autoMaximizeCheckbox = NSButton(checkboxWithTitle: "Abrir novas janelas maximizadas", target: nil, action: nil)
+    private let exclusionsSummary = NSTextField(wrappingLabelWithString: "")
+    private var summarizedExclusions: [String]?
+    private var exceptionsController: AutoMaximizeExceptionsController?
     private let loginStatus = NSTextField(wrappingLabelWithString: "")
     private let loginSettingsButton = NSButton(title: "Abrir Itens de Início…", target: nil, action: nil)
     private let slider: NSSlider
-    private let loginService = SMAppService.agent(plistName: "com.allm4.Trio.login.plist")
+    private let loginService = LoginRegistration.service
 
     init(settings: SettingsStore, onHide: @escaping () -> Void,
          onQuit: @escaping () -> Void, onPermission: @escaping () -> Void) {
@@ -146,8 +160,12 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         autoMaximizeCheckbox.action = #selector(toggleAutoMaximize(_:))
         autoMaximizeCheckbox.toolTip = "Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo."
         let autoMaximizeExplanation = secondary("Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo.")
+        let exclusionsButton = button("Exceções…", action: #selector(showAutoMaximizeExceptions))
+        let autoMaximizeRow = horizontal([autoMaximizeCheckbox, NSView(), exclusionsButton], spacing: 8)
+        exclusionsSummary.font = .systemFont(ofSize: 11)
+        exclusionsSummary.textColor = .secondaryLabelColor
         let sizeSection = vertical([sizeHeading, sliderRow, sizeExplanation, greenExplanation,
-                                    autoMaximizeCheckbox, autoMaximizeExplanation], spacing: 6)
+                                    autoMaximizeRow, autoMaximizeExplanation, exclusionsSummary], spacing: 6)
 
         let statusTitle = sectionTitle("Estado do Trio")
         statusLabel.font = .systemFont(ofSize: 12)
@@ -203,13 +221,20 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         menuCheckbox.state = settings.showInMenuBar ? .on : .off
         dockCheckbox.state = settings.keepInDock ? .on : .off
         autoMaximizeCheckbox.state = settings.autoMaximizeNewWindows ? .on : .off
+        if summarizedExclusions != settings.autoMaximizeExcludedBundleIDs {
+            let identifiers = settings.autoMaximizeExcludedBundleIDs
+            let names = identifiers.prefix(3).map { AutoMaximizeExceptionsController.appName(for: $0) }
+            exclusionsSummary.stringValue = identifiers.isEmpty ? "Nenhum aplicativo nas exceções." :
+                "Exceções: " + names.joined(separator: ", ") + (identifiers.count > 3 ? " e mais \(identifiers.count-3)." : ".")
+            summarizedExclusions = identifiers
+        }
     }
 
     private func refreshLoginState(error: String? = nil) {
         let status = loginService.status
         loginCheckbox.state = (status == .enabled || status == .requiresApproval) ? .on : .off
         loginSettingsButton.isHidden = status != .requiresApproval && error == nil
-        if let error {
+        if let error = error ?? LoginRegistration.lastError {
             loginStatus.stringValue = error
             loginStatus.textColor = .systemRed
             return
@@ -217,13 +242,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         loginStatus.textColor = .secondaryLabelColor
         switch status {
         case .enabled:
-            loginStatus.stringValue = "Início automático ativo, sem abrir as configurações."
+            loginStatus.stringValue = "Início automático registrado, sem abrir as configurações."
         case .requiresApproval:
             loginStatus.stringValue = "Ative o Trio em Itens de Início nos Ajustes do Sistema."
         case .notFound:
-            let bundledPlist = Bundle.main.bundleURL
-                .appendingPathComponent("Contents/Library/LaunchAgents/com.allm4.Trio.login.plist")
-            if FileManager.default.fileExists(atPath: bundledPlist.path) {
+            let helperInfo = Bundle.main.bundleURL
+                .appendingPathComponent("Contents/Library/LoginItems/TrioLoginHelper.app/Contents/Info.plist")
+            if FileManager.default.fileExists(atPath: helperInfo.path) {
                 loginStatus.stringValue = "O início automático ainda não está ativo. Ative a opção para solicitar o registro."
             } else {
                 loginStatus.stringValue = "O auxiliar de início não foi encontrado nesta instalação."
@@ -259,10 +284,17 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         settings.autoMaximizeNewWindows = sender.state == .on
     }
 
+    @objc private func showAutoMaximizeExceptions() {
+        guard let window, window.attachedSheet == nil else { return }
+        let editor = AutoMaximizeExceptionsController(settings: settings) { [weak self] in self?.refreshControls() }
+        exceptionsController = editor
+        editor.show(asSheetOf: window)
+    }
+
     @objc private func toggleLogin(_ sender: NSButton) {
         do {
-            if sender.state == .on { try loginService.register() }
-            else { try loginService.unregister() }
+            if sender.state == .on { try LoginRegistration.enable() }
+            else { try LoginRegistration.disable() }
             refreshLoginState()
         } catch {
             refreshLoginState(error: "Não foi possível alterar o início automático: \(error.localizedDescription)")
@@ -316,5 +348,138 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         stack.alignment = .centerY
         stack.spacing = spacing
         return stack
+    }
+}
+
+@MainActor
+private final class AutoMaximizeExceptionsWindow: NSWindow {
+    override func cancelOperation(_ sender: Any?) { performClose(sender) }
+}
+
+@MainActor
+private final class AutoMaximizeExceptionsController: NSWindowController, NSWindowDelegate, NSTableViewDataSource, NSTableViewDelegate {
+    private let settings: SettingsStore
+    private let onChange: () -> Void
+    private let table = NSTableView()
+
+    init(settings: SettingsStore, onChange: @escaping () -> Void) {
+        self.settings = settings
+        self.onChange = onChange
+        let sheet = AutoMaximizeExceptionsWindow(contentRect: NSRect(x: 0, y: 0, width: 540, height: 390),
+                             styleMask: [.titled, .closable], backing: .buffered, defer: false)
+        sheet.title = "Exceções da maximização"
+        sheet.isReleasedWhenClosed = false
+        super.init(window: sheet)
+        sheet.delegate = self
+        let content = sheet.contentView!
+        let explanation = NSTextField(wrappingLabelWithString: "Novas janelas destes aplicativos mantêm o tamanho escolhido por eles. Você continua podendo usar o botão verde do Trio.")
+        explanation.font = .systemFont(ofSize: 13)
+        let application = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("application"))
+        application.width = 385
+        let remove = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("remove"))
+        remove.width = 95
+        table.addTableColumn(application); table.addTableColumn(remove)
+        table.frame = NSRect(x: 0, y: 0, width: 500, height: 270)
+        table.autoresizingMask = [.width]
+        table.headerView = nil
+        table.rowHeight = 49
+        table.intercellSpacing = NSSize(width: 8, height: 2)
+        table.delegate = self; table.dataSource = self
+        table.selectionHighlightStyle = .none
+        let scroll = NSScrollView()
+        scroll.hasVerticalScroller = true
+        scroll.borderType = .bezelBorder
+        scroll.documentView = table
+        let add = NSButton(title: "Adicionar app…", target: self, action: #selector(addApplication))
+        add.bezelStyle = .rounded
+        let done = NSButton(title: "Concluído", target: self, action: #selector(closeSheet))
+        done.bezelStyle = .rounded; done.keyEquivalent = "\r"
+        let footer = NSStackView(views: [add, NSView(), done])
+        footer.orientation = .horizontal; footer.spacing = 8
+        for view in [explanation, scroll, footer] { content.addSubview(view); view.translatesAutoresizingMaskIntoConstraints = false }
+        NSLayoutConstraint.activate([
+            explanation.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 20),
+            explanation.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -20),
+            explanation.topAnchor.constraint(equalTo: content.topAnchor, constant: 18),
+            scroll.leadingAnchor.constraint(equalTo: explanation.leadingAnchor),
+            scroll.trailingAnchor.constraint(equalTo: explanation.trailingAnchor),
+            scroll.topAnchor.constraint(equalTo: explanation.bottomAnchor, constant: 15),
+            scroll.bottomAnchor.constraint(equalTo: footer.topAnchor, constant: -15),
+            footer.leadingAnchor.constraint(equalTo: explanation.leadingAnchor),
+            footer.trailingAnchor.constraint(equalTo: explanation.trailingAnchor),
+            footer.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -18)
+        ])
+    }
+
+    required init?(coder: NSCoder) { fatalError("Use init(settings:onChange:)") }
+    func show(asSheetOf parent: NSWindow) { table.reloadData(); if let window { parent.beginSheet(window) } }
+    func numberOfRows(in tableView: NSTableView) -> Int { settings.autoMaximizeExcludedBundleIDs.count }
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        guard settings.autoMaximizeExcludedBundleIDs.indices.contains(row) else { return nil }
+        if tableColumn?.identifier.rawValue == "remove" {
+            let button = NSButton(title: "Remover", target: self, action: #selector(removeApplication(_:)))
+            button.tag = row; button.bezelStyle = .rounded; button.controlSize = .small
+            return button
+        }
+        let id = settings.autoMaximizeExcludedBundleIDs[row]
+        let name = NSTextField(labelWithString: Self.appName(for: id))
+        name.font = .systemFont(ofSize: 13, weight: .medium)
+        let identifier = NSTextField(labelWithString: id)
+        identifier.font = .systemFont(ofSize: 11); identifier.textColor = .secondaryLabelColor
+        identifier.lineBreakMode = .byTruncatingMiddle
+        let stack = NSStackView(views: [name, identifier])
+        stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 2
+        return stack
+    }
+
+    static func appName(for identifier: String) -> String {
+        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: identifier) {
+            return (FileManager.default.displayName(atPath: url.path) as NSString).deletingPathExtension
+        }
+        switch identifier {
+        case "com.apple.ActivityMonitor": return "Monitor de Atividade"
+        case "com.apple.Terminal": return "Terminal"
+        default: return identifier
+        }
+    }
+
+    @objc private func removeApplication(_ sender: NSButton) {
+        guard settings.autoMaximizeExcludedBundleIDs.indices.contains(sender.tag) else { return }
+        settings.autoMaximizeExcludedBundleIDs.remove(at: sender.tag)
+        table.reloadData(); onChange()
+    }
+
+    @objc private func addApplication() {
+        guard let window else { return }
+        let chooser = NSOpenPanel()
+        chooser.title = "Adicionar uma exceção"
+        chooser.prompt = "Adicionar"
+        chooser.allowedContentTypes = [.application]
+        chooser.canChooseDirectories = false; chooser.canChooseFiles = true
+        chooser.treatsFilePackagesAsDirectories = false
+        chooser.allowsMultipleSelection = false
+        chooser.directoryURL = URL(fileURLWithPath: "/Applications", isDirectory: true)
+        chooser.beginSheetModal(for: window) { [weak self] response in
+            guard response == .OK, let self, let url = chooser.url else { return }
+            guard let id = Bundle(url: url)?.bundleIdentifier,
+                  id.range(of: "^[A-Za-z0-9][A-Za-z0-9.-]*$", options: .regularExpression) != nil else {
+                let alert = NSAlert()
+                alert.messageText = "Não foi possível identificar esse aplicativo."
+                alert.informativeText = "Escolha um aplicativo macOS válido."
+                alert.beginSheetModal(for: window)
+                return
+            }
+            if !self.settings.autoMaximizeExcludedBundleIDs.contains(id) {
+                self.settings.autoMaximizeExcludedBundleIDs.append(id)
+                self.table.reloadData(); self.onChange()
+            }
+        }
+    }
+
+    override func cancelOperation(_ sender: Any?) { closeSheet() }
+    func windowShouldClose(_ sender: NSWindow) -> Bool { closeSheet(); return false }
+    @objc private func closeSheet() {
+        if let window { window.sheetParent?.endSheet(window); window.orderOut(nil) }
+        onChange()
     }
 }

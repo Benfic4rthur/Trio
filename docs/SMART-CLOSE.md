@@ -49,7 +49,7 @@ Teste em Codex deve priorizar alinhamento, hover, troca de foco e movimentação
 
 ## Estado desta investigação
 
-Intercepção e diferenças entre caminhos de API: estabelecidas por fonte oficial da versão e corroboradas por evidência estática local. Compatibilidade runtime do clique encaminhado **diretamente ao original**: validada na fixture em 14/11/2026 (detalhes abaixo). Caminho completo começando na sobreposição Trio: **a validar**; o teste direto não o substitui.
+Intercepção e diferenças entre caminhos de API: estabelecidas por fonte oficial da versão e corroboradas por evidência estática local. Compatibilidade runtime do clique encaminhado **diretamente ao original**: validada na fixture em 14/11/2026 (detalhes abaixo). Caminho completo começando na sobreposição Trio: **validado na fixture em 14/11/2026**, posteriormente ao teste direto; ver a seção final e `PIPELINE-VALIDATION.md`.
 
 
 ## Validação runtime na fixture (14/11/2026)
@@ -64,3 +64,14 @@ Teste executado por `Tools/SmartCloseCompatibilityTest.swift`, que só aceita bu
 Dois ensaios preliminares foram abortados **antes de postar clique**, pelas verificações: primeiro por interpretar um retângulo CG de camada alta como obstrução, depois por ausência de foco. O Mac mantém um overlay de brilho LUM4 (`com.allm4.lum4.personal`, layer 1001) e um retângulo Dock (layer 20) cobrindo o monitor na lista CG; eles não correspondem necessariamente a áreas interativas. Para o teste autorizado, a verificação conservou foco da fixture, primeiro retângulo de janela normal layer 0 e, decisivamente, hit-test global AX idêntico ao botão original. Nenhuma exclusão genérica deve ser aplicada ao produto sem validação de identidade e hit-test.
 
 Esse resultado estabelece a integração do **evento HID no controle original** com o SmartClose instalado. Ainda faltam validar, como uma etapa separada, a ocultação e reexibição do painel Trio e o encaminhamento iniciado pelo seu botão ampliado.
+
+
+## Validação completa pelo botão ampliado Trio
+
+Em 14/11/2026, o harness `Tools/ExerciseOverlay.swift` foi compilado e executado contra o Trio instalado em `/Applications/Trio.app`, processo 18066. O programa só aceita a fixture própria, verifica que ela está ativa, exige identidade AX/CG da janela e do painel e comprova os três botões Trio por seus rótulos conhecidos. A opção de ativação só admite o bundle e caminho conhecidos da fixture; nenhum aplicativo com dados do usuário pode ser escolhido.
+
+- **Amarelo:** o harness enviou um clique HID ao NSButton ampliado do Trio, que percorreu o fluxo real do produto. Resultado: `AXMinimized = true`, fixture viva, overlay removido ao minimizar (`build/exercise-click-yellow.json`).
+- **Vermelho:** clique HID ao NSButton ampliado do Trio. O processo da fixture encerrou; o Trio continuou ativo. O log da fixture registra `applicationShouldTerminate`, `applicationWillTerminate`, `windowWillClose` (`build/exercise-click-red.json`, `build/fixtures/pipeline-red.jsonl`). A fixture não encerra ao simplesmente fechar sua última janela. Isso valida o encaminhamento real pelo Trio com o SmartClose instalado, além do teste direto anterior.
+- **Verde:** dois cliques reais pelo mesmo harness maximizaram sem fullscreen e restauraram exatamente a geometria anterior (`build/exercise-click-green-maximize.json`, `build/exercise-click-green-restore.json`).
+
+Limites desse resultado: esses cliques foram validados em uma fixture padrão, sem documentos. Não comprovam cobertura universal. O teste sintético de movimento até o verde preservou a janela e o painel de controles, mas não abriu o menu nessa rodada; esse resultado permanece registrado separadamente, sem presumir equivalência com hover físico.

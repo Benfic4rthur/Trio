@@ -25,6 +25,15 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     private var forwarding = false
     private var running = false
     private var appliedScale: Double?
+    private var drawingNeedsControlGeometry = false
+    private var needsFullLayoutRefresh = false
+    private var dragFollowWork: DispatchWorkItem?
+    private var geometrySettleWork: DispatchWorkItem?
+    private var lastGeometryFollow: TimeInterval = 0
+    private var manualGeometryInteraction: (pid: pid_t, id: CGWindowID, window: AXUIElement)?
+    private let windowAnimator = WindowAnimator()
+    private var animatingWindow: AXUIElement?
+    private var animationToken: UUID?
     private var restore: [(pid: pid_t, window: AXUIElement, original: CGRect, applied: CGRect)] = []
 
     init(settings: SettingsStore, onStatus: @escaping (String) -> Void, onOpen: @escaping () -> Void) {
@@ -34,17 +43,19 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         panel.backgroundColor = .clear; panel.isOpaque = false; panel.hasShadow = false
         panel.hidesOnDeactivate = false; panel.isFloatingPanel = false
         panel.animationBehavior = .none
-        panel.level = .normal
+        panel.acceptsMouseMovedEvents = true
+        // A normal-level foreign window is raised again by its own clicks.
+        // Keep this nonactivating panel above ordinary app windows; Workspace
+        // and AX identity tracking remove it immediately on a real transition.
+        panel.level = .floating
         panel.collectionBehavior = [.moveToActiveSpace, .ignoresCycle, .fullScreenNone]
         panel.isExcludedFromWindowsMenu = true; panel.isReleasedWhenClosed = false
         let surface = NSView(frame: .zero)
         surface.wantsLayer = true
         surface.layer?.cornerRadius = 12; surface.layer?.cornerCurve = .continuous; surface.layer?.masksToBounds = true
-        let glass = NSVisualEffectView(frame: .zero)
-        glass.material = .titlebar; glass.blendingMode = .behindWindow; glass.state = .active
-        glass.alphaValue = 0.48
-        glass.autoresizingMask = [.width, .height]
-        surface.addSubview(glass)
+        // Concentric opaque lights themselves hide the original circles.
+        // The surrounding hit region needs virtually no visual background.
+        surface.layer?.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.015).cgColor
         controls.autoresizingMask = [.width, .height]
         surface.addSubview(controls)
         panel.contentView = surface
@@ -58,47 +69,85 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
             let item = NSMenuItem(); item.tag = tag; self?.arrange(item)
         }
         arrangementPanel.onOpen = { [weak self] in self?.arrangementPanel.hide(); self?.onOpen() }
-        arrangementPanel.onDismiss = { [weak self] in self?.controls.holdGreenHover = false; self?.controls.hover = nil }
+        arrangementPanel.onDismiss = { [weak self] in
+            guard let self else { return }
+            self.controls.holdGreenHover = false
+            if self.controls.hover == 2 { self.controls.hover = nil }
+        }
     }
 
     func start() {
         guard !running else { return }; running = true
+        AXUIElementSetMessagingTimeout(AXUIElementCreateSystemWide(), 0.12)
         let center = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.didActivateApplicationNotification, NSWorkspace.activeSpaceDidChangeNotification,
                      NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification] {
             tokens.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
-                    if name != NSWorkspace.didActivateApplicationNotification || self?.target?.pid != NSWorkspace.shared.frontmostApplication?.processIdentifier { self?.hide() }
-                    self?.scheduleRefresh(after: 0.04)
+                    guard let self else { return }
+                    let changedApp = self.target?.pid != NSWorkspace.shared.frontmostApplication?.processIdentifier
+                    self.diagnostic("tracking workspace=\(name.rawValue) changedPID=\(changedApp)")
+                    // Spaces and wake invalidate the drawing even when the
+                    // same app/window is reported during the transition.
+                    if name != NSWorkspace.didActivateApplicationNotification || changedApp { self.hide() }
+                    self.scheduleRefresh(after: 0.04)
                 }
             })
         }
         tokens.append(center.addObserver(forName: NSWorkspace.didLaunchApplicationNotification, object: nil, queue: .main) { [weak self] note in
             MainActor.assumeIsolated {
                 guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.4) { self?.observe(app) }
+                for delay in [0.4, 0.9] {
+                    DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
+                        guard let self, self.running, !app.isTerminated else { return }
+                        self.observe(app)
+                        if self.settings.enabled && self.settings.autoMaximizeNewWindows,
+                           let windows = AX.value(AXUIElementCreateApplication(app.processIdentifier), kAXWindowsAttribute) as? [AXUIElement] {
+                            for window in windows { self.maximizeNew(window, pid: app.processIdentifier) }
+                        }
+                        self.scheduleRefresh()
+                    }
+                }
             }
         })
         tokens.append(center.addObserver(forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main) { [weak self] note in
             MainActor.assumeIsolated {
                 guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
-                self?.removeObserver(app.processIdentifier); self?.scheduleRefresh()
+                self?.removeObserver(app.processIdentifier)
+                if self?.target?.pid == app.processIdentifier { self?.hide() }
+                self?.scheduleRefresh()
             }
         })
         for name in [NSApplication.didChangeScreenParametersNotification, NSApplication.didBecomeActiveNotification] {
             tokens.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
-                    if self?.target?.pid != NSWorkspace.shared.frontmostApplication?.processIdentifier { self?.hide() }
+                    if name == NSApplication.didChangeScreenParametersNotification ||
+                        self?.target?.pid != NSWorkspace.shared.frontmostApplication?.processIdentifier { self?.hide() }
                     self?.scheduleRefresh()
                 }
             })
         }
-        // AX and Workspace notifications own tracking. A global click monitor
-        // would remove the panel on ordinary clicks and race its own buttons.
+        // Observe only an active drag and its release. Ordinary content clicks
+        // must never remove or rebuild a stable panel.
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDragged, .leftMouseUp]) { [weak self] event in
+            MainActor.assumeIsolated {
+                guard let self, self.running, !self.forwarding, self.animatingWindow == nil else { return }
+                if event.type == .leftMouseDragged { self.scheduleDragFollow() }
+                else {
+                    self.dragFollowWork?.cancel(); self.dragFollowWork = nil
+                    let wasManual = self.manualGeometryInteraction != nil
+                    let changed = self.checkDraggedGeometry()
+                    self.manualGeometryInteraction = nil
+                    if wasManual || changed { self.settleGeometry(after: 0.07) }
+                }
+            }
+        }
         refresh()
     }
     func stop() {
         running = false; pending?.cancel(); greenMenu?.cancel(); hide()
+        windowAnimator.cancel(); animatingWindow = nil
+        manualGeometryInteraction = nil
         if let mouseMonitor { NSEvent.removeMonitor(mouseMonitor) }; mouseMonitor = nil
         for token in tokens { NSWorkspace.shared.notificationCenter.removeObserver(token); NotificationCenter.default.removeObserver(token) }
         tokens.removeAll()
@@ -141,8 +190,11 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     }
     fileprivate func handle(_ element: AXUIElement, notification: String) {
         guard running else { return }
+        let eventPID = AX.pid(element)
+        let affectsTarget = target.map { AX.same($0.window, element) } ?? false
+        diagnostic("tracking AX=\(notification) eventPID=\(eventPID) targetPID=\(target?.pid ?? 0) targetID=\(target?.id ?? 0) targetElement=\(affectsTarget)")
         if notification == kAXWindowCreatedNotification {
-            let pid = AX.pid(element)
+            let pid = eventPID
             watch(element, pid: pid)
             if settings.enabled && settings.autoMaximizeNewWindows {
                 DispatchQueue.main.asyncAfter(deadline: .now()+0.18) { [weak self] in self?.maximizeNew(element, pid: pid) }
@@ -154,38 +206,224 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
             watchedWindows[pid]?.removeAll { AX.same($0, element) }
         }
         guard !forwarding else { return }
-        if target?.isCurrent() == true { return }
-        hide(); scheduleRefresh(after: notification == kAXResizedNotification || notification == kAXMovedNotification ? 0.09 : 0.04)
+        if let animatingWindow, AX.same(element, animatingWindow),
+           notification == kAXMovedNotification || notification == kAXResizedNotification { return }
+        if affectsTarget && (notification == kAXUIElementDestroyedNotification || notification == kAXWindowMiniaturizedNotification) {
+            diagnostic("tracking hide=target-destroyed-or-minimized")
+            hide(); scheduleRefresh(after: 0.09); return
+        }
+        if affectsTarget && (notification == kAXMovedNotification || notification == kAXResizedNotification) {
+            if let current = target {
+                let visible = SystemWindow.visible().first { $0.id == current.id && $0.pid == current.pid && $0.layer == 0 }
+                let actual = AX.rect(element)
+                if visible.map({ !SystemWindow.close($0.bounds, current.frame, tolerance: 0.1) }) == true ||
+                    actual.map({ !SystemWindow.close($0, current.frame, tolerance: 0.1) }) == true {
+                    beginManualGeometry(current)
+                    settleGeometry(after: 0.07)
+                    return
+                }
+                drawingNeedsControlGeometry = true
+                settleGeometry(after: 0.07)
+            }
+        }
+        if let target, panel.isVisible {
+            switch drawingStability(of: target) {
+            case .stable:
+                diagnostic("tracking keep=focused-window-and-frame-stable")
+                return
+            case .transient(let reason):
+                diagnostic("tracking keep-transient=\(reason)")
+                scheduleRefresh(after: 0.04, attempt: 1)
+                return
+            case .changed(let reason):
+                diagnostic("tracking hide=\(reason)")
+                hide()
+            }
+        }
+        scheduleRefresh(after: notification == kAXResizedNotification || notification == kAXMovedNotification ? 0.09 : 0.04)
     }
-    private func scheduleRefresh(after seconds: Double = 0.05) {
+    private func scheduleRefresh(after seconds: Double = 0.05, attempt: Int = 0) {
         pending?.cancel()
-        let work = DispatchWorkItem { [weak self] in self?.refresh() }; pending = work
+        let work = DispatchWorkItem { [weak self] in self?.refresh(attempt: attempt) }; pending = work
         DispatchQueue.main.asyncAfter(deadline: .now()+seconds, execute: work)
     }
     private func hide() {
+        dragFollowWork?.cancel(); dragFollowWork = nil
+        geometrySettleWork?.cancel(); geometrySettleWork = nil
         arrangementPanel.hide()
         panel.ignoresMouseEvents = true
         panel.setAccessibilityHidden(true)
         controls.setAccessibilityHidden(true)
+        drawingNeedsControlGeometry = false
+        needsFullLayoutRefresh = false
         panel.orderOut(nil); target = nil; greenMenu?.cancel(); controls.resetHover()
     }
-    func refresh() {
+
+    private func scheduleDragFollow() {
+        guard target != nil, panel.isVisible, dragFollowWork == nil else { return }
+        let delay = max(0, 1.0/60 - (ProcessInfo.processInfo.systemUptime-lastGeometryFollow))
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.dragFollowWork = nil
+            self.lastGeometryFollow = ProcessInfo.processInfo.systemUptime
+            self.checkDraggedGeometry()
+        }
+        dragFollowWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now()+delay, execute: work)
+    }
+
+    @discardableResult
+    private func checkDraggedGeometry() -> Bool {
+        guard running, settings.enabled, !forwarding, animatingWindow == nil,
+              let current = target, panel.isVisible else { return false }
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid else { hide(); return false }
+        let windows = SystemWindow.visible()
+        guard let visible = windows.first(where: { $0.id == current.id && $0.pid == current.pid && $0.layer == 0 }) else {
+            hide(); scheduleRefresh(after: 0.07); return false
+        }
+        // Selecting or dragging content does not change the visible window.
+        guard !SystemWindow.close(visible.bounds, current.frame, tolerance: 0.1) else { return false }
+        beginManualGeometry(current)
+        settleGeometry(after: 0.07)
+        return true
+    }
+
+    private func beginManualGeometry(_ current: WindowTarget) {
+        if NSEvent.pressedMouseButtons & 1 != 0 {
+            manualGeometryInteraction = (current.pid, current.id, current.window)
+        }
+        diagnostic("tracking geometry-hide id=\(current.id) held=\(NSEvent.pressedMouseButtons & 1 != 0)")
+        hide()
+    }
+
+    private func holdingManualGeometry() -> Bool {
+        guard let interaction = manualGeometryInteraction else { return false }
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == interaction.pid else {
+            manualGeometryInteraction = nil; return false
+        }
+        if let focused = AX.element(AXUIElementCreateApplication(interaction.pid), kAXFocusedWindowAttribute),
+           !AX.same(focused, interaction.window) {
+            manualGeometryInteraction = nil; return false
+        }
+        guard NSEvent.pressedMouseButtons & 1 != 0 else {
+            manualGeometryInteraction = nil; return false
+        }
+        return true
+    }
+
+    private func settleGeometry(after delay: Double) {
+        geometrySettleWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard let self, self.running else { return }
+            self.geometrySettleWork = nil
+            // A paused drag is still an interaction. The mouse-up event will
+            // schedule the final survey; no polling timer is kept alive.
+            guard !self.holdingManualGeometry() else { return }
+            self.drawingNeedsControlGeometry = true
+            self.needsFullLayoutRefresh = true
+            self.scheduleRefresh(after: 0.01)
+        }
+        geometrySettleWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now()+delay, execute: work)
+    }
+
+    private enum DrawingStability {
+        case stable
+        case transient(String)
+        case changed(String)
+    }
+
+    /// Visual tracking intentionally does not read enabled states, descendants
+    /// or rebuild button objects. Content-focus changes may transiently alter
+    /// those AX values without changing the window supporting this drawing.
+    private func drawingStability(of target: WindowTarget) -> DrawingStability {
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == target.pid else { return .changed("front-pid") }
+        let windows = SystemWindow.visible()
+        guard let index = windows.firstIndex(where: { $0.id == target.id && $0.pid == target.pid && $0.layer == 0 }) else {
+            return .changed("cg-target-not-onscreen")
+        }
+        guard SystemWindow.close(windows[index].bounds, target.frame, tolerance: 1) else { return .changed("cg-frame") }
+        let mask = WindowTarget.toAX(panel.frame)
+        guard target.frame.contains(mask), !windows[..<index].contains(where: {
+            $0.pid != getpid() && $0.layer == 0 && $0.bounds.intersects(mask)
+        }) else { return .changed("cg-mask-obscured") }
+
+        let app = AXUIElementCreateApplication(target.pid)
+        AXUIElementSetMessagingTimeout(app, 0.04)
+        guard let focused = AX.element(app, kAXFocusedWindowAttribute) else { return .transient("ax-focused-unavailable") }
+        guard AX.same(focused, target.window) else { return .changed("ax-focused-window") }
+        if AX.flag(focused, kAXMinimizedAttribute) { return .changed("ax-minimized") }
+        guard let frame = AX.rect(focused) else { return .transient("ax-frame-unavailable") }
+        guard SystemWindow.close(frame, target.frame, tolerance: 1) else { return .changed("ax-frame") }
+        if drawingNeedsControlGeometry {
+            for (button, cached) in zip(target.buttons, target.buttonFrames) {
+                guard let frame = AX.rect(button) else { return .transient("ax-control-geometry-unavailable") }
+                guard SystemWindow.close(frame, cached, tolerance: 1) else { return .changed("ax-control-geometry") }
+            }
+            drawingNeedsControlGeometry = false
+        }
+        return .stable
+    }
+
+    private func retryDrawing(_ reason: String, attempt: Int) {
+        guard running, settings.enabled, attempt < 3 else {
+            diagnostic("tracking retry-exhausted reason=\(reason) attempt=\(attempt)")
+            return
+        }
+        diagnostic("tracking retry reason=\(reason) attempt=\(attempt+1)")
+        scheduleRefresh(after: 0.04 * Double(attempt+1), attempt: attempt+1)
+    }
+
+    func refresh() { refresh(attempt: 0) }
+
+    private func refresh(attempt: Int) {
         guard running, !forwarding else { return }
+        if animatingWindow != nil { return }
         guard settings.enabled else { hide(); onStatus("Trio pausado. Os controles originais estão disponíveis."); return }
         guard AXIsProcessTrusted() else { hide(); onStatus("Permita Acessibilidade para ativar os controles. Nenhuma permissão de gravação de tela é necessária."); return }
-        if target?.isCurrent() == true, appliedScale == settings.scale { return }
-        hide()
+        guard !holdingManualGeometry() else { return }
+        if let current = target, panel.isVisible,
+           let visible = SystemWindow.visible().first(where: { $0.id == current.id && $0.pid == current.pid && $0.layer == 0 }),
+           !SystemWindow.close(visible.bounds, current.frame, tolerance: 0.1) {
+            beginManualGeometry(current)
+            settleGeometry(after: 0.07)
+            return
+        }
+        if let target, panel.isVisible {
+            switch drawingStability(of: target) {
+            case .stable:
+                if appliedScale == settings.scale && !needsFullLayoutRefresh { return }
+                // Keep the last safe drawing while a new scale is surveyed.
+            case .transient(let reason):
+                diagnostic("tracking refresh-keep-transient=\(reason)")
+                retryDrawing(reason, attempt: attempt)
+                return
+            case .changed(let reason):
+                diagnostic("tracking refresh-hide=\(reason)")
+                hide()
+            }
+        }
         for app in NSWorkspace.shared.runningApplications { observe(app) }
         guard let candidate = WindowTarget.focused() else {
+            diagnostic("tracking candidate-unavailable attempt=\(attempt) kept=\(panel.isVisible)")
+            retryDrawing("candidate-unavailable", attempt: attempt)
+            if panel.isVisible { return }
             onStatus("Aguardando uma janela compatível. Janelas sem três controles acessíveis permanecem com os originais."); return
+        }
+        if let previous = target,
+           previous.pid != candidate.pid || previous.id != candidate.id || !AX.same(previous.window, candidate.window) {
+            hide()
         }
         watch(candidate.window, pid: candidate.pid)
         guard let reserve = TrioLayout.availableRegion(window: candidate.frame, controls: candidate.buttonFrames),
               let obstacles = candidate.obstacles(for: reserve) else {
+            retryDrawing("candidate-survey", attempt: attempt)
+            if panel.isVisible { return }
             onStatus("\(candidate.name): não foi possível confirmar o espaço livre. Os controles originais foram preservados."); return
         }
         guard case .success(let layout) = TrioLayout.calculate(window: candidate.frame, controls: candidate.buttonFrames, requestedScale: settings.scale, obstacles: obstacles),
               layout.effectiveScale >= 1.02 else {
+            if panel.isVisible { return }
             onStatus("\(candidate.name): espaço insuficiente para ampliar sem cobrir ferramentas."); return
         }
         // Reserve the largest safe hover area within the same strict region.
@@ -199,15 +437,19 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                               height: layout.frame.height+(expanded.height-layout.frame.height)*t)
             if !obstacles.contains(where: { $0.intersects(test) }) { mask = test; break }
         }
-        guard candidate.isCurrent(), candidate.ownsTopmostFrame(mask) else { return }
+        guard candidate.isCurrent(), candidate.ownsTopmostFrame(mask) else {
+            retryDrawing("candidate-final-validation", attempt: attempt)
+            return
+        }
         target = candidate
+        needsFullLayoutRefresh = false
         appliedScale = settings.scale
         panel.setFrame(WindowTarget.toCocoa(mask), display: false)
         controls.configure(layout: layout, mask: mask)
         panel.ignoresMouseEvents = false
         panel.setAccessibilityHidden(false)
         controls.setAccessibilityHidden(false)
-        panel.order(.above, relativeTo: Int(candidate.id))
+        panel.orderFrontRegardless()
         onStatus(String(format: "%@: %.2f× nesta janela. Preferência %.1f×; onda limitada à área segura.", candidate.name, layout.effectiveScale, settings.scale))
     }
     private func perform(_ index: Int) {
@@ -249,6 +491,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         let state = ForwardClickState(index: index, target: target)
         forwarding = true
+        AXUIElementSetMessagingTimeout(AXUIElementCreateSystemWide(), 0.015)
         hide()
         NSAccessibility.post(element: NSApplication.shared, notification: .layoutChanged)
 
@@ -286,7 +529,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         state.attempts += 1
         let windows = SystemWindow.visible()
-        let ownCG = windows.filter { $0.pid == getpid() && $0.layer == 0 && $0.bounds.contains(state.point) }
+        let ownCG = windows.filter { $0.pid == getpid() && $0.layer >= 0 && $0.bounds.contains(state.point) }
         let top = windows.first { $0.pid != getpid() && $0.layer == 0 && $0.bounds.contains(state.point) }
         guard !windows.isEmpty, top?.pid == state.target.pid, top?.id == state.target.id,
               originalClickTargetIsCurrent(state, windows: windows),
@@ -388,7 +631,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         if let monitor = state.globalMonitor { NSEvent.removeMonitor(monitor) }
         state.localMonitor = nil
         state.globalMonitor = nil
-        AXUIElementSetMessagingTimeout(AXUIElementCreateApplication(state.target.pid), 0.12)
+        AXUIElementSetMessagingTimeout(AXUIElementCreateSystemWide(), 0.12)
         if state.nudged || state.posted, !state.pointerMovedByUser,
            let original = state.originalPointer, let now = CGEvent(source: nil)?.location,
            hypot(now.x-state.point.x, now.y-state.point.y) < 2 {
@@ -405,7 +648,10 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute, kAXZoomButtonAttribute].allSatisfy { AX.element(window, $0).map { AX.flag($0, kAXEnabledAttribute) } ?? false }
     }
     private func maximizeNew(_ window: AXUIElement, pid: pid_t) {
+        guard let bundleID = NSRunningApplication(processIdentifier: pid)?.bundleIdentifier,
+              !settings.autoMaximizeExcludedBundleIDs.contains(bundleID) else { return }
         guard running, settings.enabled, settings.autoMaximizeNewWindows, pid != getpid(), canResize(window),
+              !(animatingWindow.map { AX.same($0, window) } ?? false),
               let frame = AX.rect(window), let screen = WindowTarget.screen(for: frame),
               !SystemWindow.close(frame, WindowTarget.toAX(screen.frame), tolerance: 1),
               !restore.contains(where: { $0.pid == pid && AX.same($0.window, window) }) else { return }
@@ -417,21 +663,64 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         hide()
         if let i = restore.firstIndex(where: { $0.pid == target.pid && AX.same($0.window, target.window) }),
            SystemWindow.close(target.frame, restore[i].applied, tolerance: 3) {
-            let prior = restore.remove(at: i)
-            _ = AX.setFrame(clamped(prior.original, to: WindowTarget.toAX(screen.visibleFrame)), on: target.window)
+            let prior = restore[i]
+            apply(clamped(prior.original, to: WindowTarget.toAX(screen.visibleFrame)), to: target.window, pid: target.pid, preserve: false, restoring: true)
         } else {
             apply(WindowTarget.toAX(screen.visibleFrame), to: target.window, pid: target.pid, preserve: true)
         }
         scheduleRefresh(after: 0.13)
     }
-    private func apply(_ rect: CGRect, to window: AXUIElement, pid: pid_t, preserve: Bool) {
+    private func apply(_ rect: CGRect, to window: AXUIElement, pid: pid_t, preserve: Bool, restoring: Bool = false) {
         guard let before = AX.rect(window), canResize(window) else { return }
-        guard AX.setFrame(rect, on: window), let applied = AX.rect(window) else { onStatus("Este aplicativo não permitiu organizar a janela."); return }
+        let foreground = NSWorkspace.shared.frontmostApplication?.processIdentifier == pid &&
+            (AX.element(AXUIElementCreateApplication(pid), kAXFocusedWindowAttribute).map { AX.same($0, window) } ?? false)
+        // Complete the previous operation's cancellation before establishing
+        // this operation's recovery record or animation token.
+        if foreground { windowAnimator.cancel(); hide() }
+        let operationToken = UUID()
         if preserve {
             restore.removeAll { $0.pid == pid && AX.same($0.window, window) }
-            restore.append((pid, window, before, applied))
+            restore.append((pid, window, before, before))
         }
-        scheduleRefresh(after: 0.13)
+        let finish: (Bool) -> Void = { [weak self] success in
+            guard let self else { return }
+            if self.animationToken == operationToken,
+               let animated = self.animatingWindow, AX.same(animated, window) {
+                self.animatingWindow = nil
+                self.animationToken = nil
+            }
+            guard self.running else { return }
+            let applied = AX.rect(window)
+            let completed = success && applied != nil &&
+                (!restoring || SystemWindow.close(applied!, rect, tolerance: 3))
+            guard completed, let applied else {
+                // A cancelled animation can leave an intermediate frame.
+                // Keep its original size recoverable on the next green click.
+                if let partial = applied,
+                   let index = self.restore.firstIndex(where: { $0.pid == pid && AX.same($0.window, window) }) {
+                    self.restore[index].applied = partial
+                }
+                self.onStatus("Este aplicativo não permitiu concluir a organização da janela."); self.scheduleRefresh(); return
+            }
+            if preserve,
+               let index = self.restore.firstIndex(where: { $0.pid == pid && AX.same($0.window, window) }) {
+                self.restore[index].applied = applied
+            } else {
+                self.restore.removeAll { $0.pid == pid && AX.same($0.window, window) }
+            }
+            self.scheduleRefresh(after: 0.035)
+        }
+        if foreground && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion && !SystemWindow.close(before, rect, tolerance: 1) {
+            animatingWindow = window; animationToken = operationToken
+            windowAnimator.animate(window: window, from: before, to: rect, canContinue: { [weak self] in
+                guard let self else { return false }
+                guard self.running, self.settings.enabled,
+                      NSWorkspace.shared.frontmostApplication?.processIdentifier == pid,
+                      let focused = AX.element(AXUIElementCreateApplication(pid), kAXFocusedWindowAttribute),
+                      AX.same(focused, window), !AX.flag(window, kAXMinimizedAttribute) else { return false }
+                return true
+            }, completion: finish)
+        } else { finish(AX.setFrame(rect, on: window)) }
     }
     private func clamped(_ rect: CGRect, to work: CGRect) -> CGRect {
         let size = CGSize(width: min(rect.width, work.width), height: min(rect.height, work.height))
@@ -468,6 +757,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         var frame = target.frame
         if sender.tag == 1 || sender.tag == 2 { frame = CGRect(x: work.minX + (sender.tag == 2 ? work.width/2 : 0), y: work.minY, width: work.width/2, height: work.height) }
         else { frame.origin = CGPoint(x: work.midX-frame.width/2, y: work.midY-frame.height/2); frame = clamped(frame, to: work) }
-        hide(); apply(frame, to: target.window, pid: target.pid, preserve: true)
+        hide()
+        apply(frame, to: target.window, pid: target.pid, preserve: false)
     }
 }

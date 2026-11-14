@@ -54,7 +54,7 @@ private final class ArrangementRowButton: NSButton {
         panel.hasShadow = true
         panel.hidesOnDeactivate = false
         panel.isFloatingPanel = false
-        panel.level = .normal
+        panel.level = .floating
         panel.collectionBehavior = [.moveToActiveSpace, .ignoresCycle, .fullScreenNone]
         panel.isExcludedFromWindowsMenu = true
         panel.isReleasedWhenClosed = false
