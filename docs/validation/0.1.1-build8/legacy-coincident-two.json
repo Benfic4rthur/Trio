@@ -1,0 +1,303 @@
+{
+  "fixtureBundleID" : "com.allm4.TrioFixture",
+  "fixturePID" : 35387,
+  "generatedAt" : "2026-11-14T22:14:17Z",
+  "privateAPIs" : false,
+  "snapshots" : [
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 328,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 351,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 374,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "focusedFrame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2161,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 35387
+        },
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2160,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 35387
+        }
+      ],
+      "raisedFixtureIndex" : 0,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 620,
+          "width" : 900,
+          "x" : 320,
+          "y" : 260
+        },
+        "id" : 2161,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 35387
+      },
+      "trioPanels" : [
+
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 328,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 351,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 374,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "focusedFrame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2160,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 35387
+        },
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2161,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 35387
+        }
+      ],
+      "raisedFixtureIndex" : 1,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 620,
+          "width" : 900,
+          "x" : 320,
+          "y" : 260
+        },
+        "id" : 2160,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 35387
+      },
+      "trioPanels" : [
+
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 328,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 351,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 374,
+            "y" : 268
+          },
+          "hitPID" : 35387,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "focusedFrame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2161,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 35387
+        },
+        {
+          "frame" : {
+            "height" : 620,
+            "width" : 900,
+            "x" : 320,
+            "y" : 260
+          },
+          "id" : 2160,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 35387
+        }
+      ],
+      "raisedFixtureIndex" : 0,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 620,
+          "width" : 900,
+          "x" : 320,
+          "y" : 260
+        },
+        "id" : 2161,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 35387
+      },
+      "trioPanels" : [
+
+      ]
+    }
+  ],
+  "trioPID" : 28619
+}

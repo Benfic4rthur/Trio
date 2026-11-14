@@ -1,0 +1,748 @@
+{
+  "accessibilityTrusted" : true,
+  "action" : "click-green",
+  "animationHiddenSamples" : 22,
+  "animationSamples" : [
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "frame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 321,
+          "y" : 261
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 4.166940925642848e-08
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "frame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 321,
+          "y" : 261
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.014121750002232147
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "frame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 321,
+          "y" : 261
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.027226625003095251
+    },
+    {
+      "cgWindow" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "frame" : {
+        "height" : 620,
+        "width" : 900,
+        "x" : 320,
+        "y" : 260
+      },
+      "panelVisible" : false,
+      "t" : 0.039738875002512941
+    },
+    {
+      "cgWindow" : {
+        "height" : 638,
+        "width" : 932,
+        "x" : 320,
+        "y" : 260
+      },
+      "frame" : {
+        "height" : 638,
+        "width" : 932,
+        "x" : 314,
+        "y" : 256
+      },
+      "panelVisible" : false,
+      "t" : 0.053214875002595363
+    },
+    {
+      "cgWindow" : {
+        "height" : 682,
+        "width" : 1012,
+        "x" : 314,
+        "y" : 256
+      },
+      "frame" : {
+        "height" : 682,
+        "width" : 1012,
+        "x" : 299,
+        "y" : 247
+      },
+      "panelVisible" : false,
+      "t" : 0.069884708336758194
+    },
+    {
+      "cgWindow" : {
+        "height" : 682,
+        "width" : 1012,
+        "x" : 299,
+        "y" : 247
+      },
+      "frame" : {
+        "height" : 750,
+        "width" : 1136,
+        "x" : 276,
+        "y" : 232
+      },
+      "panelVisible" : false,
+      "t" : 0.083599750003486406
+    },
+    {
+      "cgWindow" : {
+        "height" : 750,
+        "width" : 1136,
+        "x" : 276,
+        "y" : 232
+      },
+      "frame" : {
+        "height" : 835,
+        "width" : 1291,
+        "x" : 276,
+        "y" : 232
+      },
+      "panelVisible" : false,
+      "t" : 0.095847416669130325
+    },
+    {
+      "cgWindow" : {
+        "height" : 835,
+        "width" : 1291,
+        "x" : 247,
+        "y" : 213
+      },
+      "frame" : {
+        "height" : 941,
+        "width" : 1484,
+        "x" : 247,
+        "y" : 213
+      },
+      "panelVisible" : false,
+      "t" : 0.1147220416678465
+    },
+    {
+      "cgWindow" : {
+        "height" : 941,
+        "width" : 1484,
+        "x" : 211,
+        "y" : 189
+      },
+      "frame" : {
+        "height" : 1037,
+        "width" : 1658,
+        "x" : 179,
+        "y" : 168
+      },
+      "panelVisible" : false,
+      "t" : 0.13131970833637752
+    },
+    {
+      "cgWindow" : {
+        "height" : 1037,
+        "width" : 1658,
+        "x" : 179,
+        "y" : 168
+      },
+      "frame" : {
+        "height" : 1145,
+        "width" : 1854,
+        "x" : 179,
+        "y" : 168
+      },
+      "panelVisible" : false,
+      "t" : 0.14527583333619987
+    },
+    {
+      "cgWindow" : {
+        "height" : 1145,
+        "width" : 1854,
+        "x" : 142,
+        "y" : 144
+      },
+      "frame" : {
+        "height" : 1250,
+        "width" : 2046,
+        "x" : 142,
+        "y" : 144
+      },
+      "panelVisible" : false,
+      "t" : 0.1619170000012673
+    },
+    {
+      "cgWindow" : {
+        "height" : 1250,
+        "width" : 2046,
+        "x" : 107,
+        "y" : 120
+      },
+      "frame" : {
+        "height" : 1348,
+        "width" : 2224,
+        "x" : 107,
+        "y" : 120
+      },
+      "panelVisible" : false,
+      "t" : 0.17861312500099302
+    },
+    {
+      "cgWindow" : {
+        "height" : 1437,
+        "width" : 2385,
+        "x" : 74,
+        "y" : 98
+      },
+      "frame" : {
+        "height" : 1437,
+        "width" : 2385,
+        "x" : 74,
+        "y" : 98
+      },
+      "panelVisible" : false,
+      "t" : 0.19523158333686297
+    },
+    {
+      "cgWindow" : {
+        "height" : 1500,
+        "width" : 2500,
+        "x" : 44,
+        "y" : 79
+      },
+      "frame" : {
+        "height" : 1500,
+        "width" : 2500,
+        "x" : 23,
+        "y" : 65
+      },
+      "panelVisible" : false,
+      "t" : 0.22102662500037695
+    },
+    {
+      "cgWindow" : {
+        "height" : 1548,
+        "width" : 2587,
+        "x" : 23,
+        "y" : 65
+      },
+      "frame" : {
+        "height" : 1548,
+        "width" : 2587,
+        "x" : 6,
+        "y" : 54
+      },
+      "panelVisible" : false,
+      "t" : 0.23740679166803602
+    },
+    {
+      "cgWindow" : {
+        "height" : 1562,
+        "width" : 2618,
+        "x" : 6,
+        "y" : 54
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2623,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.25443595833348809
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2623,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.27095595833452535
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.2858660833335307
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.30326141666955664
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.31988333333356422
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.33666854166949634
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.34920420833441312
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.3633611250006652
+    },
+    {
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panelVisible" : false,
+      "t" : 0.37821883333526785
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 1,
+          "y" : 50
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.39278891666981508
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 1,
+          "y" : 50
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.40651866666667047
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 1,
+          "y" : 50
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.41988579166718409
+    },
+    {
+      "aligned" : true,
+      "anchorErrorX" : 0,
+      "anchorErrorY" : 0,
+      "cgWindow" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "frame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "panel" : {
+        "frame" : {
+          "height" : 30,
+          "width" : 74,
+          "x" : 1,
+          "y" : 50
+        },
+        "id" : 2306,
+        "layer" : 3,
+        "order" : 6,
+        "pid" : 37167
+      },
+      "panelVisible" : true,
+      "t" : 0.43620687500151689
+    }
+  ],
+  "animationVisibleMisalignedSamples" : 0,
+  "distinctGeometryCount" : 15,
+  "distinctGeometryFirst300ms" : 15,
+  "eventPoint" : {
+    "x" : 382.75,
+    "y" : 276
+  },
+  "fixtureBundleID" : "com.allm4.TrioFixture",
+  "fixtureCGWindowIDBefore" : 2526,
+  "fixturePID" : 39780,
+  "fixtureProcessRunningAfter" : true,
+  "fixtureStillFront" : true,
+  "fixtureWindowCount" : 15,
+  "fixtureWindowCountAfter" : 15,
+  "frontmostBundleIDAfter" : "com.allm4.TrioFixture",
+  "fullScreenAfter" : false,
+  "generatedAt" : "2026-11-14T22:29:46Z",
+  "minimizedAfter" : false,
+  "nativeControlsBefore" : [
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 328,
+      "y" : 268
+    },
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 351,
+      "y" : 268
+    },
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 374,
+      "y" : 268
+    }
+  ],
+  "overlayAboveFixtureBefore" : true,
+  "overlayBefore" : {
+    "frame" : {
+      "height" : 30,
+      "width" : 74,
+      "x" : 321,
+      "y" : 261
+    },
+    "id" : 2306,
+    "layer" : 3,
+    "order" : 6,
+    "pid" : 37167
+  },
+  "pointerAfter" : {
+    "x" : 434.23046875,
+    "y" : 245.30078125
+  },
+  "posted" : "mouseMoved + physical-path leftMouseDown\/leftMouseUp into Trio",
+  "postedClickWindowUnderPointer" : 2306,
+  "postEventAccess" : true,
+  "reduceMotion" : false,
+  "stripAXHits" : [
+    {
+      "description" : "Maximizar ou restaurar janela",
+      "frame" : {
+        "height" : 32,
+        "width" : 26.499999999999979,
+        "x" : 369.5,
+        "y" : 260
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Maximizar ou restaurar janela"
+    },
+    {
+      "description" : "Fechar pelo botão original",
+      "frame" : {
+        "height" : 32,
+        "width" : 28.500000000000021,
+        "x" : 320,
+        "y" : 260
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Fechar pelo botão original"
+    },
+    {
+      "description" : "Minimizar janela",
+      "frame" : {
+        "height" : 32,
+        "width" : 25,
+        "x" : 346.5,
+        "y" : 260
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Minimizar janela"
+    }
+  ],
+  "trioBundleID" : "com.allm4.Trio",
+  "trioControlsBefore" : [
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 28.500000000000021,
+        "x" : 320,
+        "y" : 260
+      },
+      "index" : 0,
+      "label" : "Fechar pelo botão original"
+    },
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 25,
+        "x" : 346.5,
+        "y" : 260
+      },
+      "index" : 1,
+      "label" : "Minimizar janela"
+    },
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 26.499999999999979,
+        "x" : 369.5,
+        "y" : 260
+      },
+      "index" : 2,
+      "label" : "Maximizar ou restaurar janela"
+    }
+  ],
+  "trioPanelsAfter" : [
+    {
+      "frame" : {
+        "height" : 30,
+        "width" : 74,
+        "x" : 1,
+        "y" : 50
+      },
+      "id" : 2306,
+      "layer" : 3,
+      "order" : 4,
+      "pid" : 37167
+    }
+  ],
+  "trioPanelsBefore" : [
+    {
+      "frame" : {
+        "height" : 30,
+        "width" : 74,
+        "x" : 321,
+        "y" : 261
+      },
+      "id" : 2306,
+      "layer" : 3,
+      "order" : 6,
+      "pid" : 37167
+    }
+  ],
+  "trioPID" : 37167,
+  "trioProcessRunningAfter" : true,
+  "windowAfter" : {
+    "height" : 1567,
+    "width" : 2624,
+    "x" : 0,
+    "y" : 49
+  },
+  "windowBefore" : {
+    "height" : 620,
+    "width" : 900,
+    "x" : 320,
+    "y" : 260
+  }
+}

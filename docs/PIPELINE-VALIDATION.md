@@ -143,3 +143,52 @@ A restauração após o amarelo foi apenas preparação da fixture própria por 
 O resize inferior direito e os menus/snaps foram validados na build 6 conforme seção anterior; não foram reexecutados amplamente nesta rodada representativa da build 7. A build 7 foi liberada para congelamento após os resultados acima. A última ação vermelha encerrou a própria fixture; nenhum ensaio permanece executando e o agente não parou o Trio. As verificações do registro real de login e da autorização própria do aplicativo foram realizadas separadamente pela sessão principal.
 
 Esta validação cobre os cenários e metadados descritos. Não é uma certificação universal de aplicativos, dispositivos de entrada, monitores ou Spaces; a revisão física do usuário e os testes de cobertura adicionais continuam distintos dos ensaios sintéticos registrados aqui.
+
+## Correção de identidade: versão 0.1.1, build 8, processo 37167
+
+A regra anterior exigia exatamente uma janela CG com o PID e os bounds da janela AX focada. Duas janelas do mesmo aplicativo com bounds idênticos produziam dois candidatos e eram rejeitadas. O probe da fixture reproduziu essa ambiguidade; a regra legada retornaria falso nas três alternâncias. O probe inicial não registrava foreground e não é usado, isoladamente, como comprovação visual de um aplicativo em segundo plano.
+
+A versão 0.1.1 resolve a identidade pública usando a ordem CG e os três hit-tests de Acessibilidade restritos ao aplicativo, comparados aos botões da janela focada, com revalidação de foco e geometria. Não usa AXWindowNumber nem APIs privadas. A produção não recebeu limite de quantidade de janelas; o gerador de fixture é limitado deliberadamente a até 15 janelas próprias.
+
+### Quinze janelas coincidentes
+
+Foi criada uma única instância da fixture 39090 com 15 janelas padrão em bounds coincidentes. O probe percorreu as 15 e retornou à primeira, totalizando 16 focos. Todos os cenários tiveram:
+
+- fixture realmente em primeiro plano e foco na janela levantada;
+- 15 candidatos CG coincidentes;
+- os três app-scoped AX hits iguais aos botões da janela focada, com foco estável;
+- painel Trio alinhado à região dos controles da janela focada.
+
+Os 15 IDs CG apareceram sucessivamente no topo, sem recusa por quantidade. O arquivo `docs/validation/0.1.1-build8/coincident-fifteen-focus.json` conserva os 16 snapshots. `Tools/InspectCoincidentWindows.swift` reproduz a preparação e os testes somente na fixture própria.
+
+### Duas ações na identidade correta
+
+A primeira fixture recebeu término normal externo depois da prova de foco, antes de qualquer clique deste ensaio. Foi criada outra fixture própria, processo 39780, novamente com 15 janelas. As duas ações foram executadas imediatamente em sequência:
+
+1. Com **15 candidatos coincidentes**, o verde restaurou a janela focada do monitor inteiro para `(320,260,900,620)`.
+2. O segundo clique maximizou **a mesma janela CG 2526** para `(0,49,2624,1567)`.
+
+O frame CG desse ID e o frame AX da janela alvo coincidiram ao fim de cada ação; as 15 janelas continuaram vivas, sem fullscreen e sem amostras visíveis desalinhadas durante a interpolação. Os arquivos `green-first.json` e `green-second.json` na pasta de validação conservam o caminho real CG → NSButton Trio e as geometrias. Os nomes dos arquivos originais em build usavam “maximize/restore”, mas a ordem real começou restaurando porque a janela já estava maximizada; a evidência é descrita pela operação efetivamente observada.
+
+### Recursos e limite da evidência
+
+O RSS do Trio foi lido antes de criar as 15 janelas (97.824 KiB) e após a sequência (97.792 KiB). Não houve crescimento observado nesse cenário; a variação pequena não é um benchmark formal nem uma promessa de memória fixa. A leitura de CPU durante os focos foi atividade transitória, não repouso. A sessão principal fez a medição de idle separadamente depois que a fixture foi ocultada.
+
+O Edge real foi apenas inspecionado, sem ativação, cliques ou leitura de conteúdo. Nessa leitura existia **uma** janela AX/CG, então não se afirma que este agente executou o caso físico de duas janelas do Edge. A regressão de múltiplas identidades coincidentes foi validada nas 15 janelas AppKit próprias; janelas de barras personalizadas continuam dependentes de suas provas públicas de geometria e controles.
+
+Após essa primeira rodada, a fixture 39780 ficou viva e oculta. Ela foi encerrada normalmente apenas para preparar o ciclo final abaixo. O Trio 37167 não foi parado. As evidências principais foram copiadas para `docs/validation/0.1.1-build8/` para não depender da preservação de executáveis e arquivos temporários em build.
+
+### Ciclo final de amarelo e vermelho: build 8 instalada
+
+Em 14/11/2026, às 22:41 UTC, foi conferida a instalação `0.1.1`, build `8`, e criada a fixture 41562 com duas janelas coincidentes, IDs CG 2670 e 2669. Os três focos do probe confirmaram foreground, os três hit-tests AX restritos ao aplicativo, dois candidatos CG e o painel alinhado. Os cliques seguintes foram enviados por eventos HID **ao NSButton do Trio real**, após comprovar os rótulos e a geometria de seus três controles; o encaminhamento ao botão original foi executado pelo próprio aplicativo instalado.
+
+| Ação | Resultado observado | Evidência preservada |
+|---|---|---|
+| Amarelo na janela 2670 | Somente 2670 minimizada; duas janelas e processo permaneceram vivos; 2669 continuou normal e visível | `yellow-first.json`, `yellow-red-result.json` |
+| Restaurar e levantar a própria janela por AX; repetir amarelo | Novamente somente 2670 minimizada, com 2669 normal; ambos os cliques partiram de dois candidatos coincidentes com prova de identidade completa | `yellow-second.json`, `yellow-red-result.json` |
+| Restaurar e levantar a própria janela; vermelho na 2670 | Evento `windowWillClose` da 2670, contagem de duas para uma e processo ainda vivo; a sobrevivente era 2669 | `red-first.json`, `yellow-red-result.json` |
+| Vermelho na última janela, 2669 | `applicationShouldTerminate` e `applicationWillTerminate`, seguido do fechamento da 2669; fixture encerrada e Trio 37167 continuou vivo | `red-last.json`, `yellow-red-result.json` |
+
+As restaurações AX foram apenas preparação da fixture entre os cliques. Nenhum `AXPress` no botão vermelho ou amarelo original substituiu o caminho de clique do produto. O término na última janela, em uma fixture configurada para continuar executando quando a última janela é fechada, confirma nesta build a integração com o SmartClose ativo. A sequência usa as regras atuais dele; não afirma que toda configuração de SmartClose de outros usuários tenha a mesma política.
+
+O arquivo `yellow-red-result.json` conserva as asserções verificadas, os estados AX/CG após cada minimização e os eventos mínimos da fixture, sem títulos ou conteúdos de janelas do usuário. Nenhuma janela Edge, Codex ou outro aplicativo do usuário recebeu ação. A última ação encerrou a fixture; os ensaios terminaram, sem processo de teste ou hover ativo. O aplicativo Trio instalado permaneceu funcionando e não houve nova alteração de produção nesta rodada.

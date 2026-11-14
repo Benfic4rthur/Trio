@@ -1,0 +1,1061 @@
+{
+  "accessibilityTrusted" : true,
+  "applications" : [
+    {
+      "active" : false,
+      "bundleID" : "com.microsoft.edgemac",
+      "hidden" : false,
+      "name" : "Microsoft Edge",
+      "pid" : 36976,
+      "running" : true,
+      "visibleCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1568,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2270,
+          "layer" : 0
+        }
+      ],
+      "windowCount" : 1,
+      "windows" : [
+        {
+          "AXFullScreen" : false,
+          "AXMain" : true,
+          "AXMinimized" : false,
+          "controls" : [
+            {
+              "actions" : [
+                "AXPress"
+              ],
+              "attribute" : "AXCloseButton",
+              "enabled" : true,
+              "frame" : {
+                "height" : 16,
+                "width" : 16,
+                "x" : 12,
+                "y" : 61
+              },
+              "present" : true,
+              "role" : "AXButton",
+              "subrole" : "AXCloseButton"
+            },
+            {
+              "actions" : [
+                "AXPress"
+              ],
+              "attribute" : "AXMinimizeButton",
+              "enabled" : true,
+              "frame" : {
+                "height" : 16,
+                "width" : 16,
+                "x" : 35,
+                "y" : 61
+              },
+              "present" : true,
+              "role" : "AXButton",
+              "subrole" : "AXMinimizeButton"
+            },
+            {
+              "actions" : [
+                "AXPress",
+                "AXZoomWindow",
+                "AXShowMenu"
+              ],
+              "attribute" : "AXZoomButton",
+              "enabled" : true,
+              "frame" : {
+                "height" : 16,
+                "width" : 16,
+                "x" : 58,
+                "y" : 61
+              },
+              "present" : true,
+              "role" : "AXButton",
+              "subrole" : "AXFullScreenButton"
+            }
+          ],
+          "focused" : true,
+          "frame" : {
+            "height" : 1568,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "index" : 0,
+          "nearbyElements" : {
+            "band" : {
+              "height" : 145,
+              "width" : 330,
+              "x" : 0,
+              "y" : 49
+            },
+            "elements" : [
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 36,
+                  "x" : 0,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 32,
+                  "x" : 40,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 32,
+                  "x" : 76,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 24,
+                  "x" : 116,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXPopUpButton"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 1963,
+                  "x" : 140,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXTextField"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 28,
+                  "x" : 6,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "enabled" : true,
+                "frame" : {
+                  "height" : 41,
+                  "width" : 2544,
+                  "x" : 80,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXTabGroup"
+              }
+            ],
+            "hierarchy" : [
+              {
+                "childCount" : 4,
+                "depth" : 0,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "role" : "AXWindow",
+                "subrole" : "AXStandardWindow"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 1,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 2,
+                "depth" : 2,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 3,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 3,
+                "depth" : 4,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 2,
+                "depth" : 5,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 112,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 8,
+                "depth" : 6,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 40,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 89
+                },
+                "hidden" : false,
+                "role" : "AXToolbar"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 36,
+                  "x" : 0,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 32,
+                  "x" : 40,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 32,
+                  "x" : 76,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 4,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 2107,
+                  "x" : 112,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXGroup",
+                "subrole" : "AXApplicationGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 24,
+                  "x" : 116,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXPopUpButton"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 1963,
+                  "x" : 140,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXTextField"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 28,
+                  "x" : 2107,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 3,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 24,
+                  "width" : 80,
+                  "x" : 2135,
+                  "y" : 97
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 9,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 40,
+                  "width" : 289,
+                  "x" : 2223,
+                  "y" : 89
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 40,
+                  "width" : 32,
+                  "x" : 2516,
+                  "y" : 89
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 32,
+                  "x" : 2552,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 36,
+                  "x" : 2588,
+                  "y" : 93
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 35,
+                "depth" : 6,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 32,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 129
+                },
+                "hidden" : false,
+                "role" : "AXToolbar"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 6,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXToolbar"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 28,
+                  "x" : 6,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXButton"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 16,
+                  "width" : 10,
+                  "x" : 38,
+                  "y" : 137
+                },
+                "hidden" : false,
+                "role" : "AXSplitter"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 48,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 82,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 116,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 150,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 184,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 218,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 252,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 286,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 320,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 354,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 388,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 422,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 456,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 490,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 524,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 558,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 592,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 626,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 660,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 694,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 728,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 762,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 796,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 830,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 68,
+                  "x" : 864,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 934,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 968,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 32,
+                  "x" : 1002,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 97,
+                  "x" : 1036,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 91,
+                  "x" : 1135,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 78,
+                  "x" : 1228,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 96,
+                  "x" : 1308,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 28,
+                  "width" : 150,
+                  "x" : 1406,
+                  "y" : 131
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 5,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1456,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 161
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 6,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1456,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 161
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 7,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1456,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 161
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 8,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1456,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 161
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "childCount" : 3,
+                "depth" : 5,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 41,
+                  "width" : 2544,
+                  "x" : 80,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXTabGroup"
+              },
+              {
+                "childCount" : 0,
+                "depth" : 3,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 1568,
+                  "width" : 2624,
+                  "x" : 0,
+                  "y" : 49
+                },
+                "hidden" : false,
+                "role" : "AXGroup"
+              },
+              {
+                "depth" : 1,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 16,
+                  "width" : 16,
+                  "x" : 12,
+                  "y" : 61
+                },
+                "role" : "AXButton",
+                "subrole" : "AXCloseButton"
+              },
+              {
+                "childCount" : 1,
+                "depth" : 1,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 16,
+                  "width" : 16,
+                  "x" : 58,
+                  "y" : 61
+                },
+                "role" : "AXButton",
+                "subrole" : "AXFullScreenButton"
+              },
+              {
+                "depth" : 1,
+                "enabled" : true,
+                "frame" : {
+                  "height" : 16,
+                  "width" : 16,
+                  "x" : 35,
+                  "y" : 61
+                },
+                "role" : "AXButton",
+                "subrole" : "AXMinimizeButton"
+              }
+            ],
+            "truncated" : false,
+            "visited" : 65
+          },
+          "positionSettable" : true,
+          "role" : "AXWindow",
+          "sizeSettable" : true,
+          "subrole" : "AXStandardWindow"
+        }
+      ],
+      "windowsAXResult" : 0
+    }
+  ],
+  "coordinates" : "AX\/CG origin top-left; points; NSScreen origin bottom-left",
+  "frontmostBundleID" : "com.openai.codex",
+  "generatedAt" : "2026-11-14T22:21:40Z",
+  "macOS" : "Version 27.2.1 (Build 26B131)",
+  "omits" : [
+    "window\/document titles",
+    "text values",
+    "URLs",
+    "labels",
+    "command lines"
+  ],
+  "postEventAccess" : true,
+  "screens" : [
+    {
+      "frame" : {
+        "height" : 1696,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 0
+      },
+      "scale" : 1,
+      "visibleFrame" : {
+        "height" : 1568,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 79
+      }
+    }
+  ]
+}

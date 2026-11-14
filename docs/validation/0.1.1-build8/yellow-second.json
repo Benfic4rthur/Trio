@@ -1,0 +1,176 @@
+{
+  "accessibilityTrusted" : true,
+  "action" : "click-yellow",
+  "coincidentFixtureAppHitProof" : true,
+  "coincidentFixtureCandidateCount" : 2,
+  "eventPoint" : {
+    "x" : 39,
+    "y" : 65
+  },
+  "fixtureBundleID" : "com.allm4.TrioFixture",
+  "fixtureCGWindowIDBefore" : 2670,
+  "fixturePID" : 41562,
+  "fixtureProcessRunningAfter" : true,
+  "fixtureStillFront" : true,
+  "fixtureWindowCount" : 2,
+  "fixtureWindowCountAfter" : 2,
+  "frontmostBundleIDAfter" : "com.allm4.TrioFixture",
+  "fullScreenAfter" : false,
+  "generatedAt" : "2026-11-14T22:41:19Z",
+  "minimizedAfter" : true,
+  "nativeControlsBefore" : [
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 8,
+      "y" : 57
+    },
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 31,
+      "y" : 57
+    },
+    {
+      "height" : 16,
+      "width" : 16,
+      "x" : 54,
+      "y" : 57
+    }
+  ],
+  "overlayAboveFixtureBefore" : true,
+  "overlayBefore" : {
+    "frame" : {
+      "height" : 30,
+      "width" : 74,
+      "x" : 1,
+      "y" : 50
+    },
+    "id" : 2306,
+    "layer" : 3,
+    "order" : 7,
+    "pid" : 37167
+  },
+  "pointerAfter" : {
+    "x" : 39,
+    "y" : 65
+  },
+  "posted" : "mouseMoved + physical-path leftMouseDown\/leftMouseUp into Trio",
+  "postedClickWindowUnderPointer" : 2306,
+  "postEventAccess" : true,
+  "reduceMotion" : false,
+  "restoredMinimizedFixtureRaised" : true,
+  "stripAXHits" : [
+    {
+      "description" : "Fechar pelo botão original",
+      "frame" : {
+        "height" : 32,
+        "width" : 28.5,
+        "x" : 0,
+        "y" : 49
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Fechar pelo botão original"
+    },
+    {
+      "description" : "Minimizar janela",
+      "frame" : {
+        "height" : 32,
+        "width" : 25,
+        "x" : 26.5,
+        "y" : 49
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Minimizar janela"
+    },
+    {
+      "description" : "Maximizar ou restaurar janela",
+      "frame" : {
+        "height" : 32,
+        "width" : 26.5,
+        "x" : 49.5,
+        "y" : 49
+      },
+      "pid" : 37167,
+      "role" : "AXButton",
+      "title" : "Maximizar ou restaurar janela"
+    }
+  ],
+  "trioBundleID" : "com.allm4.Trio",
+  "trioControlsBefore" : [
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 28.5,
+        "x" : 0,
+        "y" : 49
+      },
+      "index" : 0,
+      "label" : "Fechar pelo botão original"
+    },
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 25,
+        "x" : 26.5,
+        "y" : 49
+      },
+      "index" : 1,
+      "label" : "Minimizar janela"
+    },
+    {
+      "frame" : {
+        "height" : 32,
+        "width" : 26.5,
+        "x" : 49.5,
+        "y" : 49
+      },
+      "index" : 2,
+      "label" : "Maximizar ou restaurar janela"
+    }
+  ],
+  "trioPanelsAfter" : [
+    {
+      "frame" : {
+        "height" : 30,
+        "width" : 74,
+        "x" : 1,
+        "y" : 50
+      },
+      "id" : 2306,
+      "layer" : 3,
+      "order" : 7,
+      "pid" : 37167
+    }
+  ],
+  "trioPanelsBefore" : [
+    {
+      "frame" : {
+        "height" : 30,
+        "width" : 74,
+        "x" : 1,
+        "y" : 50
+      },
+      "id" : 2306,
+      "layer" : 3,
+      "order" : 7,
+      "pid" : 37167
+    }
+  ],
+  "trioPID" : 37167,
+  "trioProcessRunningAfter" : true,
+  "windowAfter" : {
+    "height" : 1567,
+    "width" : 2624,
+    "x" : 0,
+    "y" : 49
+  },
+  "windowBefore" : {
+    "height" : 1567,
+    "width" : 2624,
+    "x" : 0,
+    "y" : 49
+  }
+}

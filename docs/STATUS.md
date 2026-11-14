@@ -25,14 +25,15 @@ Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e fu
 | Cores e preferência | Cores explícitas em sRGB: vermelho `#FF5F57`, amarelo `#FFBC2E`, verde `#28C840`, sem branqueamento. A preferência existente de **1,3×** foi preservada; o padrão continua **1,5×**. |
 | Região dos controles | Da borda esquerda até **5 pt após o verde original**; base concêntrica, com tamanho ajustado à área segura. Codex medido: 16 pt → 24 pt, **1,5×**. |
 | Fundo | Círculos opacos cobrem os discos originais; área ao redor com 1,5% de opacidade, sem retângulo sólido. Estados de hover e barras diferentes precisam de revisão visual por aplicativo. |
-| Vermelho + Smart Close | Caminho real do NSButton Trio ao clique HID original passou na fixture, incluindo a build 7. A fixture encerrou e o Trio permaneceu ativo. `AXPress` direto não teve o mesmo resultado. [Detalhes](SMART-CLOSE.md). |
-| Amarelo | Minimização passou pelo controle ampliado, com fixture viva. |
+| Vermelho + Smart Close | Build 8: com duas janelas coincidentes, o vermelho fechou somente o alvo (2→1) mantendo o processo vivo; na última janela, o Smart Close encerrou a fixture. Cliques HID reais nos controles Trio, com identidade AX/CG comprovada; Trio permaneceu vivo. A comparação anterior por `AXPress` teve comportamento diferente. [Detalhes](SMART-CLOSE.md). |
+| Amarelo | Build 8: dois cliques minimizaram somente a janela alvo entre duas coincidentes, mantendo a outra normal e o processo vivo. A restauração AX da fixture entre cliques foi apenas preparação do teste. |
 | Verde | Build 8: dois cliques no mesmo ID entre 15 janelas coincidentes restauraram a 900×620 e maximizaram na área útil, com frames CG/AX iguais, sem fullscreen ou amostras de painel visível desalinhado. |
 | Arrasto e estabilidade | Rodada final da build 7: dez passos de arrasto e pausa pressionada; painel oculto durante movimento, sem amostras visíveis fora da âncora, alinhado novamente aos 150/300 ms após soltar. Três ativações e cliques no conteúdo mantiveram o painel acima da janela. |
 | Menu e organização | Hover, saída para vermelho, saída do menu e organização em metades passaram na build 6. A rodada representativa da build 7 não repetiu amplamente todos esses caminhos. |
 | Auto-maximização | Preferência implementada, com exceções por aplicativo. A janela inicial da fixture foi maximizada em ensaio; cobertura de alertas, diálogos e aplicativos diferentes segue na matriz de compatibilidade. |
 | Início e instância | Registro por **SMAppService.loginItem** efetivamente abriu o Trio em modo acessório, sem configurações, com uma instância e Acessibilidade preservada. Migração remove o antigo agente próprio e respeita a preferência desligada. Logout/login completo ainda pendente. |
 | Codex e Finder | Sobreposição observada. Indicadores de compartilhamento ou ferramentas ocupando a faixa podem levar à recusa segura sem solicitar novas permissões. |
+| CPU e memória | Amostra de repouso de 10,001 s na build 8: **0,0007% de um núcleo**, **26,235 MiB de pegada física** e **95,297 MiB de RSS**. Uma amostra curta não mede picos ou vazamentos prolongados. [Método e limites](PERFORMANCE.md). |
 | Identidade visual | ICNS instalado corresponde ao do projeto; símbolos ×, − e setas conferidos. [Prévia em tamanhos reais](branding/trio-icon-final.png). |
 
 As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) identificam as builds e os processos de cada rodada. Resultados antigos não são atribuídos automaticamente a binários posteriores. O ensaio de identidade da build 8 foi restrito à fixture própria; dois cliques no verde restauraram e maximizaram a mesma janela entre as 15, com frames CG/AX iguais e sem fullscreen ou painel visível desalinhado. Esses resultados não certificam todos os aplicativos ou dispositivos de entrada.
@@ -42,7 +43,7 @@ As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) id
 | Cenário | Situação |
 | --- | --- |
 | Barras padrão e personalizadas | Aplicativos reais adicionais e versões diferentes precisam entrar na matriz. |
-| Smart Close com múltiplas janelas | Testar regras de primeira/última janela e mais aplicativos. |
+| Smart Close com múltiplas janelas | A regra de primeira/última janela passou em duas janelas coincidentes da fixture na build 8; ampliar para mais aplicativos reais. |
 | Monitores e Spaces | Monitores adicionais, transições de Spaces, Mission Control e Stage Manager ainda não têm cobertura física completa. |
 | Início de sessão | O lançamento real pelo LoginItem passou; sair e entrar novamente na sessão ainda pendente. |
 | Intel físico e macOS anterior | Não testados. macOS 13 é o destino mínimo de compilação, não uma certificação de todas as versões. |

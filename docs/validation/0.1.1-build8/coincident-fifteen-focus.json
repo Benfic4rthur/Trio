@@ -1,0 +1,4282 @@
+{
+  "expectedWindowCount" : 15,
+  "fixtureBundleID" : "com.allm4.TrioFixture",
+  "fixturePID" : 39090,
+  "generatedAt" : "2026-11-14T22:26:25Z",
+  "privateAPIs" : false,
+  "snapshots" : [
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 0,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2455,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 1,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2454,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 2,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2453,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 3,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2452,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 4,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2451,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 5,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2450,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 6,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2449,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 7,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2448,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 8,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2447,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 9,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2446,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 10,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2445,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 11,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2444,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 12,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2443,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 13,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2442,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 14,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2441,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    },
+    {
+      "appHitProofAcceptsTopmostCandidate" : true,
+      "appRestrictedHitTests" : [
+        {
+          "attribute" : "AXCloseButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 8,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXCloseButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXMinimizeButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 31,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXMinimizeButton",
+          "sameFocusedButton" : true
+        },
+        {
+          "attribute" : "AXZoomButton",
+          "error" : 0,
+          "frame" : {
+            "height" : 16,
+            "width" : 16,
+            "x" : 54,
+            "y" : 57
+          },
+          "hitPID" : 39090,
+          "hitRole" : "AXButton",
+          "hitSubrole" : "AXFullScreenButton",
+          "sameFocusedButton" : true
+        }
+      ],
+      "fixtureIsFrontmost" : true,
+      "focusedFrame" : {
+        "height" : 1567,
+        "width" : 2624,
+        "x" : 0,
+        "y" : 49
+      },
+      "focusIsRaisedWindow" : true,
+      "focusStableAfterHitTests" : true,
+      "legacyUniqueMatcherAccepts" : false,
+      "matchingCGWindows" : [
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2455,
+          "layer" : 0,
+          "order" : 8,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2441,
+          "layer" : 0,
+          "order" : 9,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2442,
+          "layer" : 0,
+          "order" : 10,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2443,
+          "layer" : 0,
+          "order" : 11,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2444,
+          "layer" : 0,
+          "order" : 12,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2445,
+          "layer" : 0,
+          "order" : 13,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2446,
+          "layer" : 0,
+          "order" : 14,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2447,
+          "layer" : 0,
+          "order" : 15,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2448,
+          "layer" : 0,
+          "order" : 16,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2449,
+          "layer" : 0,
+          "order" : 17,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2450,
+          "layer" : 0,
+          "order" : 18,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2451,
+          "layer" : 0,
+          "order" : 19,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2452,
+          "layer" : 0,
+          "order" : 20,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2453,
+          "layer" : 0,
+          "order" : 21,
+          "pid" : 39090
+        },
+        {
+          "frame" : {
+            "height" : 1567,
+            "width" : 2624,
+            "x" : 0,
+            "y" : 49
+          },
+          "id" : 2454,
+          "layer" : 0,
+          "order" : 22,
+          "pid" : 39090
+        }
+      ],
+      "raisedFixtureIndex" : 0,
+      "selectedTopmostCandidate" : {
+        "frame" : {
+          "height" : 1567,
+          "width" : 2624,
+          "x" : 0,
+          "y" : 49
+        },
+        "id" : 2455,
+        "layer" : 0,
+        "order" : 8,
+        "pid" : 39090
+      },
+      "trioPanelAlignedToFocusedControls" : true,
+      "trioPanels" : [
+        {
+          "frame" : {
+            "height" : 30,
+            "width" : 74,
+            "x" : 1,
+            "y" : 50
+          },
+          "id" : 2306,
+          "layer" : 3,
+          "order" : 7,
+          "pid" : 37167
+        }
+      ]
+    }
+  ],
+  "trioPID" : 37167
+}

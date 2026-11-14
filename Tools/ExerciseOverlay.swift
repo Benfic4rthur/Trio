@@ -106,11 +106,18 @@ guard let windows = value(axApp, kAXWindowsAttribute) as? [AXUIElement], (1...15
       windows.allSatisfy({ pid($0) == fixturePID && value($0,kAXRoleAttribute) as? String == kAXWindowRole && (value($0,kAXSubroleAttribute) as? String == kAXStandardWindowSubrole || value($0,kAXMinimizedAttribute) as? Bool == true) }) else { abort("Fixture must expose one through fifteen owned standard windows") }
 report["fixtureWindowCount"] = windows.count
 if args.contains("--restore-minimized-fixture") {
+    var restored: AXUIElement?
     for owned in windows where value(owned,kAXMinimizedAttribute) as? Bool == true {
         guard AXUIElementSetAttributeValue(owned,kAXMinimizedAttribute as CFString,kCFBooleanFalse) == .success else { abort("Cannot restore minimized owned fixture for test setup") }
+        restored = owned
     }
     _ = fixture.activate(options:[.activateAllWindows])
     settle(0.45)
+    if let restored {
+        guard AXUIElementPerformAction(restored,kAXRaiseAction as CFString) == .success else { abort("Cannot raise restored owned fixture for test setup") }
+        settle(0.35)
+        report["restoredMinimizedFixtureRaised"] = true
+    }
 }
 if args.contains("--arrange-fixture-pair") {
     guard windows.count == 2 else { abort("Two owned fixture windows required for pair setup") }

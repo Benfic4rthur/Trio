@@ -1,0 +1,167 @@
+{
+  "appVersion": "0.1.1",
+  "appBuild": "8",
+  "trioPID": 37167,
+  "fixturePID": 41562,
+  "assertionsPassed": true,
+  "postActionInspections": [
+    {
+      "source": "v8-after-yellow-first.json",
+      "windowCount": 2,
+      "visibleCGWindows": [
+        {
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          },
+          "id": 2669,
+          "layer": 0
+        }
+      ],
+      "windows": [
+        {
+          "index": 0,
+          "minimized": false,
+          "focused": true,
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          }
+        },
+        {
+          "index": 1,
+          "minimized": true,
+          "focused": false,
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          }
+        }
+      ]
+    },
+    {
+      "source": "v8-after-yellow-second.json",
+      "windowCount": 2,
+      "visibleCGWindows": [
+        {
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          },
+          "id": 2669,
+          "layer": 0
+        }
+      ],
+      "windows": [
+        {
+          "index": 0,
+          "minimized": false,
+          "focused": true,
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          }
+        },
+        {
+          "index": 1,
+          "minimized": true,
+          "focused": false,
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          }
+        }
+      ]
+    },
+    {
+      "source": "v8-after-red-first.json",
+      "windowCount": 1,
+      "visibleCGWindows": [
+        {
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          },
+          "id": 2669,
+          "layer": 0
+        }
+      ],
+      "windows": [
+        {
+          "index": 0,
+          "minimized": false,
+          "focused": true,
+          "frame": {
+            "height": 1567,
+            "width": 2624,
+            "x": 0,
+            "y": 49
+          }
+        }
+      ]
+    }
+  ],
+  "fixtureEvents": [
+    {
+      "event": "windowDidMiniaturize",
+      "pid": 41562,
+      "time": 1794696072.535194,
+      "window": 2670
+    },
+    {
+      "event": "windowDidDeminiaturize",
+      "pid": 41562,
+      "time": 1794696080.806233,
+      "window": 2670
+    },
+    {
+      "event": "windowDidMiniaturize",
+      "pid": 41562,
+      "time": 1794696081.841,
+      "window": 2670
+    },
+    {
+      "event": "windowDidDeminiaturize",
+      "pid": 41562,
+      "time": 1794696083.4129229,
+      "window": 2670
+    },
+    {
+      "event": "windowWillClose",
+      "pid": 41562,
+      "time": 1794696084.1955981,
+      "window": 2670
+    },
+    {
+      "event": "applicationShouldTerminate",
+      "pid": 41562,
+      "time": 1794696085.9906049
+    },
+    {
+      "event": "applicationWillTerminate",
+      "pid": 41562,
+      "time": 1794696085.996272
+    },
+    {
+      "event": "windowWillClose",
+      "pid": 41562,
+      "time": 1794696085.997027,
+      "window": 2669
+    }
+  ],
+  "scope": "Only owned fixture and own Trio overlay; no user-app activation or actions"
+}

@@ -56,8 +56,8 @@ O ZIP em [`distribution/`](distribution/) é o pacote real compilado localmente,
 
 - **25 testes passaram.** Incluem geometria, limites de espaço, obstáculos, dimensões inválidas, coordenadas negativas, cobertura concêntrica e identificação conservadora de janelas coincidentes.
 - **Build 8 instalada e exercitada** em macOS 27.2.1, M1 Pro. O pacote e o auxiliar contêm arm64 e x86_64; hardware Intel ainda não foi testado.
-- **Smart Close 0.4.2:** o clique real no controle Trio chegou ao botão original e encerrou a fixture. `AXPress` direto teve comportamento diferente, mantendo o processo vivo. [Ensaio documentado](docs/SMART-CLOSE.md).
-- **Janelas coincidentes:** 15 janelas da fixture própria e 16 trocas de foco passaram, com painel alinhado e identidade AX dos três controles. Dois cliques no verde da build 8 restauraram e maximizaram a mesma janela entre as 15, com CG e AX concordando, sem fullscreen ou painel visível desalinhado. Os testes de vermelho, amarelo e arrasto das builds anteriores permanecem identificados separadamente. [Resultados e escopo](docs/PIPELINE-VALIDATION.md).
+- **Smart Close 0.4.2, build 8:** com duas janelas coincidentes, o vermelho fechou somente a janela alvo e preservou o processo; o vermelho na última janela encerrou a fixture pelo Smart Close. Os cliques reais passaram pelos controles Trio e pelos botões originais. No ensaio anterior de comparação, `AXPress` direto teve comportamento diferente, mantendo o processo vivo. [Ensaio documentado](docs/SMART-CLOSE.md).
+- **Janelas coincidentes:** 15 janelas da fixture própria e 16 trocas de foco passaram, com painel alinhado e identidade AX dos três controles. Dois cliques no verde da build 8 restauraram e maximizaram a mesma janela entre as 15, com CG e AX concordando, sem fullscreen ou painel visível desalinhado. Na build 8, o amarelo minimizou somente o alvo em dois cliques, mantendo a outra janela normal; os dois cliques vermelhos preservaram a regra de primeira/última janela do Smart Close. Os ensaios de arrasto das builds anteriores permanecem identificados separadamente. [Resultados e escopo](docs/PIPELINE-VALIDATION.md).
 - **Início silencioso:** o registro por LoginItem abriu a instância do Trio sem configurações, em modo acessório, preservando a autorização de Acessibilidade. Uma sessão completa de sair/entrar no macOS ainda não foi exercitada.
 - A sobreposição foi observada no **Codex** e no **Finder**. Regiões ocupadas por indicadores de compartilhamento ou ferramentas próximas podem ser recusadas.
 
@@ -82,4 +82,5 @@ O primeiro script compila o app e o auxiliar para arm64 e x86_64 e verifica a as
 | [APIs públicas](docs/API-RESEARCH.md) | Pesquisa técnica e limites das APIs. |
 | [Smart Close](docs/SMART-CLOSE.md) | Interceptação e comparação dos caminhos de clique. |
 | [Ensaios de execução](docs/PIPELINE-VALIDATION.md) | Resultados por build, sem extrapolar a cobertura. |
+| [CPU e memória](docs/PERFORMANCE.md) | Amostra de repouso com unidade Mach e pegada física separada do RSS. |
 | [Ícone final](docs/branding/trio-icon-final.png) | Arte do app em 256, 128 e 64 pixels. |
