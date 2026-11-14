@@ -49,4 +49,18 @@ Teste em Codex deve priorizar alinhamento, hover, troca de foco e movimentação
 
 ## Estado desta investigação
 
-Intercepção e diferenças entre caminhos de API: estabelecidas por fonte oficial da versão e corroboradas por evidência estática local. Compatibilidade runtime do clique encaminhado: **a validar**. Não se deve declarar integração concluída apenas com essa análise.
+Intercepção e diferenças entre caminhos de API: estabelecidas por fonte oficial da versão e corroboradas por evidência estática local. Compatibilidade runtime do clique encaminhado **diretamente ao original**: validada na fixture em 14/11/2026 (detalhes abaixo). Caminho completo começando na sobreposição Trio: **a validar**; o teste direto não o substitui.
+
+
+## Validação runtime na fixture (14/11/2026)
+
+Teste executado por `Tools/SmartCloseCompatibilityTest.swift`, que só aceita bundle `com.allm4.TrioFixture`, exige uma única instância/janela padrão sem documentos e valida controles e permissões já existentes. Não pede permissões nem permite selecionar aplicativos arbitrários.
+
+- **AXPress** (`build/smartclose-axpress-result.json`): resultado AX `0` (sucesso), janelas de 1 para 0, processo continuou ativo. O log registrou `windowWillClose`, sem encerramento. Isso confirma a diferença de comportamento nesta instalação.
+- A fixture sem janelas foi encerrada como limpeza do teste e reaberta limpa.
+- **Mouse HID ao botão original** (`build/smartclose-hid-result.json`): par `leftMouseDown`/`leftMouseUp` postado em `.cghidEventTap`; processo encerrou. Log `build/fixtures/hid-test.jsonl`: `applicationShouldTerminate`, `applicationWillTerminate`, `windowWillClose`. A fixture, por implementação, não encerra só porque sua última janela fechou. O mouseDown também não chegou ao monitor local da fixture, compatível com o SmartClose ter consumido o evento e solicitado término.
+- As preferências do SmartClose permaneceram intactas. Nenhuma janela de documentos do usuário recebeu cliques de fechar.
+
+Dois ensaios preliminares foram abortados **antes de postar clique**, pelas verificações: primeiro por interpretar um retângulo CG de camada alta como obstrução, depois por ausência de foco. O Mac mantém um overlay de brilho LUM4 (`com.allm4.lum4.personal`, layer 1001) e um retângulo Dock (layer 20) cobrindo o monitor na lista CG; eles não correspondem necessariamente a áreas interativas. Para o teste autorizado, a verificação conservou foco da fixture, primeiro retângulo de janela normal layer 0 e, decisivamente, hit-test global AX idêntico ao botão original. Nenhuma exclusão genérica deve ser aplicada ao produto sem validação de identidade e hit-test.
+
+Esse resultado estabelece a integração do **evento HID no controle original** com o SmartClose instalado. Ainda faltam validar, como uma etapa separada, a ocultação e reexibição do painel Trio e o encaminhamento iniciado pelo seu botão ampliado.

@@ -23,8 +23,30 @@ public struct LayoutFailure: Error, Equatable, Sendable {
 }
 
 public enum TrioLayout {
-    /// The returned opaque panel masks every original button, including the
-    /// area left behind when the replacement buttons are brought closer.
+    /// The complete reservation allowed by the user. Horizontal expansion ends
+    /// five points after the original green button; it never consumes the next
+    /// toolbar item. Vertical growth stays symmetric around the native row.
+    public static func availableRegion(window: CGRect, controls: [CGRect]) -> CGRect? {
+        guard valid(window), controls.count == 3, controls.allSatisfy(valid) else { return nil }
+        let nativeUnion = controls.dropFirst().reduce(controls[0]) { $0.union($1) }
+        let centerY = nativeUnion.midY
+        let diameter = controls.map(\.height).max()!
+        let tolerance = max(2, diameter * 0.2)
+        guard controls.allSatisfy({ abs($0.midY - centerY) <= tolerance }),
+              controls[0].maxX <= controls[1].minX,
+              controls[1].maxX <= controls[2].minX,
+              window.contains(nativeUnion),
+              nativeUnion.minX - window.minX <= min(120, window.width * 0.25),
+              centerY - window.minY <= min(120, window.height * 0.25) else { return nil }
+        let left = window.minX + 1
+        let right = min(window.maxX - 1, controls[2].maxX + 5)
+        let halfHeight = min(centerY - (window.minY + 1), window.maxY - 1 - centerY)
+        let region = CGRect(x: left, y: centerY - halfHeight, width: right - left, height: halfHeight * 2)
+        return valid(region) ? region : nil
+    }
+
+    /// Replacement circles stay concentric with the native traffic lights, so
+    /// their opaque disks cover the originals without an opaque panel backdrop.
     /// Obstacles are conservative bounds of nearby tools, never just centers.
     public static func calculate(
         window: CGRect,
@@ -56,33 +78,32 @@ public enum TrioLayout {
             return failure("Os controles não estão no canto superior esquerdo da janela.")
         }
 
+        guard let reservation = availableRegion(window: window, controls: controls) else {
+            return failure("Não há uma região segura para os controles nesta janela.")
+        }
         let mask = nativeUnion.insetBy(dx: -2, dy: -2)
-        let safeWindow = window.insetBy(dx: 1, dy: 1)
         let desiredScale = min(5, max(1, requestedScale))
 
         func candidate(_ scale: Double) -> ControlLayout? {
             let diameter = nativeDiameter * CGFloat(scale)
-            let gap: CGFloat = 2
-            let padding: CGFloat = 3
-            let groupWidth = diameter * 3 + gap * 2
-            // Keep the group centered on the native controls. Only shift right
-            // if its padding would otherwise leave the target window.
-            let left = max(nativeUnion.midX - groupWidth / 2, safeWindow.minX + padding)
-            let top = centerY - diameter / 2
-            let circles = (0..<3).map { index in
-                CGRect(x: left + CGFloat(index) * (diameter + gap), y: top,
+            let circles = controls.map { original in
+                CGRect(x: original.midX - diameter / 2, y: original.midY - diameter / 2,
                        width: diameter, height: diameter)
             }
-            let group = CGRect(x: left, y: top, width: groupWidth, height: diameter)
-            let panel = mask.union(group.insetBy(dx: -padding, dy: -padding))
-            guard valid(panel), safeWindow.contains(panel),
+            // Keep this geometric proof even though centers currently coincide:
+            // later alignment changes must not reveal a native colored crescent.
+            guard zip(circles, controls).allSatisfy({ replacement, original in
+                hypot(replacement.midX - original.midX, replacement.midY - original.midY) +
+                    max(original.width, original.height) / 2 <= replacement.width / 2 + 0.000001
+            }) else { return nil }
+            let envelope = circles.dropFirst().reduce(circles[0]) { $0.union($1) }
+            let panel = mask.union(envelope.insetBy(dx: -1, dy: -1))
+            guard valid(panel), reservation.contains(panel),
                   !obstacles.contains(where: { overlaps(panel, $0) }) else { return nil }
             return ControlLayout(frame: panel, circles: circles, effectiveScale: scale)
         }
 
-        // Every candidate panel contains the preceding one. The fixed native
-        // mask plus a centered, expanding group makes a binary search safe even
-        // with obstacles above, below, or between the original buttons.
+        // Concentric circles form nested envelopes, allowing a bounded search.
         guard var best = candidate(1) else {
             return failure("Não há espaço seguro para cobrir e ampliar os controles sem encobrir ferramentas.")
         }
@@ -104,8 +125,8 @@ public enum TrioLayout {
 
     private static func valid(_ rect: CGRect) -> Bool {
         rect.origin.x.isFinite && rect.origin.y.isFinite &&
-        rect.width.isFinite && rect.height.isFinite &&
-        rect.width > 0 && rect.height > 0 &&
+        rect.size.width.isFinite && rect.size.height.isFinite &&
+        rect.size.width > 0 && rect.size.height > 0 &&
         rect.minX.isFinite && rect.minY.isFinite &&
         rect.maxX.isFinite && rect.maxY.isFinite
     }

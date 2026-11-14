@@ -16,7 +16,7 @@ final class SettingsStore: NSObject {
 
     var scale: Double {
         didSet {
-            let bounded = scale.isFinite ? min(5, max(1, scale)) : 2
+            let bounded = scale.isFinite ? min(5, max(1, scale)) : 1.5
             if scale != bounded { scale = bounded }
             guard scale != oldValue else { return }
             defaults.set(scale, forKey: "controlScale")
@@ -40,15 +40,25 @@ final class SettingsStore: NSObject {
         }
     }
 
+    var autoMaximizeNewWindows: Bool {
+        didSet {
+            guard autoMaximizeNewWindows != oldValue else { return }
+            defaults.set(autoMaximizeNewWindows, forKey: "autoMaximizeNewWindows")
+            onChange?()
+        }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: ["controlsEnabled": true, "controlScale": 2.0,
-                                     "showInMenuBar": false, "keepInDock": false])
+        defaults.register(defaults: ["controlsEnabled": true, "controlScale": 1.5,
+                                     "showInMenuBar": false, "keepInDock": false,
+                                     "autoMaximizeNewWindows": true])
         enabled = defaults.bool(forKey: "controlsEnabled")
         showInMenuBar = defaults.bool(forKey: "showInMenuBar")
         keepInDock = defaults.bool(forKey: "keepInDock")
+        autoMaximizeNewWindows = defaults.bool(forKey: "autoMaximizeNewWindows")
         let savedScale = defaults.double(forKey: "controlScale")
-        scale = savedScale.isFinite ? min(5, max(1, savedScale)) : 2
+        scale = savedScale.isFinite ? min(5, max(1, savedScale)) : 1.5
         super.init()
     }
 }
@@ -65,6 +75,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     private let loginCheckbox = NSButton(checkboxWithTitle: "Iniciar silenciosamente com o macOS", target: nil, action: nil)
     private let menuCheckbox = NSButton(checkboxWithTitle: "Mostrar na barra de menus", target: nil, action: nil)
     private let dockCheckbox = NSButton(checkboxWithTitle: "Manter no Dock ao esconder", target: nil, action: nil)
+    private let autoMaximizeCheckbox = NSButton(checkboxWithTitle: "Abrir novas janelas maximizadas", target: nil, action: nil)
     private let loginStatus = NSTextField(wrappingLabelWithString: "")
     private let loginSettingsButton = NSButton(title: "Abrir Itens de Início…", target: nil, action: nil)
     private let slider: NSSlider
@@ -77,7 +88,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         self.onQuit = onQuit
         self.onPermission = onPermission
         slider = NSSlider(value: settings.scale, minValue: 1, maxValue: 5, target: nil, action: nil)
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 650),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 690),
                               styleMask: [.titled, .closable, .miniaturizable],
                               backing: .buffered, defer: false)
         window.title = "Trio"
@@ -131,7 +142,12 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         let sliderRow = horizontal([secondary("1×"), slider, secondary("5×")], spacing: 10)
         let sizeExplanation = secondary("O tamanho efetivo se ajusta ao espaço livre da barra. Janelas sem uma área segura mantêm seus controles originais.")
         let greenExplanation = secondary("O verde maximiza na área útil do monitor. Clique novamente para restaurar o tamanho anterior; passe o mouse para organizar a janela.")
-        let sizeSection = vertical([sizeHeading, sliderRow, sizeExplanation, greenExplanation], spacing: 6)
+        autoMaximizeCheckbox.target = self
+        autoMaximizeCheckbox.action = #selector(toggleAutoMaximize(_:))
+        autoMaximizeCheckbox.toolTip = "Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo."
+        let autoMaximizeExplanation = secondary("Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo.")
+        let sizeSection = vertical([sizeHeading, sliderRow, sizeExplanation, greenExplanation,
+                                    autoMaximizeCheckbox, autoMaximizeExplanation], spacing: 6)
 
         let statusTitle = sectionTitle("Estado do Trio")
         statusLabel.font = .systemFont(ofSize: 12)
@@ -186,6 +202,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         pauseButton.title = settings.enabled ? "Pausar controles" : "Retomar controles"
         menuCheckbox.state = settings.showInMenuBar ? .on : .off
         dockCheckbox.state = settings.keepInDock ? .on : .off
+        autoMaximizeCheckbox.state = settings.autoMaximizeNewWindows ? .on : .off
     }
 
     private func refreshLoginState(error: String? = nil) {
@@ -204,7 +221,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         case .requiresApproval:
             loginStatus.stringValue = "Ative o Trio em Itens de Início nos Ajustes do Sistema."
         case .notFound:
-            loginStatus.stringValue = "O auxiliar de início não foi encontrado nesta instalação."
+            let bundledPlist = Bundle.main.bundleURL
+                .appendingPathComponent("Contents/Library/LaunchAgents/com.allm4.Trio.login.plist")
+            if FileManager.default.fileExists(atPath: bundledPlist.path) {
+                loginStatus.stringValue = "O início automático ainda não está ativo. Ative a opção para solicitar o registro."
+            } else {
+                loginStatus.stringValue = "O auxiliar de início não foi encontrado nesta instalação."
+            }
         case .notRegistered:
             loginStatus.stringValue = "O Trio iniciará quando você abrir o aplicativo."
         @unknown default:
@@ -230,6 +253,10 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
 
     @objc private func toggleDockVisibility(_ sender: NSButton) {
         settings.keepInDock = sender.state == .on
+    }
+
+    @objc private func toggleAutoMaximize(_ sender: NSButton) {
+        settings.autoMaximizeNewWindows = sender.state == .on
     }
 
     @objc private func toggleLogin(_ sender: NSButton) {

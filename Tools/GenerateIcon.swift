@@ -86,7 +86,8 @@ func artwork() {
         (512, 0xFFDF76, 0xF2AC28),
         (722, 0x88ECA7, 0x20B96B)
     ]
-    for (x, top, bottom) in lights {
+    for (index, light) in lights.enumerated() {
+        let (x, top, bottom) = light
         let frame = NSRect(x: x - 75, y: 601, width: 150, height: 150)
         let circle = NSBezierPath(ovalIn: frame)
         shadow(9, NSSize(width: 0, height: -6), 0.25) {
@@ -100,6 +101,35 @@ func artwork() {
         circle.addClip()
         gradient([color(0xFFFFFF, 0), color(0xFFFFFF, 0.38)], in: gloss, angle: 90)
         NSGraphicsContext.restoreGraphicsState()
+
+        let center = NSPoint(x: x, y: 676)
+        let glyph = NSBezierPath()
+        glyph.lineWidth = 9
+        glyph.lineCapStyle = .round
+        glyph.lineJoinStyle = .round
+        switch index {
+        case 0:
+            glyph.move(to: NSPoint(x: center.x-22, y: center.y-22))
+            glyph.line(to: NSPoint(x: center.x+22, y: center.y+22))
+            glyph.move(to: NSPoint(x: center.x-22, y: center.y+22))
+            glyph.line(to: NSPoint(x: center.x+22, y: center.y-22))
+        case 1:
+            glyph.move(to: NSPoint(x: center.x-27, y: center.y))
+            glyph.line(to: NSPoint(x: center.x+27, y: center.y))
+        default:
+            glyph.move(to: NSPoint(x: center.x-5, y: center.y-5))
+            glyph.line(to: NSPoint(x: center.x-25, y: center.y-25))
+            glyph.move(to: NSPoint(x: center.x-25, y: center.y-8))
+            glyph.line(to: NSPoint(x: center.x-25, y: center.y-25))
+            glyph.line(to: NSPoint(x: center.x-8, y: center.y-25))
+            glyph.move(to: NSPoint(x: center.x+5, y: center.y+5))
+            glyph.line(to: NSPoint(x: center.x+25, y: center.y+25))
+            glyph.move(to: NSPoint(x: center.x+8, y: center.y+25))
+            glyph.line(to: NSPoint(x: center.x+25, y: center.y+25))
+            glyph.line(to: NSPoint(x: center.x+25, y: center.y+8))
+        }
+        color(0x28313A, 0.84).setStroke()
+        glyph.stroke()
     }
 }
 
