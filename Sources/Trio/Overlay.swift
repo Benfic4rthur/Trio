@@ -58,7 +58,9 @@ final class ControlHitButton: NSButton {
 
     func configure(layout: ControlLayout, mask: CGRect) {
         circles = layout.circles.map { $0.offsetBy(dx: -mask.minX, dy: -mask.minY) }
-        frame.size = mask.size
+        // Re-establish the complete frame after a backing-store/session change.
+        // Resizing only the size can preserve an old parent-relative origin.
+        frame = CGRect(origin: .zero, size: mask.size)
         for i in 0..<3 {
             let start: CGFloat = i == 0 ? 0 : (circles[i-1].midX + circles[i].midX)/2
             let end: CGFloat = i == 2 ? bounds.width : (circles[i].midX + circles[i+1].midX)/2
@@ -151,6 +153,9 @@ final class ControlHitButton: NSButton {
     }
 
     override func draw(_ dirtyRect: NSRect) {
+        // This transparent layer retains its backing store. Remove the previous
+        // hover/frame before painting; otherwise old colored pixels can survive.
+        NSGraphicsContext.current?.cgContext.clear(dirtyRect)
         guard circles.count == 3 else { return }
         var order = [0,1,2]
         if let hover { order.removeAll(where: { $0 == hover }); order.append(hover) }

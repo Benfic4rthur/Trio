@@ -1,20 +1,24 @@
 # Estado do Trio
 
-Atualizado em **14/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.1, build 8.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **15/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.2, build 9.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.1.1, build 8**, instalada em `/Applications/Trio.app`. |
+| Versão atual | **0.1.2, build 9**, instalada em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`, **1.848.889 bytes**, com instalador, guia 0.1.1 e app Universal; extração e assinatura conferidas localmente. |
-| Integridade do ZIP | SHA-256 `e94b36feed23a6fb76e251bb4f50a95c15e00eb4401134d998310bb0ba90a5be`; pacote, checksum e metadados atualizados juntos. |
+| Pacote | `Trio-macOS-universal.zip`. **1.866.713 bytes**. com instalador. guia 0.1.2 e app Universal; extração e assinatura conferidas localmente. |
+| Integridade do ZIP | SHA-256 `4a30e58acc5121cfb1b0a55a69de22895b2139760c2e4d3f5811a7d3a5106396`; pacote, checksum e metadados atualizados juntos. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Retomada e alinhamento — build 9
+
+O teste anterior mostrou um deslocamento nativo de 4 pt sem mudança da moldura: a build 8 permaneceu na linha antiga. A build 9 acompanhou a nova posição. Desenho após cinco hovers, três ciclos locais de notificações de sessão, dez cliques de conteúdo e os três botões na versão instalada passaram. O usuário confirmou o bloqueio/desbloqueio real em 15/11/2026. [Evidências e limites](RECOVERY-0.1.2.md).
 
 ## Funcionalidade e evidências
 

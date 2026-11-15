@@ -37,10 +37,13 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let menu = NSMenu()
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
+        appMenu.addItem(withTitle: "Deslocar controles de teste", action: #selector(shiftControls), keyEquivalent: "b")
         appMenu.addItem(withTitle: "Encerrar fixture", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appItem.submenu = appMenu
         menu.addItem(appItem)
         NSApp.mainMenu = menu
+        DistributedNotificationCenter.default().addObserver(self, selector: #selector(shiftControls),
+            name: Notification.Name((Bundle.main.bundleIdentifier ?? "com.allm4.TrioFixture") + ".shiftControls"), object: nil)
         monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
             self?.record(event.type == .leftMouseDown ? "leftMouseDown" : "rightMouseDown", window: event.window,
                          extra: ["x": event.locationInWindow.x, "y": event.locationInWindow.y])
@@ -108,6 +111,19 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     @objc func toolClicked(_ sender: NSButton) { record("nearbyToolClicked", window: sender.window) }
+    @objc func shiftControls() {
+        for window in windows {
+            let before = window.frame
+            for kind: NSWindow.ButtonType in [.closeButton, .miniaturizeButton, .zoomButton] {
+                guard let button = window.standardWindowButton(kind) else { continue }
+                button.setFrameOrigin(NSPoint(x: button.frame.minX, y: button.frame.minY - 4))
+                NSAccessibility.post(element: button, notification: .moved)
+            }
+            NSAccessibility.post(element: window, notification: .layoutChanged)
+            record("nativeControlsShifted", window: window,
+                   extra: ["outerFrameUnchanged": NSEqualRects(before, window.frame)])
+        }
+    }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         record("applicationShouldTerminate")

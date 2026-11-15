@@ -1,4 +1,4 @@
-// Visitor-facing copy. Version, build, URLs and checksums come from the release metadata.
+// Visitor-facing copy. Versions and package integrity come from the release metadata.
 export const content = {
   "pt": {
     "meta": {
@@ -117,10 +117,14 @@ export const content = {
     "release": {
       "title": "Versões e novidades",
       "current": "Versão atual",
-      "date": "14 de novembro de 2026",
-      "summary": "Correção para janelas do mesmo aplicativo maximizadas no mesmo lugar, com validação em quinze janelas. Cores dos controles mais vivas e ajustes no menu da demonstração.",
+      "date": "15 de novembro de 2026",
+      "summary": "Retomada após bloquear e desbloquear, alinhamento quando a barra muda e desenho da onda sem sobras de cor.",
       "initialSummary": "Primeira versão com controles ampliados, onda ao passar o mouse, maximizar e restaurar, integração com Smart Close e exceções por aplicativo.",
-      "free": "Gratuito, para usar no seu Mac."
+      "free": "Gratuito, para usar no seu Mac.",
+      "previousVersion": "0.1.1",
+      "previousSummary": "Correção para janelas do mesmo aplicativo maximizadas no mesmo lugar, com validação em quinze janelas. Cores dos controles mais vivas e ajustes no menu da demonstração.",
+      "previousDate": "14 de novembro de 2026",
+      "initialDate": "14 de novembro de 2026"
     }
   },
   "en": {
@@ -240,10 +244,14 @@ export const content = {
     "release": {
       "title": "Versions and updates",
       "current": "Current version",
-      "date": "November 14, 2026",
-      "summary": "Fixed detection of same-app windows maximized in the same position, verified with fifteen windows. More vivid control colors and fixes to the demo menu.",
+      "date": "November 15, 2026",
+      "summary": "Restores the controls after locking and unlocking, follows title bar changes, and clears old pixels from the hover animation.",
       "initialSummary": "The first release includes larger controls, hover magnification, maximize and restore, Smart Close integration, and per-app exceptions.",
-      "free": "Free to use on your Mac."
+      "free": "Free to use on your Mac.",
+      "previousVersion": "0.1.1",
+      "previousSummary": "Fixed detection of same-app windows maximized in the same position, verified with fifteen windows. More vivid control colors and fixes to the demo menu.",
+      "previousDate": "November 14, 2026",
+      "initialDate": "November 14, 2026"
     }
   },
   "es": {
@@ -363,10 +371,14 @@ export const content = {
     "release": {
       "title": "Versiones y novedades",
       "current": "Versión actual",
-      "date": "14 de noviembre de 2026",
-      "summary": "Corregida la detección de ventanas de una misma app maximizadas en la misma posición, verificada con quince ventanas. Colores más vivos y ajustes en el menú de la demostración.",
+      "date": "15 de noviembre de 2026",
+      "summary": "Recupera los controles al bloquear y desbloquear, sigue los cambios de la barra y elimina los restos de color de la animación.",
       "initialSummary": "La primera versión incluye controles ampliados, aumento al pasar el puntero, maximizar y restaurar, integración con Smart Close y excepciones por aplicación.",
-      "free": "Gratis, para usar en tu Mac."
+      "free": "Gratis, para usar en tu Mac.",
+      "previousVersion": "0.1.1",
+      "previousSummary": "Corregida la detección de ventanas de una misma app maximizadas en la misma posición, verificada con quince ventanas. Colores más vivos y ajustes en el menú de la demostración.",
+      "previousDate": "14 de noviembre de 2026",
+      "initialDate": "14 de noviembre de 2026"
     }
   }
 };

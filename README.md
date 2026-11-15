@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.1 · build 8</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.2 · build 9</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -45,10 +45,13 @@ Dock e barra de menus vêm desativados para o uso em segundo plano e podem ser h
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
+| **0.1.2** | **9** | **15/11/2026** | Retomada após bloqueio, alinhamento quando a barra muda e limpeza do desenho da onda. |
 | **0.1.1** | **8** | **14/11/2026** | Identidade de janelas coincidentes, troca segura de foco e cores explícitas em sRGB. |
 | 0.1.0 | 7 | 14/11/2026 | Controles ampliados, onda de hover, menu de organização, Smart Close, exceções de maximização automática e início silencioso. |
 
-A build 8 corrige a seleção de janelas do mesmo aplicativo com a mesma geometria, situação comum ao abrir várias janelas maximizadas. O Trio só aceita essa identificação após comprovar por Acessibilidade os três controles da janela ativa. Um ensaio com 15 janelas coincidentes e 16 trocas de foco confirmou o alinhamento e a identidade. O início silencioso continua usando `SMAppService.loginItem`. [Histórico completo](CHANGELOG.md).
+A build 9 reconstrói os controles ao retomar a sessão e acompanha a posição dos botões mesmo quando a moldura da janela não muda. O bloqueio/desbloqueio real foi confirmado pelo usuário; os testes de desenho, retomada simulada, dez cliques de conteúdo e ações na versão instalada passaram. [Correção e evidências](docs/RECOVERY-0.1.2.md).
+
+A build 8 corrigiu a seleção de janelas do mesmo aplicativo com a mesma geometria, situação comum ao abrir várias janelas maximizadas. O Trio só aceita essa identificação após comprovar por Acessibilidade os três controles da janela ativa. Um ensaio com 15 janelas coincidentes e 16 trocas de foco confirmou o alinhamento e a identidade. O início silencioso continua usando `SMAppService.loginItem`. [Histórico completo](CHANGELOG.md).
 
 O ZIP em [`distribution/`](distribution/) é o pacote real compilado localmente, com [checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) e [metadados de versão](distribution/release.json). É uma distribuição pública pelo repositório; não é uma GitHub Release. O código-fonte é público e não usa GitHub Actions ou builds remotos.
 

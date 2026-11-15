@@ -1,4 +1,10 @@
-# Consumo do Trio 0.1.1 — build 8
+# Consumo do Trio
+
+## 0.1.2 — build 9 · 15/11/2026
+
+Após os testes, uma amostra de repouso de 10,004 s mediu CPU média de 0,0000% de um núcleo na precisão impressa, pegada física de 24,688 MiB e RSS de 92,062 MiB, sem alteração da pegada ou despertares no intervalo. Isso descreve essa amostra curta no M1 Pro; não mede picos ou vazamentos prolongados. A medição usa o mesmo utilitário e conversão Mach descritos abaixo.
+
+## 0.1.1 — build 8
 
 Medição local em 14/11/2026, no M1 Pro com macOS 27.2.1. App instalado em `/Applications/Trio.app`, controles em 1,3×, início automático ativo e configurações escondidas.
 

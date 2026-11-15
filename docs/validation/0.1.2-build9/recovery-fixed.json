@@ -1,0 +1,38 @@
+{
+  "afterPanelY" : 1044,
+  "afterRowY" : 1044,
+  "alignedAfterNativeRowShift" : true,
+  "baseline" : false,
+  "beforePanelY" : 1040,
+  "beforeRowY" : 1040,
+  "contentClickCount" : 10,
+  "fixturePID" : 4526,
+  "missingPanelSamplesAcrossClicks" : 0,
+  "outerWindowFrameUnchanged" : true,
+  "overlayPID" : 4522,
+  "passed" : true,
+  "simulatedWorkspaceCycles" : [
+    {
+      "hiddenWhileSuspended" : true,
+      "recoveredWithoutClick" : true,
+      "suspend" : "NSWorkspaceScreensDidSleepNotification"
+    },
+    {
+      "hiddenWhileSuspended" : true,
+      "recoveredWithoutClick" : true,
+      "suspend" : "NSWorkspaceSessionDidResignActiveNotification"
+    },
+    {
+      "hiddenWhileSuspended" : true,
+      "recoveredWithoutClick" : true,
+      "suspend" : "NSWorkspaceWillSleepNotification"
+    }
+  ],
+  "statuses" : [
+    "Trio Alignment Fixture: 1.30× nesta janela. Preferência 1.3×; onda limitada à área segura.",
+    "Trio Alignment Fixture: 1.30× nesta janela. Preferência 1.3×; onda limitada à área segura.",
+    "Trio Alignment Fixture: 1.30× nesta janela. Preferência 1.3×; onda limitada à área segura.",
+    "Trio Alignment Fixture: 1.30× nesta janela. Preferência 1.3×; onda limitada à área segura.",
+    "Trio Alignment Fixture: 1.30× nesta janela. Preferência 1.3×; onda limitada à área segura."
+  ]
+}

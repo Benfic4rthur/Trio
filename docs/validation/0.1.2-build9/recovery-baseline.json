@@ -1,0 +1,15 @@
+{
+  "afterPanelY" : 65,
+  "afterRowY" : 69,
+  "alignedAfterNativeRowShift" : false,
+  "baseline" : true,
+  "beforePanelY" : 65,
+  "beforeRowY" : 65,
+  "fixturePID" : 4065,
+  "outerWindowFrameUnchanged" : true,
+  "overlayPID" : 857,
+  "passed" : true,
+  "statuses" : [
+
+  ]
+}

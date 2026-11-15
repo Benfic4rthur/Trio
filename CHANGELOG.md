@@ -1,5 +1,15 @@
 # Histórico do Trio
 
+## 0.1.2 — build 9 · 15/11/2026
+
+- Corrige o alinhamento quando os botões nativos mudam de posição sem redimensionar a janela.
+- Limpa os pixels anteriores da camada transparente antes de redesenhar a onda.
+- Reconstrói o painel e as observações de Acessibilidade ao retomar a sessão, preservando o tamanho escolhido e a geometria de restauração.
+- Usa notificações públicas e tentativas limitadas, com uma recuperação pelo primeiro movimento do ponteiro quando necessário. Sem varredura contínua.
+- Evita recriar o painel em cliques normais que não mudam sua geometria; notificações de layout de conteúdo são agrupadas.
+
+**Validação:** 25 testes existentes, teste de desenho, reprodução da falha anterior por deslocamento de 4 pontos, três ciclos locais de notificações da sessão, dez cliques no conteúdo sem desaparecimento e verde/amarelo/vermelho reais no aplicativo instalado. O usuário confirmou o bloqueio e desbloqueio físicos. [Detalhes](docs/RECOVERY-0.1.2.md).
+
 ## 0.1.1 — build 8 · 14/11/2026
 
 | Área | Mudança |
