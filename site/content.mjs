@@ -118,12 +118,12 @@ export const content = {
       "title": "Versões e novidades",
       "current": "Versão atual",
       "date": "15 de novembro de 2026",
-      "summary": "Retomada após bloquear e desbloquear, alinhamento quando a barra muda e desenho da onda sem sobras de cor.",
+      "summary": "Cliques na barra mantêm os controles visíveis. A ocultação temporária só começa ao arrastar a janela.",
       "initialSummary": "Primeira versão com controles ampliados, onda ao passar o mouse, maximizar e restaurar, integração com Smart Close e exceções por aplicativo.",
       "free": "Gratuito, para usar no seu Mac.",
-      "previousVersion": "0.1.1",
-      "previousSummary": "Correção para janelas do mesmo aplicativo maximizadas no mesmo lugar, com validação em quinze janelas. Cores dos controles mais vivas e ajustes no menu da demonstração.",
-      "previousDate": "14 de novembro de 2026",
+      "previousVersion": "0.1.2",
+      "previousSummary": "Retomada após bloquear e desbloquear, alinhamento quando a barra muda e desenho da onda sem sobras de cor.",
+      "previousDate": "15 de novembro de 2026",
       "initialDate": "14 de novembro de 2026"
     }
   },
@@ -245,12 +245,12 @@ export const content = {
       "title": "Versions and updates",
       "current": "Current version",
       "date": "November 15, 2026",
-      "summary": "Restores the controls after locking and unlocking, follows title bar changes, and clears old pixels from the hover animation.",
+      "summary": "Title bar clicks keep the controls visible. Temporary hiding starts only when you drag the window.",
       "initialSummary": "The first release includes larger controls, hover magnification, maximize and restore, Smart Close integration, and per-app exceptions.",
       "free": "Free to use on your Mac.",
-      "previousVersion": "0.1.1",
-      "previousSummary": "Fixed detection of same-app windows maximized in the same position, verified with fifteen windows. More vivid control colors and fixes to the demo menu.",
-      "previousDate": "November 14, 2026",
+      "previousVersion": "0.1.2",
+      "previousSummary": "Restores the controls after locking and unlocking, follows title bar changes, and clears old pixels from the hover animation.",
+      "previousDate": "November 15, 2026",
       "initialDate": "November 14, 2026"
     }
   },
@@ -372,12 +372,12 @@ export const content = {
       "title": "Versiones y novedades",
       "current": "Versión actual",
       "date": "15 de noviembre de 2026",
-      "summary": "Recupera los controles al bloquear y desbloquear, sigue los cambios de la barra y elimina los restos de color de la animación.",
+      "summary": "Los clics en la barra mantienen visibles los controles. Solo se ocultan temporalmente al arrastrar la ventana.",
       "initialSummary": "La primera versión incluye controles ampliados, aumento al pasar el puntero, maximizar y restaurar, integración con Smart Close y excepciones por aplicación.",
       "free": "Gratis, para usar en tu Mac.",
-      "previousVersion": "0.1.1",
-      "previousSummary": "Corregida la detección de ventanas de una misma app maximizadas en la misma posición, verificada con quince ventanas. Colores más vivos y ajustes en el menú de la demostración.",
-      "previousDate": "14 de noviembre de 2026",
+      "previousVersion": "0.1.2",
+      "previousSummary": "Recupera los controles al bloquear y desbloquear, sigue los cambios de la barra y elimina los restos de color de la animación.",
+      "previousDate": "15 de noviembre de 2026",
       "initialDate": "14 de noviembre de 2026"
     }
   }

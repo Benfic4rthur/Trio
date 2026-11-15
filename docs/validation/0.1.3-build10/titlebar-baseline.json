@@ -1,0 +1,27 @@
+{
+  "baseline" : true,
+  "fixturePID" : 10212,
+  "passed" : true,
+  "titleClicks" : [
+    {
+      "fraction" : 0.59999999999999998,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 16,
+      "windowUnchanged" : true
+    },
+    {
+      "fraction" : 0.76000000000000001,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 20,
+      "windowUnchanged" : true
+    },
+    {
+      "fraction" : 0.92000000000000004,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 20,
+      "windowUnchanged" : true
+    }
+  ],
+  "totalMissingSamples" : 56,
+  "trioPID" : 4652
+}

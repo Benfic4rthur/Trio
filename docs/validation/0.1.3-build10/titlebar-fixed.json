@@ -1,0 +1,31 @@
+{
+  "baseline" : false,
+  "fixturePID" : 10928,
+  "heldPressVisible" : true,
+  "hiddenDuringDrag" : true,
+  "passed" : true,
+  "returnedAfterDrag" : true,
+  "titleClicks" : [
+    {
+      "fraction" : 0.59999999999999998,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 0,
+      "windowUnchanged" : true
+    },
+    {
+      "fraction" : 0.76000000000000001,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 0,
+      "windowUnchanged" : true
+    },
+    {
+      "fraction" : 0.92000000000000004,
+      "hitRole" : "AXWindow",
+      "missingSamples" : 0,
+      "windowUnchanged" : true
+    }
+  ],
+  "totalMissingSamples" : 0,
+  "trioPID" : 10907,
+  "windowActuallyMoved" : true
+}

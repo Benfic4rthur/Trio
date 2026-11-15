@@ -1,0 +1,28 @@
+{
+  "afterPanelY" : 69,
+  "afterRowY" : 69,
+  "alignedAfterNativeRowShift" : true,
+  "alignedBeforeShift" : true,
+  "baseline" : false,
+  "beforePanelY" : 65,
+  "beforeRowY" : 65,
+  "contentClickCount" : 10,
+  "fixturePID" : 11049,
+  "greenChangedThenRestored" : true,
+  "installed" : true,
+  "missingPanelSamplesAcrossClicks" : 0,
+  "outerWindowFrameUnchanged" : true,
+  "overlayPID" : 10907,
+  "passed" : false,
+  "redClosedFixture" : false,
+  "simulatedWorkspaceCycles" : [
+
+  ],
+  "smartCloseRunning" : true,
+  "smartCloseTerminatedFixture" : false,
+  "statuses" : [
+
+  ],
+  "trioSurvived" : true,
+  "yellowMinimizedFixture" : true
+}

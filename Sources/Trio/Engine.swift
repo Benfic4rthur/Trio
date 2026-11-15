@@ -37,6 +37,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     private var geometrySettleWork: DispatchWorkItem?
     private var lastGeometryFollow: TimeInterval = 0
     private var manualGeometryInteraction: (pid: pid_t, id: CGWindowID, window: AXUIElement)?
+    private var pendingNativeDrag: (pid: pid_t, id: CGWindowID, point: CGPoint)?
     private let windowAnimator = WindowAnimator()
     private var animatingWindow: AXUIElement?
     private var animationToken: UUID?
@@ -157,18 +158,23 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                 }
             })
         }
-        // Mouse-down is predictive only on verified native title-bar background
-        // or a resize edge. Content and toolbar controls remain untouched.
+        // A verified title-bar/edge press only arms drag detection. A stationary
+        // click must keep the drawing visible; hide only once dragging starts.
         mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .leftMouseDragged, .leftMouseUp]) { [weak self] event in
             MainActor.assumeIsolated {
                 guard let self, self.running, !self.forwarding, self.animatingWindow == nil else { return }
                 if event.type == .leftMouseDown {
+                    self.pendingNativeDrag = nil
                     if self.target == nil || !self.panel.isVisible {
                         self.scheduleRefresh(after: 0.02)
-                    } else { self.anticipateNativeGeometryDrag(event) }
+                    } else { self.armNativeGeometryDrag(event) }
                 }
-                else if event.type == .leftMouseDragged { self.scheduleDragFollow() }
+                else if event.type == .leftMouseDragged {
+                    self.beginArmedNativeDrag(event)
+                    self.scheduleDragFollow()
+                }
                 else {
+                    self.pendingNativeDrag = nil
                     self.dragFollowWork?.cancel(); self.dragFollowWork = nil
                     let wasManual = self.manualGeometryInteraction != nil
                     let changed = self.checkDraggedGeometry()
@@ -368,6 +374,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         DispatchQueue.main.asyncAfter(deadline: .now()+seconds, execute: work)
     }
     private func hide() {
+        pendingNativeDrag = nil
         dragFollowWork?.cancel(); dragFollowWork = nil
         geometrySettleWork?.cancel(); geometrySettleWork = nil
         arrangementPanel.hide()
@@ -392,7 +399,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         DispatchQueue.main.asyncAfter(deadline: .now()+delay, execute: work)
     }
 
-    private func anticipateNativeGeometryDrag(_ event: NSEvent) {
+    private func armNativeGeometryDrag(_ event: NSEvent) {
         guard settings.enabled, let current = target, panel.isVisible,
               NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid,
               let cgEvent = event.cgEvent,
@@ -427,7 +434,19 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         guard let focused = AX.element(AXUIElementCreateApplication(current.pid), kAXFocusedWindowAttribute),
               AX.same(focused, current.window),
               NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid else { return }
-        diagnostic("tracking predictive-geometry-hide id=\(current.id) title=\(titleBackground) edge=\(onEdge && windowBackground) role=\(role)")
+        pendingNativeDrag = (current.pid, current.id, point)
+    }
+
+    private func beginArmedNativeDrag(_ event: NSEvent) {
+        guard let armed = pendingNativeDrag, let current = target,
+              current.pid == armed.pid, current.id == armed.id, panel.isVisible,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid,
+              let point = event.cgEvent?.location,
+              hypot(point.x-armed.point.x, point.y-armed.point.y) >= 2 else { return }
+        pendingNativeDrag = nil
+        guard let focused = AX.element(AXUIElementCreateApplication(current.pid), kAXFocusedWindowAttribute),
+              AX.same(focused, current.window) else { return }
+        diagnostic("tracking native-drag-start id=\(current.id)")
         beginManualGeometry(current)
         settleGeometry(after: 0.07)
     }

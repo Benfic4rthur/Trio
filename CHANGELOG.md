@@ -1,5 +1,14 @@
 # Histórico do Trio
 
+## 0.1.3 — build 10 · 15/11/2026
+
+- Mantém o Trio visível ao clicar na barra sem mover a janela.
+- O pressionamento arma a detecção; a ocultação temporária começa ao arrastar, a partir de 2 pontos de deslocamento.
+- Limpa a intenção de arrasto ao soltar, ocultar ou trocar de contexto, preservando as verificações de identidade.
+- Mantém preferências salvas e a correção de retomada da sessão da 0.1.2.
+
+**Validação:** reprodução anterior e ensaio da versão instalada com três cliques na barra, pressão mantida e arrasto real; 25 testes existentes passaram. A rodada de ações passou na repetição, após uma primeira tentativa em que o vermelho não fechou a fixture. [Evidências e limites](docs/TITLEBAR-0.1.3.md).
+
 ## 0.1.2 — build 9 · 15/11/2026
 
 - Corrige o alinhamento quando os botões nativos mudam de posição sem redimensionar a janela.

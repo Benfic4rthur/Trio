@@ -1,20 +1,24 @@
 # Estado do Trio
 
-Atualizado em **15/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.2, build 9.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **15/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.3, build 10.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.1.2, build 9**, instalada em `/Applications/Trio.app`. |
+| Versão atual | **0.1.3, build 10**, instalada em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`. **1.866.713 bytes**. com instalador. guia 0.1.2 e app Universal; extração e assinatura conferidas localmente. |
-| Integridade do ZIP | SHA-256 `4a30e58acc5121cfb1b0a55a69de22895b2139760c2e4d3f5811a7d3a5106396`; pacote, checksum e metadados atualizados juntos. |
+| Pacote | `Trio-macOS-universal.zip`. **1.867.622 bytes**. com instalador. guia 0.1.3 e app Universal; extração e assinatura conferidas localmente. |
+| Integridade do ZIP | SHA-256 `657020c8d50a195885931d8c9a14c729cf95b4eabb3714febe3b126d804ad0d6`; pacote, checksum e metadados atualizados juntos. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Cliques na barra — build 10
+
+O clique parado mantém o painel; a ocultação começa no arrasto real. A versão instalada teve zero desaparecimentos nas 72 amostras de três cliques de barra, com pressão mantida e arrasto exercitados separadamente. Uma rodada adicional de ações passou na repetição, após falha isolada do vermelho na primeira tentativa. Os testes foram encerrados a pedido do usuário. [Evidências e limites](TITLEBAR-0.1.3.md).
 
 ## Retomada e alinhamento — build 9
 
