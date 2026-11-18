@@ -117,12 +117,12 @@ export const content = {
     "release": {
       "title": "Versões e novidades",
       "current": "Versão atual",
-      "date": "15 de novembro de 2026",
-      "summary": "Cliques na barra mantêm os controles visíveis. A ocultação temporária só começa ao arrastar a janela.",
+      "date": "18 de novembro de 2026",
+      "summary": "Melhora a compatibilidade com barras personalizadas, incluindo o Claude, preservando as ferramentas próximas aos controles.",
       "initialSummary": "Primeira versão com controles ampliados, onda ao passar o mouse, maximizar e restaurar, integração com Smart Close e exceções por aplicativo.",
       "free": "Gratuito, para usar no seu Mac.",
-      "previousVersion": "0.1.2",
-      "previousSummary": "Retomada após bloquear e desbloquear, alinhamento quando a barra muda e desenho da onda sem sobras de cor.",
+      "previousVersion": "0.1.3",
+      "previousSummary": "Cliques na barra mantêm os controles visíveis. A ocultação temporária só começa ao arrastar a janela.",
       "previousDate": "15 de novembro de 2026",
       "initialDate": "14 de novembro de 2026"
     }
@@ -244,12 +244,12 @@ export const content = {
     "release": {
       "title": "Versions and updates",
       "current": "Current version",
-      "date": "November 15, 2026",
-      "summary": "Title bar clicks keep the controls visible. Temporary hiding starts only when you drag the window.",
+      "date": "November 18, 2026",
+      "summary": "Improves compatibility with custom title bars, including Claude, while keeping nearby tools accessible.",
       "initialSummary": "The first release includes larger controls, hover magnification, maximize and restore, Smart Close integration, and per-app exceptions.",
       "free": "Free to use on your Mac.",
-      "previousVersion": "0.1.2",
-      "previousSummary": "Restores the controls after locking and unlocking, follows title bar changes, and clears old pixels from the hover animation.",
+      "previousVersion": "0.1.3",
+      "previousSummary": "Title bar clicks keep the controls visible. Temporary hiding starts only when you drag the window.",
       "previousDate": "November 15, 2026",
       "initialDate": "November 14, 2026"
     }
@@ -371,12 +371,12 @@ export const content = {
     "release": {
       "title": "Versiones y novedades",
       "current": "Versión actual",
-      "date": "15 de noviembre de 2026",
-      "summary": "Los clics en la barra mantienen visibles los controles. Solo se ocultan temporalmente al arrastrar la ventana.",
+      "date": "18 de noviembre de 2026",
+      "summary": "Mejora la compatibilidad con barras personalizadas, incluido Claude, y conserva el acceso a las herramientas cercanas.",
       "initialSummary": "La primera versión incluye controles ampliados, aumento al pasar el puntero, maximizar y restaurar, integración con Smart Close y excepciones por aplicación.",
       "free": "Gratis, para usar en tu Mac.",
-      "previousVersion": "0.1.2",
-      "previousSummary": "Recupera los controles al bloquear y desbloquear, sigue los cambios de la barra y elimina los restos de color de la animación.",
+      "previousVersion": "0.1.3",
+      "previousSummary": "Los clics en la barra mantienen visibles los controles. Solo se ocultan temporalmente al arrastrar la ventana.",
       "previousDate": "15 de noviembre de 2026",
       "initialDate": "14 de noviembre de 2026"
     }

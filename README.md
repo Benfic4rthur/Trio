@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.3 · build 10</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.4 · build 11</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -45,10 +45,13 @@ Dock e barra de menus vêm desativados para o uso em segundo plano e podem ser h
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
-| **0.1.3** | **10** | **15/11/2026** | Cliques parados na barra mantêm o Trio visível; ocultação apenas no arrasto. |
+| **0.1.4** | **11** | **18/11/2026** | Compatibilidade com elementos invisíveis de barras personalizadas, incluindo o Claude. |
+| 0.1.3 | 10 | 15/11/2026 | Cliques parados na barra mantêm o Trio visível; ocultação apenas no arrasto. |
 | 0.1.2 | 9 | 15/11/2026 | Retomada após bloqueio, alinhamento quando a barra muda e limpeza do desenho da onda. |
 | **0.1.1** | **8** | **14/11/2026** | Identidade de janelas coincidentes, troca segura de foco e cores explícitas em sRGB. |
 | 0.1.0 | 7 | 14/11/2026 | Controles ampliados, onda de hover, menu de organização, Smart Close, exceções de maximização automática e início silencioso. |
+
+A build 11 corrige a recusa do Claude causada por um elemento de layout vazio, fora da região dos controles. A inspeção da janela real passou em 1,3× após a correção; controles e ações mantêm as verificações estritas. [Diagnóstico, validação e limites](docs/COMPATIBILITY-0.1.4.md).
 
 A build 10 separa clique de arrasto na barra: pressionar sem mover mantém os controles. A reprodução anterior registrou 56 amostras sem painel; a versão instalada registrou zero em 72 amostras e manteve a ocultação durante o arrasto real. [Correção e limites](docs/TITLEBAR-0.1.3.md).
 

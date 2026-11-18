@@ -1,5 +1,13 @@
 # Histórico do Trio
 
+## 0.1.4 — build 11 · 18/11/2026
+
+- Corrige a recusa de janelas, como a do Claude, quando a árvore AX contém elementos vazios fora da região reservada aos controles.
+- Preserva a exigência de geometria positiva para janelas, botões e ações; não ignora elementos desconhecidos ou obstáculos dentro da reserva.
+- Mantém o tamanho salvo, início silencioso, encaminhamento para Smart Close e funcionamento por notificações.
+
+**Validação:** causa reproduzida por diagnóstico estrutural na janela real do Claude, inspeção corrigida em 1,3×, layouts de Edge/Codex preservados e 25 testes existentes passaram. Universal arm64/x86_64 compilado localmente; Intel físico e confirmação visual do overlay no Claude permanecem fora deste ensaio. [Evidências e limites](docs/COMPATIBILITY-0.1.4.md).
+
 ## 0.1.3 — build 10 · 15/11/2026
 
 - Mantém o Trio visível ao clicar na barra sem mover a janela.

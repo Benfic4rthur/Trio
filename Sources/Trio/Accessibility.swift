@@ -15,14 +15,21 @@ enum AX {
     static func string(_ element: AXUIElement, _ name: String) -> String? { value(element, name) as? String }
     static func flag(_ element: AXUIElement, _ name: String) -> Bool { (value(element, name) as? Bool) ?? false }
     static func rect(_ element: AXUIElement) -> CGRect? {
+        guard let rect = surveyRect(element), validRect(rect) else { return nil }
+        return rect
+    }
+    /// AX trees can contain empty layout placeholders. Preserve their finite
+    /// geometry for obstacle pruning; window/control/action geometry still
+    /// goes through rect(_:) and must have strictly positive dimensions.
+    static func surveyRect(_ element: AXUIElement) -> CGRect? {
         guard let p = value(element, kAXPositionAttribute), let s = value(element, kAXSizeAttribute),
               CFGetTypeID(p) == AXValueGetTypeID(), CFGetTypeID(s) == AXValueGetTypeID() else { return nil }
         var point = CGPoint.zero, size = CGSize.zero
         guard AXValueGetValue(p as! AXValue, .cgPoint, &point), AXValueGetValue(s as! AXValue, .cgSize, &size),
               point.x.isFinite, point.y.isFinite, size.width.isFinite, size.height.isFinite,
-              size.width > 0, size.height > 0 else { return nil }
+              size.width >= 0, size.height >= 0 else { return nil }
         let rect = CGRect(origin: point, size: size)
-        return validRect(rect) ? rect : nil
+        return rect.maxX.isFinite && rect.maxY.isFinite ? rect : nil
     }
     static func validRect(_ rect: CGRect) -> Bool {
         rect.origin.x.isFinite && rect.origin.y.isFinite &&
@@ -207,7 +214,15 @@ struct WindowTarget {
             guard depth < 32, withinBudget() else { complete = false; return }
             visited += 1
             if buttons.contains(where: { AX.same($0, element) }) { return }
-            guard let rect = AX.rect(element) else { complete = false; return }
+            guard let rect = AX.surveyRect(element) else { complete = false; return }
+            // Empty, off-reservation layout nodes are common in web-backed
+            // title bars (Claude exposes a 1×0 group at its bottom edge).
+            // They occupy no area here. An empty node anchored inside the
+            // reservation remains unproven; never use it as a free-space hole.
+            if rect.isEmpty {
+                if proposedBounds.contains(rect.origin) { complete = false }
+                return
+            }
             // Bounds are a conservative pruning boundary for supported AX
             // containers. Children that draw outside their container require
             // an explicit compatibility profile, outside this prototype.
