@@ -1,20 +1,24 @@
 # Estado do Trio
 
-Atualizado em **20/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.2.0, build 12.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **20/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.2.1, build 13.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.2.0, build 12**, instalada em `/Applications/Trio.app`. |
+| Versão atual | **0.2.1, build 13**, instalada em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`. 1.954.998 bytes. Inclui o instalador, o guia e o app Universal. |
-| Integridade do ZIP | SHA-256 `2cbace460392b0f2108d912ab6b7d99f9f717edcb5da8b58479984f011fe094a`; pacote, checksum e metadados atualizados juntos. |
+| Pacote | `Trio-macOS-universal.zip`. 1.951.648 bytes. Inclui o instalador, o guia e o app Universal. |
+| Integridade do ZIP | SHA-256 `e379c3c7778a82e9c0fa5dc5bbf374af6254de8183cb6b13d8de12c00edcd6a4`; pacote, checksum e metadados atualizados juntos. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Última janela do Edge na build 13
+
+No Edge 157.0.4341.60, a última janela podia desaparecer e o navegador continuar em execução. Num perfil temporário, o processo permaneceu ativo durante os nove segundos de observação. Com a correção instalada, o processo terminou em 0,71 s ao acionar o controle original e em 0,75 s ao acionar o vermelho do Trio. Foram duas aberturas independentes do Edge, com os controles acionados por Acessibilidade. O modo em segundo plano não foi desativado pelo teste. [Resultados do ensaio](validation/0.2.1-build13/edge-close.json).
 
 ## Fechamento e tamanho de janelas na build 12
 

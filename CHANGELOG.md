@@ -1,5 +1,11 @@
 # Histórico do Trio
 
+## 0.2.1 — build 13 · 20/11/2026
+
+- O Trio pede o encerramento assim que confirma que a última janela fechou. Se a mesma instância permanecer sem janelas na verificação seguinte, força sua saída. O intervalo fixo de cinco segundos foi removido.
+- No Microsoft Edge, o Trio também acompanha a destruição da última janela principal identificada quando o navegador recebe o fechamento diretamente.
+- A verificação da saída acompanha a atualização da Acessibilidade e da animação do macOS. Abrir outra janela cancela o encerramento pendente. O Finder e os aplicativos configurados como exceções continuam protegidos.
+
 ## 0.2.0 — build 12 · 20/11/2026
 
 - O vermelho aciona o fechar da janela selecionada. Quando ela é a última e o fechamento foi confirmado, o Trio pede ao aplicativo que encerre. Se a mesma instância ainda estiver rodando cinco segundos depois, o Trio pode forçar o encerramento após reconfirmar que ela segue sem janelas. Outras janelas abertas e minimizadas são preservadas.

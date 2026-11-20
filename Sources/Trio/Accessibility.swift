@@ -71,6 +71,16 @@ struct SystemWindow {
     let pid: pid_t
     let bounds: CGRect
     let layer: Int
+    /// Includes minimized windows and windows on other Spaces. Ask only for
+    /// the IDs so this check doesn't depend on screen recording permission.
+    static func noLongerExists(_ id: CGWindowID) -> Bool {
+        guard let rows = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID) as? [[String: Any]],
+              !rows.isEmpty else { return false }
+        return rows.allSatisfy { row in
+            guard let number = row[kCGWindowNumber as String] as? CGWindowID else { return false }
+            return number != id
+        }
+    }
     static func visible() -> [SystemWindow] {
         guard let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else { return [] }
         var windows: [SystemWindow] = []

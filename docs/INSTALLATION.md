@@ -2,7 +2,7 @@
 
 [Português](#português) · [English](#english) · [Español](#español)
 
-Guia da versão **0.2.0, build 12**, preparado em 20/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
+Guia da versão **0.2.1, build 13**, preparado em 20/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
 
 O pacote e o código-fonte são públicos e gratuitos. O ZIP é distribuído pela pasta `distribution/` do repositório; esse caminho não é uma GitHub Release. Não é necessário compilar o app para instalá-lo.
 

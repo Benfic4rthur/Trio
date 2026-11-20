@@ -349,7 +349,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         diagnostic("tracking AX=\(notification) eventPID=\(eventPID) targetPID=\(target?.pid ?? 0) targetID=\(target?.id ?? 0) targetElement=\(affectsTarget)")
         if notification == kAXWindowCreatedNotification {
-            closing.windowOpened(in: eventPID)
+            closing.windowOpened(element, in: eventPID)
             let pid = eventPID
             watch(element, pid: pid)
             if settings.enabled && settings.autoMaximizeNewWindows {
@@ -364,6 +364,9 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
             let pid = AX.pid(element)
             watchedWindows[pid]?.removeAll { AX.same($0, element) }
             watchedControls[pid]?.removeAll { AX.same($0.window, element) }
+        }
+        if notification == kAXMainWindowChangedNotification || notification == kAXFocusedWindowChangedNotification {
+            closing.browserWindowMayHaveClosed(in: eventPID)
         }
         guard !forwarding else { return }
         if notification == kAXUIElementDestroyedNotification && affectsControl {
@@ -417,6 +420,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         DispatchQueue.main.asyncAfter(deadline: .now()+seconds, execute: work)
     }
     private func hide() {
+        if let target { closing.browserWindowMayHaveClosed(in: target.pid) }
         pendingNativeDrag = nil
         dragFollowWork?.cancel(); dragFollowWork = nil
         geometrySettleWork?.cancel(); geometrySettleWork = nil
@@ -632,6 +636,9 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         for app in NSWorkspace.shared.runningApplications { observe(app) }
         guard let candidate = WindowTarget.focused() else {
+            if let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier {
+                closing.browserWindowMayHaveClosed(in: pid)
+            }
             diagnostic("tracking candidate-unavailable attempt=\(attempt) kept=\(panel.isVisible)")
             retryDrawing("candidate-unavailable", attempt: attempt)
             if panel.isVisible {
@@ -646,6 +653,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         watch(candidate.window, pid: candidate.pid)
         watchControls(of: candidate)
+        closing.observeBrowserWindow(candidate)
         func fit(_ indices: [Int]) -> (ControlLayout, CGRect, [CGRect])? {
             let frames = indices.compactMap { candidate.buttonFrame(for: $0) }
             guard frames.count == indices.count,

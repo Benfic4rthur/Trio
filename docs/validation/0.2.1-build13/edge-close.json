@@ -1,0 +1,41 @@
+{
+  "beforeAdditionalWindowTracking": {
+    "edgeVersion": "157.0.4341.60",
+    "requestedAction": "original-owned-Edge-close-AXPress",
+    "backgroundModeForcedOff": false,
+    "pressedOriginalEdgeButton": true,
+    "pressedTrioRedButton": false,
+    "HIDPosted": false,
+    "mainExitedBeforeCleanup": false,
+    "trioProcessRunningAfter": true,
+    "temporaryProfileRemoved": true
+  },
+  "installedOriginalButton": {
+    "edgeVersion": "157.0.4341.60",
+    "requestedAction": "original-owned-Edge-close-AXPress",
+    "backgroundModeForcedOff": false,
+    "pressedOriginalEdgeButton": true,
+    "pressedTrioRedButton": false,
+    "HIDPosted": false,
+    "mainExitedBeforeCleanup": true,
+    "mainExitDelaySeconds": 0.7112897916667862,
+    "mainTerminationReasonBeforeCleanup": "exit",
+    "mainTerminationStatusBeforeCleanup": 0,
+    "trioProcessRunningAfter": true,
+    "temporaryProfileRemoved": true
+  },
+  "installedTrioButton": {
+    "edgeVersion": "157.0.4341.60",
+    "requestedAction": "Trio-red-AXPress",
+    "backgroundModeForcedOff": false,
+    "pressedOriginalEdgeButton": false,
+    "pressedTrioRedButton": true,
+    "HIDPosted": false,
+    "mainExitedBeforeCleanup": true,
+    "mainExitDelaySeconds": 0.7507095416658558,
+    "mainTerminationReasonBeforeCleanup": "exit",
+    "mainTerminationStatusBeforeCleanup": 0,
+    "trioProcessRunningAfter": true,
+    "temporaryProfileRemoved": true
+  }
+}

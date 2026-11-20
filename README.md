@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.2.0 · build 12</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.2.1 · build 13</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -43,7 +43,7 @@ O Trio amplia os controles disponíveis na janela em primeiro plano, inclusive q
 
 **Abrir novas janelas maximizadas** considera as dimensões iniciais da janela e a área útil do monitor. Janelas pequenas conservam o tamanho original. Terminal e Monitor de Atividade já vêm na lista de exceções.
 
-**Manter abertos ao fechar a última janela** tem sua própria lista nos ajustes. Adicione, por exemplo, o Claude para que o Trio apenas feche suas janelas. A decisão do próprio aplicativo de sair quando a última janela fecha continua valendo. O Smart Close é opcional. O Trio aciona o botão acessível da janela e confere se ainda existem outras, inclusive minimizadas, antes de pedir o encerramento. Se a mesma instância continuar em segundo plano por cinco segundos depois do pedido, o Trio confere a lista de janelas e as exceções novamente antes de forçar a saída. Se a contagem for incerta, o aplicativo permanece aberto.
+**Manter abertos ao fechar a última janela** tem sua própria lista nos ajustes. Adicione, por exemplo, o Claude para que o Trio apenas feche suas janelas. A decisão do próprio aplicativo de sair quando a última janela fecha continua valendo. O Smart Close é opcional. O Trio aciona o botão acessível da janela e confere se ainda existem outras, inclusive minimizadas, antes de pedir o encerramento. Se a mesma instância ainda estiver rodando na confirmação seguinte, o Trio confere as janelas e as exceções antes de forçar a saída. No Edge, o Trio também acompanha o fechamento nativo da última janela identificada. Se a contagem for incerta, o aplicativo permanece aberto.
 
 Os critérios e exemplos por resolução estão no [estudo de tamanho das janelas](docs/AUTO_MAXIMIZE.md). O ensaio com cinco janelas está no [relatório da versão](docs/STATUS.md).
 
@@ -51,7 +51,8 @@ Os critérios e exemplos por resolução estão no [estudo de tamanho das janela
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
-| **0.2.0** | **12** | **20/11/2026** | Fechamento por janela com exceções, ampliação do vermelho sozinho e maximização automática por tamanho. |
+| **0.2.1** | **13** | **20/11/2026** | Encerramento imediato após confirmar a última janela e acompanhamento do fechar nativo no Edge. |
+| 0.2.0 | 12 | 20/11/2026 | Fechamento por janela com exceções, ampliação do vermelho sozinho e maximização automática por tamanho. |
 | 0.1.4 | 11 | 18/11/2026 | Compatibilidade com elementos invisíveis de barras personalizadas, incluindo o Claude. |
 | 0.1.3 | 10 | 15/11/2026 | Cliques parados na barra mantêm o Trio visível; ocultação apenas no arrasto. |
 | 0.1.2 | 9 | 15/11/2026 | Retomada após bloqueio, alinhamento quando a barra muda e limpeza do desenho da onda. |

@@ -175,7 +175,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         let sliderRow = horizontal([secondary("1×"), slider, secondary("5×")], spacing: 10)
         let sizeExplanation = secondary("O tamanho efetivo se ajusta ao espaço livre da barra. Janelas sem uma área segura mantêm seus controles originais.")
         let greenExplanation = secondary("O verde maximiza na área útil do monitor. Clique novamente para restaurar o tamanho anterior; passe o mouse para organizar a janela.")
-        let redExplanation = secondary("O vermelho fecha esta janela e encerra o app ao fechar a última. O Finder continua aberto. Se após 5 segundos o app ainda estiver aberto sem janelas, o Trio força o encerramento.")
+        let redExplanation = secondary("O vermelho fecha esta janela e encerra o app ao fechar a última. O Finder continua aberto. Se o app continuar rodando após a confirmação do fechamento, o Trio verifica as exceções e força a saída.")
         let quitExceptionsButton = button("Escolher apps…", action: #selector(showQuitExceptions))
         let quitExceptionsRow = horizontal([secondary("Manter abertos ao fechar a última janela"), NSView(), quitExceptionsButton], spacing: 8)
         quitExclusionsSummary.font = .systemFont(ofSize: 11)
