@@ -16,6 +16,11 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     private let panel: TrioPanel
     private let controls = TrioControlsView(frame: .zero)
     private let arrangementPanel = ArrangementPanel()
+    private lazy var closing = WindowClosing { [weak self] app in
+        guard let self, self.running, !self.sessionSuspended, self.settings.enabled,
+              let identifier = app.bundleIdentifier else { return false }
+        return !self.settings.quitExcludedBundleIDs.contains(identifier)
+    }
     private var target: WindowTarget?
     private var observers: [pid_t: AXObserver] = [:]
     private var watchedWindows: [pid_t: [AXUIElement]] = [:]
@@ -42,6 +47,25 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     private var animatingWindow: AXUIElement?
     private var animationToken: UUID?
     private var restore: [(pid: pid_t, window: AXUIElement, original: CGRect, applied: CGRect)] = []
+    private final class AutoMaximizeRequest {
+        let window: AXUIElement
+        let application: NSRunningApplication
+        let expiresAt: TimeInterval
+        var stability: AutoMaximizeStability
+        var nextCheck: TimeInterval?
+        init(window: AXUIElement, application: NSRunningApplication, now: TimeInterval) {
+            self.window = window; self.application = application
+            expiresAt = now + 1.6
+            stability = AutoMaximizeStability(startedAt: now)
+            nextCheck = now + 0.18
+        }
+    }
+    // Completed entries remain until destruction/termination, so late launch
+    // surveys cannot repeat an automatic change after a manual restoration.
+    private var autoMaximizeRequests: [AutoMaximizeRequest] = []
+    private var autoMaximizeWork: DispatchWorkItem?
+    private var autoMaximizeScheduledToken: UUID?
+    private var autoMaximizeGeneration = UUID()
 
     init(settings: SettingsStore, onStatus: @escaping (String) -> Void, onOpen: @escaping () -> Void) {
         self.settings = settings; self.onStatus = onStatus; self.onOpen = onOpen
@@ -66,6 +90,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         controls.autoresizingMask = [.width, .height]
         surface.addSubview(controls)
         panel.contentView = surface
+        controls.targetWindow = { [weak self] in self?.target?.id }
         controls.onAction = { [weak self] index in self?.perform(index) }
         controls.onContext = { [weak self] in self?.contextMenu() }
         controls.onGreenHover = { [weak self] in self?.scheduleGreenMenu() }
@@ -127,12 +152,13 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         tokens.append(center.addObserver(forName: NSWorkspace.didLaunchApplicationNotification, object: nil, queue: .main) { [weak self] note in
             MainActor.assumeIsolated {
-                guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+                guard let self, let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+                let generation = self.autoMaximizeGeneration
                 for delay in [0.4, 0.9] {
-                    DispatchQueue.main.asyncAfter(deadline: .now()+delay) {
+                    DispatchQueue.main.asyncAfter(deadline: .now()+delay) { [weak self] in
                         guard let self, self.running, !app.isTerminated else { return }
                         self.observe(app)
-                        if self.settings.enabled && self.settings.autoMaximizeNewWindows,
+                        if self.autoMaximizeGeneration == generation, self.settings.enabled && self.settings.autoMaximizeNewWindows,
                            let windows = AX.value(AXUIElementCreateApplication(app.processIdentifier), kAXWindowsAttribute) as? [AXUIElement] {
                             for window in windows { self.maximizeNew(window, pid: app.processIdentifier) }
                         }
@@ -144,6 +170,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         tokens.append(center.addObserver(forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main) { [weak self] note in
             MainActor.assumeIsolated {
                 guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+                self?.closing.forget(app.processIdentifier)
                 self?.removeObserver(app.processIdentifier)
                 if self?.target?.pid == app.processIdentifier { self?.hide() }
                 self?.scheduleRefresh()
@@ -193,7 +220,9 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         refresh()
     }
     func stop() {
+        closing.reset()
         running = false; pending?.cancel(); greenMenu?.cancel(); hide()
+        cancelAutoMaximize(clearHistory: true)
         cancelResumeWork()
         for token in sessionNotifyTokens { notify_cancel(token) }
         sessionNotifyTokens.removeAll()
@@ -210,7 +239,11 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         watchedWindows[pid] = nil
         watchedControls[pid] = nil
-        if discardRestore { restore.removeAll { $0.pid == pid } }
+        if discardRestore {
+            restore.removeAll { $0.pid == pid }
+            autoMaximizeRequests.removeAll { $0.application.processIdentifier == pid }
+            scheduleAutoMaximize()
+        }
     }
     private func cancelResumeWork() {
         resumeWorks.forEach { $0.cancel() }; resumeWorks.removeAll()
@@ -220,6 +253,8 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     private func suspendSession() {
         guard running else { return }
         sessionSuspended = true
+        closing.reset()
+        cancelAutoMaximize(clearHistory: false)
         cancelResumeWork()
         pending?.cancel(); manualGeometryInteraction = nil
         windowAnimator.cancel(); animatingWindow = nil; animationToken = nil
@@ -290,7 +325,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         var groups = watchedControls[candidate.pid] ?? []
         let names = [kAXMovedNotification, kAXResizedNotification, kAXUIElementDestroyedNotification]
         if let index = groups.firstIndex(where: { AX.same($0.window, candidate.window) }) {
-            if zip(groups[index].buttons, candidate.buttons).allSatisfy({ AX.same($0.0, $0.1) }) { return }
+            if groups[index].buttons.count == candidate.buttons.count && zip(groups[index].buttons, candidate.buttons).allSatisfy({ AX.same($0.0, $0.1) }) { return }
             for button in groups.remove(at: index).buttons {
                 for name in names { AXObserverRemoveNotification(observer, button, name as CFString) }
             }
@@ -308,16 +343,24 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         let affectsTarget = target.map { AX.same($0.window, element) } ?? false
         let affectsControl = target?.buttons.contains(where: { AX.same($0, element) }) ?? false
         if eventPID == target?.pid { drawingNeedsControlGeometry = true }
+        if affectsTarget && notification == kAXLayoutChangedNotification {
+            needsFullLayoutRefresh = true
+            scheduleRefresh(after: 0.06)
+        }
         diagnostic("tracking AX=\(notification) eventPID=\(eventPID) targetPID=\(target?.pid ?? 0) targetID=\(target?.id ?? 0) targetElement=\(affectsTarget)")
         if notification == kAXWindowCreatedNotification {
+            closing.windowOpened(in: eventPID)
             let pid = eventPID
             watch(element, pid: pid)
             if settings.enabled && settings.autoMaximizeNewWindows {
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.18) { [weak self] in self?.maximizeNew(element, pid: pid) }
+                maximizeNew(element, pid: pid)
             }
         }
         if notification == kAXUIElementDestroyedNotification {
+            closing.windowDestroyed(element)
             restore.removeAll { AX.same($0.window, element) }
+            autoMaximizeRequests.removeAll { AX.same($0.window, element) }
+            scheduleAutoMaximize()
             let pid = AX.pid(element)
             watchedWindows[pid]?.removeAll { AX.same($0, element) }
             watchedControls[pid]?.removeAll { AX.same($0.window, element) }
@@ -406,11 +449,11 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
               cgEvent.getIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent) == Int64(current.id) else { return }
         let point = cgEvent.location
         guard !WindowTarget.toAX(panel.frame).contains(point),
-              let reserved = TrioLayout.availableRegion(window: current.frame, controls: current.buttonFrames),
+              let reserved = TrioLayout.availableRegion(window: current.frame, controls: current.buttonFrames, controlIndices: current.controlIndices),
               !reserved.contains(point) else { return }
         let nativeRow = current.buttonFrames.dropFirst().reduce(current.buttonFrames[0]) { $0.union($1) }
         let titleHeight = min(current.frame.height, max(0, 2*(nativeRow.midY-current.frame.minY)))
-        let onTitle = point.x > current.buttonFrames[2].maxX+5 &&
+        let onTitle = point.x > nativeRow.maxX+5 &&
             point.x < current.frame.maxX && point.y >= current.frame.minY &&
             point.y <= current.frame.minY+titleHeight
         let onEdge = current.frame.insetBy(dx: -3, dy: -3).contains(point) &&
@@ -560,9 +603,10 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     func refresh() { refresh(attempt: 0) }
 
     private func refresh(attempt: Int) {
+        if !settings.enabled || !settings.autoMaximizeNewWindows { cancelAutoMaximize(clearHistory: false) }
         guard running, !sessionSuspended, !forwarding else { return }
         if animatingWindow != nil { return }
-        guard settings.enabled else { hide(); onStatus("Trio pausado. Os controles originais estão disponíveis."); return }
+        guard settings.enabled else { closing.reset(); hide(); onStatus("Trio pausado. Os controles originais estão disponíveis."); return }
         guard AXIsProcessTrusted() else { hide(); onStatus("Permita Acessibilidade para ativar os controles. Nenhuma permissão de gravação de tela é necessária."); return }
         guard !holdingManualGeometry() else { return }
         if let current = target, panel.isVisible,
@@ -590,8 +634,11 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         guard let candidate = WindowTarget.focused() else {
             diagnostic("tracking candidate-unavailable attempt=\(attempt) kept=\(panel.isVisible)")
             retryDrawing("candidate-unavailable", attempt: attempt)
-            if panel.isVisible { return }
-            onStatus("Aguardando uma janela compatível. Janelas sem três controles acessíveis permanecem com os originais."); return
+            if panel.isVisible {
+                if needsFullLayoutRefresh && attempt >= 3 { hide() }
+                else { return }
+            }
+            onStatus("Aguardando uma janela compatível. O Trio precisa identificar o botão de fechar da janela ativa."); return
         }
         if let previous = target,
            previous.pid != candidate.pid || previous.id != candidate.id || !AX.same(previous.window, candidate.window) {
@@ -599,16 +646,24 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         watch(candidate.window, pid: candidate.pid)
         watchControls(of: candidate)
-        guard let reserve = TrioLayout.availableRegion(window: candidate.frame, controls: candidate.buttonFrames),
-              let obstacles = candidate.obstacles(for: reserve) else {
-            retryDrawing("candidate-survey", attempt: attempt)
-            if panel.isVisible { return }
-            onStatus("\(candidate.name): não foi possível confirmar o espaço livre. Os controles originais foram preservados."); return
+        func fit(_ indices: [Int]) -> (ControlLayout, CGRect, [CGRect])? {
+            let frames = indices.compactMap { candidate.buttonFrame(for: $0) }
+            guard frames.count == indices.count,
+                  let region = TrioLayout.availableRegion(window: candidate.frame, controls: frames, controlIndices: indices),
+                  var obstacles = candidate.obstacles(for: region) else { return nil }
+            for slot in candidate.controlIndices where !indices.contains(slot) {
+                if let rect = candidate.buttonFrame(for: slot) { obstacles.append(rect.insetBy(dx: -2, dy: -2)) }
+            }
+            guard case let .success(layout) = TrioLayout.calculate(window: candidate.frame, controls: frames,
+                requestedScale: settings.scale, obstacles: obstacles, controlIndices: indices) else { return nil }
+            return (layout, region, obstacles)
         }
-        guard case .success(let layout) = TrioLayout.calculate(window: candidate.frame, controls: candidate.buttonFrames, requestedScale: settings.scale, obstacles: obstacles),
-              layout.effectiveScale >= 1.02 else {
-            if panel.isVisible { return }
-            onStatus("\(candidate.name): espaço insuficiente para ampliar sem cobrir ferramentas."); return
+        guard let (layout, reserve, obstacles) = fit(candidate.controlIndices) ??
+            (candidate.controlIndices.count > 1 ? fit([0]) : nil) else {
+            hide()
+            retryDrawing("candidate-survey", attempt: attempt)
+            onStatus("\(candidate.name): espaço insuficiente para os controles do Trio.")
+            return
         }
         // Reserve the largest safe hover area within the same strict region.
         let expanded = CGRect(x: reserve.minX, y: reserve.minY, width: reserve.width, height: reserve.height)
@@ -629,6 +684,10 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         needsFullLayoutRefresh = false
         appliedScale = settings.scale
         panel.setFrame(WindowTarget.toCocoa(mask), display: false)
+        if !layout.controlIndices.contains(2) {
+            greenMenu?.cancel()
+            arrangementPanel.hide()
+        }
         controls.configure(layout: layout, mask: mask)
         panel.ignoresMouseEvents = false
         panel.setAccessibilityHidden(false)
@@ -639,12 +698,16 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     }
     private func perform(_ index: Int) {
         diagnostic("action \(index), front=\(NSWorkspace.shared.frontmostApplication?.processIdentifier ?? 0), target=\(target?.pid ?? 0)")
-        guard !sessionSuspended, let target, settings.enabled, target.isCurrent() else { diagnostic("rejected: no current target"); hide(); scheduleRefresh(); return }
+        guard running, !sessionSuspended, !forwarding, panel.isVisible, let target, settings.enabled, target.controlIndices.contains(index), target.isCurrent() else { diagnostic("rejected: no current target"); hide(); scheduleRefresh(); return }
         if index == 2 { greenMenu?.cancel(); toggleMaximize(target); return }
-        forwardOriginalClick(index, target: target)
+        if index == 0 {
+            if !closing.close(target) { onStatus("O aplicativo não permitiu fechar esta janela.") }
+            scheduleRefresh(after: 0.06)
+        } else if index == 1 { forwardOriginalClick(index, target: target) }
     }
     private final class ForwardClickState {
-        let index: Int
+        let button: AXUIElement
+        let rect: CGRect
         let target: WindowTarget
         let point: CGPoint
         let originalPointer: CGPoint?
@@ -656,10 +719,10 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         var localMonitor: Any?
         var globalMonitor: Any?
 
-        init(index: Int, target: WindowTarget) {
-            self.index = index
+        init(button: AXUIElement, rect: CGRect, target: WindowTarget) {
+            self.button = button
+            self.rect = rect
             self.target = target
-            let rect = target.buttonFrames[index]
             point = CGPoint(x: rect.midX, y: rect.midY)
             originalPointer = CGEvent(source: nil)?.location
             deadline = ProcessInfo.processInfo.systemUptime + 0.3
@@ -667,14 +730,15 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     }
 
     private func forwardOriginalClick(_ index: Int, target: WindowTarget) {
-        guard !forwarding, running, settings.enabled, index == 0 || index == 1,
+        guard !forwarding, running, settings.enabled, index == 1, let button = target.button(for: index),
+              let rect = target.buttonFrame(for: index),
               CGPreflightPostEventAccess() else {
             diagnostic("rejected: event posting not authorized or forwarding unavailable")
             onStatus("O macOS não autorizou o envio do clique. O botão original foi preservado.")
             hide()
             return
         }
-        let state = ForwardClickState(index: index, target: target)
+        let state = ForwardClickState(button: button, rect: rect, target: target)
         forwarding = true
         AXUIElementSetMessagingTimeout(AXUIElementCreateSystemWide(), 0.015)
         hide()
@@ -734,7 +798,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         var hit: AXUIElement?
         let hitError = AXUIElementCopyElementAtPosition(system, Float(state.point.x), Float(state.point.y), &hit)
         let hitPID = hit.map { AX.pid($0) } ?? 0
-        let same = hit.map { AX.same($0, state.target.buttons[state.index]) } ?? false
+        let same = hit.map { AX.same($0, state.button) } ?? false
         diagnostic("forward attempt=\(state.attempts) current=true top=true ownCG=[] hitError=\(hitError.rawValue) hitPID=\(hitPID) same=\(same) nudged=\(state.nudged)")
         guard ProcessInfo.processInfo.systemUptime < state.deadline else {
             finishOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
@@ -777,7 +841,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         state.posted = true
         diagnostic("forward attempt=\(state.attempts) posting HID down/up to original button")
         down.post(tap: .cghidEventTap)
-        // Always release the synthetic down, including when Smart Close changes focus.
+        // Always release the synthetic down, even if minimization changes focus.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) { up.post(tap: .cghidEventTap) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) { [weak self] in
             self?.finishOriginalClick(state, failure: nil)
@@ -793,14 +857,13 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         let app = AXUIElementCreateApplication(target.pid)
         AXUIElementSetMessagingTimeout(app, 0.015)
         guard let focused = AX.element(app, kAXFocusedWindowAttribute), AX.same(focused, target.window),
-              withinBudget(), AX.string(focused, kAXSubroleAttribute) == kAXStandardWindowSubrole,
+              withinBudget(), WindowTarget.isSupportedWindow(focused, hasCloseButton: target.controlIndices.contains(0)),
               !AX.flag(focused, kAXMinimizedAttribute), withinBudget(),
               let frame = AX.rect(focused), SystemWindow.close(frame, target.frame, tolerance: 1),
               withinBudget() else { return false }
-        let attributes = [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute]
-        guard let button = AX.element(focused, attributes[state.index]),
-              AX.same(button, target.buttons[state.index]), withinBudget(),
-              let rect = AX.rect(button), SystemWindow.close(rect, target.buttonFrames[state.index], tolerance: 1),
+        guard let button = AX.element(focused, kAXMinimizeButtonAttribute),
+              AX.same(button, state.button), withinBudget(),
+              let rect = AX.rect(button), SystemWindow.close(rect, state.rect, tolerance: 1),
               AX.flag(button, kAXEnabledAttribute), withinBudget(),
               let children = AX.value(focused, kAXChildrenAttribute) as? [AXUIElement],
               withinBudget() else { return false }
@@ -828,23 +891,127 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         if running { scheduleRefresh(after: 0.08) }
     }
     private func canResize(_ window: AXUIElement) -> Bool {
-        AX.string(window, kAXSubroleAttribute) == kAXStandardWindowSubrole &&
+        AX.string(window, kAXRoleAttribute) == kAXWindowRole &&
         !AX.flag(window, kAXMinimizedAttribute) && AX.isSettable(window, kAXPositionAttribute) && AX.isSettable(window, kAXSizeAttribute) &&
-        [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute, kAXZoomButtonAttribute].allSatisfy { AX.element(window, $0).map { AX.flag($0, kAXEnabledAttribute) } ?? false }
+        (AX.element(window, kAXZoomButtonAttribute).map { AX.flag($0, kAXEnabledAttribute) } ?? false)
     }
     private func maximizeNew(_ window: AXUIElement, pid: pid_t) {
-        guard let bundleID = NSRunningApplication(processIdentifier: pid)?.bundleIdentifier,
-              !settings.autoMaximizeExcludedBundleIDs.contains(bundleID) else { return }
-        guard running, !sessionSuspended, settings.enabled, settings.autoMaximizeNewWindows, pid != getpid(), canResize(window),
-              !(animatingWindow.map { AX.same($0, window) } ?? false),
-              let frame = AX.rect(window), let screen = WindowTarget.screen(for: frame),
-              !SystemWindow.close(frame, WindowTarget.toAX(screen.frame), tolerance: 1),
-              !restore.contains(where: { $0.pid == pid && AX.same($0.window, window) }) else { return }
-        apply(WindowTarget.toAX(screen.visibleFrame), to: window, pid: pid, preserve: true)
+        guard running, !sessionSuspended, settings.enabled, settings.autoMaximizeNewWindows,
+              pid != getpid(), let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated,
+              app.activationPolicy == .regular, AX.pid(window) == pid,
+              !autoMaximizeRequests.contains(where: { $0.application.processIdentifier == pid && AX.same($0.window, window) }) else { return }
+        autoMaximizeRequests.append(AutoMaximizeRequest(window: window, application: app, now: ProcessInfo.processInfo.systemUptime))
+        scheduleAutoMaximize()
+    }
+    private func suppressAutoMaximize(_ window: AXUIElement, pid: pid_t) {
+        if let request = autoMaximizeRequests.first(where: { $0.application.processIdentifier == pid && AX.same($0.window, window) }) {
+            request.nextCheck = nil
+        } else if let app = NSRunningApplication(processIdentifier: pid), !app.isTerminated {
+            let request = AutoMaximizeRequest(window: window, application: app, now: ProcessInfo.processInfo.systemUptime)
+            request.nextCheck = nil; autoMaximizeRequests.append(request)
+        }
+        scheduleAutoMaximize()
+    }
+    private func cancelAutoMaximize(clearHistory: Bool) {
+        autoMaximizeGeneration = UUID()
+        autoMaximizeWork?.cancel(); autoMaximizeWork = nil
+        autoMaximizeScheduledToken = nil
+        if clearHistory { autoMaximizeRequests.removeAll() }
+        else { for request in autoMaximizeRequests { request.nextCheck = nil } }
+    }
+    private func scheduleAutoMaximize() {
+        autoMaximizeWork?.cancel(); autoMaximizeWork = nil
+        autoMaximizeScheduledToken = nil
+        guard running, !sessionSuspended, settings.enabled, settings.autoMaximizeNewWindows,
+              let next = autoMaximizeRequests.compactMap(\.nextCheck).min() else { return }
+        let generation = autoMaximizeGeneration
+        let scheduledToken = UUID()
+        autoMaximizeScheduledToken = scheduledToken
+        let work = DispatchWorkItem { [weak self] in
+            guard let self, self.autoMaximizeGeneration == generation,
+                  self.autoMaximizeScheduledToken == scheduledToken else { return }
+            self.autoMaximizeWork = nil
+            self.autoMaximizeScheduledToken = nil
+            self.processAutoMaximize()
+        }
+        autoMaximizeWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + max(0.02, next - ProcessInfo.processInfo.systemUptime), execute: work)
+    }
+    private func processAutoMaximize() {
+        guard running, !sessionSuspended, settings.enabled, settings.autoMaximizeNewWindows else {
+            cancelAutoMaximize(clearHistory: false); return
+        }
+        let now = ProcessInfo.processInfo.systemUptime
+        guard let request = autoMaximizeRequests.filter({ ($0.nextCheck ?? .infinity) <= now + 0.002 })
+            .min(by: { ($0.nextCheck ?? .infinity) < ($1.nextCheck ?? .infinity) }) else { scheduleAutoMaximize(); return }
+        defer { scheduleAutoMaximize() }
+        let window = request.window, app = request.application, pid = app.processIdentifier
+        // Consume before doing work. Only a bounded transient result requeues.
+        request.nextCheck = nil
+        guard !app.isTerminated, let currentApp = NSRunningApplication(processIdentifier: pid),
+              currentApp.launchDate == app.launchDate, currentApp.activationPolicy == .regular,
+              AX.pid(window) == pid, let bundleID = currentApp.bundleIdentifier,
+              !settings.autoMaximizeExcludedBundleIDs.contains(bundleID) else {
+            diagnostic("autoMax skip=application-or-exception pid=\(pid)"); return
+        }
+        // An explicit user gesture wins. Never finish a queued automatic
+        // resize after the user has started moving/resizing a new window.
+        guard NSEvent.pressedMouseButtons == 0, manualGeometryInteraction == nil,
+              !restore.contains(where: { $0.pid == pid && AX.same($0.window, window) }) else {
+            diagnostic("autoMax skip=user-interaction-or-arranged pid=\(pid)"); return
+        }
+        let busy = forwarding || animatingWindow != nil
+        let frame = busy ? nil : AX.rect(window)
+        switch request.stability.observe(frame: frame, at: now, blocked: busy) {
+        case .wait(let delay): request.nextCheck = now + delay; return
+        case .expired: diagnostic("autoMax skip=stabilization-timeout pid=\(pid)"); return
+        case .ready: break
+        }
+        guard let frame, let screen = WindowTarget.screen(for: frame),
+              let windows = AX.value(AXUIElementCreateApplication(pid), kAXWindowsAttribute) as? [AXUIElement],
+              windows.contains(where: { AX.same($0, window) }) else { diagnostic("autoMax skip=unavailable pid=\(pid)"); return }
+        let children = AX.value(window, kAXChildrenAttribute) as? [AXUIElement]
+        let hasSheet = children == nil || (children?.count ?? 0) > 32 ||
+            children?.contains(where: {
+                guard ProcessInfo.processInfo.systemUptime < request.expiresAt else { return true }
+                guard let role = AX.string($0, kAXRoleAttribute) else { return true }
+                return role == kAXSheetRole
+            }) == true
+        guard ProcessInfo.processInfo.systemUptime < request.expiresAt else { diagnostic("autoMax skip=metadata-timeout pid=\(pid)"); return }
+        let modalInApplication = windows.contains {
+            guard ProcessInfo.processInfo.systemUptime < request.expiresAt else { return true }
+            return AX.flag($0, kAXModalAttribute)
+        }
+        guard ProcessInfo.processInfo.systemUptime < request.expiresAt else { diagnostic("autoMax skip=metadata-timeout pid=\(pid)"); return }
+        let standard = AX.string(window, kAXRoleAttribute) == kAXWindowRole &&
+            AX.string(window, kAXSubroleAttribute) == kAXStandardWindowSubrole
+        let normalLayer = SystemWindow.visible().contains { $0.pid == pid && $0.layer == 0 && SystemWindow.close($0.bounds, frame) }
+        // Automatic eligibility is intentionally stricter than the green
+        // button. A missing/disabled standard action leaves the window alone.
+        let resizable = AX.isSettable(window, kAXPositionAttribute) && AX.isSettable(window, kAXSizeAttribute) &&
+            [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute, kAXZoomButtonAttribute].allSatisfy {
+                guard ProcessInfo.processInfo.systemUptime < request.expiresAt,
+                      let button = AX.element(window, $0),
+                      ProcessInfo.processInfo.systemUptime < request.expiresAt else { return false }
+                return AX.flag(button, kAXEnabledAttribute)
+            }
+        let workArea = WindowTarget.toAX(screen.visibleFrame)
+        let decision = AutoMaximizePolicy.decision(frame: frame, workArea: workArea, isStandard: standard,
+                                                  isResizable: resizable, isAuxiliary: !normalLayer || hasSheet,
+                                                  isModal: modalInApplication, isMinimized: AX.flag(window, kAXMinimizedAttribute),
+                                                  isFullscreen: SystemWindow.close(frame, WindowTarget.toAX(screen.frame), tolerance: 2))
+        diagnostic("autoMax decision=\(decision.rawValue) pid=\(pid) width=\(Int(frame.width)) height=\(Int(frame.height))")
+        guard decision == .maximize, ProcessInfo.processInfo.systemUptime < request.expiresAt,
+              !app.isTerminated, running, !sessionSuspended, settings.enabled, settings.autoMaximizeNewWindows,
+              NSEvent.pressedMouseButtons == 0, manualGeometryInteraction == nil,
+              let confirmed = AX.rect(window), SystemWindow.close(confirmed, frame, tolerance: 2),
+              ProcessInfo.processInfo.systemUptime < request.expiresAt else { return }
+        apply(workArea, to: window, pid: pid, preserve: true)
     }
     private func toggleMaximize(_ target: WindowTarget) {
         diagnostic("maximize current=\(target.isCurrent()) resize=\(canResize(target.window))")
         guard target.isCurrent(), canResize(target.window), let screen = WindowTarget.screen(for: target.frame) else { return }
+        suppressAutoMaximize(target.window, pid: target.pid)
         hide()
         if let i = restore.firstIndex(where: { $0.pid == target.pid && AX.same($0.window, target.window) }),
            SystemWindow.close(target.frame, restore[i].applied, tolerance: 3) {
@@ -924,8 +1091,47 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         let menu = NSMenu()
         let open = menu.addItem(withTitle: "Abrir Trio", action: #selector(openSettings), keyEquivalent: ""); open.target = self
         let pause = menu.addItem(withTitle: "Pausar Trio", action: #selector(pause), keyEquivalent: ""); pause.target = self
+        populateQuitItems(in: menu)
         menu.popUp(positioning: nil, at: controls.convert(panel.mouseLocationOutsideOfEventStream, from: nil), in: controls)
     }
+    func populateQuitItems(in menu: NSMenu) {
+        guard running, settings.enabled, !sessionSuspended,
+              let app = NSWorkspace.shared.frontmostApplication, WindowClosing.canQuit(app),
+              let name = app.localizedName else { return }
+        menu.addItem(.separator())
+        for (title, action) in [("Encerrar " + name, #selector(quitSelectedApp(_:))),
+                                ("Forçar encerramento de " + name + "…", #selector(forceQuitSelectedApp(_:)))] {
+            let item = menu.addItem(withTitle: title, action: action, keyEquivalent: "")
+            item.target = self
+            item.representedObject = app
+        }
+    }
+
+    private func appForMenuItem(_ sender: NSMenuItem) -> NSRunningApplication? {
+        guard let app = sender.representedObject as? NSRunningApplication, WindowClosing.canQuit(app),
+              settings.enabled, running, !sessionSuspended,
+              NSWorkspace.shared.frontmostApplication == app else { return nil }
+        return app
+    }
+
+    @objc private func quitSelectedApp(_ sender: NSMenuItem) {
+        guard let app = appForMenuItem(sender) else { return }
+        if !app.terminate() { onStatus("O aplicativo recusou o pedido de encerramento.") }
+    }
+
+    @objc private func forceQuitSelectedApp(_ sender: NSMenuItem) {
+        guard let app = appForMenuItem(sender), let name = app.localizedName else { return }
+        let alert = NSAlert()
+        alert.messageText = "Forçar encerramento de " + name + "?"
+        alert.informativeText = "Todas as janelas deste aplicativo serão encerradas. Alterações não salvas podem ser perdidas."
+        alert.addButton(withTitle: "Cancelar")
+        alert.addButton(withTitle: "Forçar encerramento")
+        alert.alertStyle = .warning
+        alert.window.level = .modalPanel
+        guard alert.runModal() == .alertSecondButtonReturn, WindowClosing.canQuit(app) else { return }
+        if !app.forceTerminate() { onStatus("O macOS recusou o encerramento forçado de " + name + ".") }
+    }
+
     private func arrangementMenu() {
         arrangementPanel.show(below: panel.frame, relativeTo: panel.windowNumber)
         controls.holdGreenHover = arrangementPanel.isVisible
@@ -936,7 +1142,8 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     @objc private func openSettings() { onOpen() }
     @objc private func pause() { settings.enabled = false; refresh() }
     @objc private func arrange(_ sender: NSMenuItem) {
-        guard let target, target.isCurrent(), let screen = WindowTarget.screen(for: target.frame) else { hide(); return }
+        guard let target, target.button(for: 2) != nil, target.isCurrent(), canResize(target.window), let screen = WindowTarget.screen(for: target.frame) else { hide(); return }
+        suppressAutoMaximize(target.window, pid: target.pid)
         if sender.tag == 0 { toggleMaximize(target); return }
         let work = WindowTarget.toAX(screen.visibleFrame)
         var frame = target.frame

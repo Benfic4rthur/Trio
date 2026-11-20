@@ -57,17 +57,35 @@ final class SettingsStore: NSObject {
         }
     }
 
+    static let finderBundleID = "com.apple.finder"
+    var quitExcludedBundleIDs: [String] {
+        didSet {
+            quitExcludedBundleIDs = Self.normalizedQuitExceptions(quitExcludedBundleIDs)
+            guard quitExcludedBundleIDs != oldValue else { return }
+            defaults.set(quitExcludedBundleIDs, forKey: "quitExcludedBundleIDs")
+            onChange?()
+        }
+    }
+
+    private static func normalizedQuitExceptions(_ identifiers: [String]) -> [String] {
+        var result = [finderBundleID]
+        for identifier in identifiers where !identifier.isEmpty && !result.contains(identifier) { result.append(identifier) }
+        return result
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         defaults.register(defaults: ["controlsEnabled": true, "controlScale": 1.5,
                                      "showInMenuBar": false, "keepInDock": false,
                                      "autoMaximizeNewWindows": true,
+                                     "quitExcludedBundleIDs": [SettingsStore.finderBundleID],
                                      "autoMaximizeExcludedBundleIDs": ["com.apple.ActivityMonitor", "com.apple.Terminal"]])
         enabled = defaults.bool(forKey: "controlsEnabled")
         showInMenuBar = defaults.bool(forKey: "showInMenuBar")
         keepInDock = defaults.bool(forKey: "keepInDock")
         autoMaximizeNewWindows = defaults.bool(forKey: "autoMaximizeNewWindows")
         autoMaximizeExcludedBundleIDs = defaults.stringArray(forKey: "autoMaximizeExcludedBundleIDs") ?? []
+        quitExcludedBundleIDs = Self.normalizedQuitExceptions(defaults.stringArray(forKey: "quitExcludedBundleIDs") ?? [])
         let savedScale = defaults.double(forKey: "controlScale")
         scale = savedScale.isFinite ? min(5, max(1, savedScale)) : 1.5
         super.init()
@@ -86,8 +104,9 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     private let loginCheckbox = NSButton(checkboxWithTitle: "Iniciar silenciosamente com o macOS", target: nil, action: nil)
     private let menuCheckbox = NSButton(checkboxWithTitle: "Mostrar na barra de menus", target: nil, action: nil)
     private let dockCheckbox = NSButton(checkboxWithTitle: "Manter no Dock ao esconder", target: nil, action: nil)
-    private let autoMaximizeCheckbox = NSButton(checkboxWithTitle: "Abrir novas janelas maximizadas", target: nil, action: nil)
+    private let autoMaximizeCheckbox = NSButton(checkboxWithTitle: "Maximizar novas janelas grandes", target: nil, action: nil)
     private let exclusionsSummary = NSTextField(wrappingLabelWithString: "")
+    private let quitExclusionsSummary = NSTextField(wrappingLabelWithString: "")
     private var summarizedExclusions: [String]?
     private var exceptionsController: AutoMaximizeExceptionsController?
     private let loginStatus = NSTextField(wrappingLabelWithString: "")
@@ -102,7 +121,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         self.onQuit = onQuit
         self.onPermission = onPermission
         slider = NSSlider(value: settings.scale, minValue: 1, maxValue: 5, target: nil, action: nil)
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 690),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 780),
                               styleMask: [.titled, .closable, .miniaturizable],
                               backing: .buffered, defer: false)
         window.title = "Trio"
@@ -156,15 +175,21 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         let sliderRow = horizontal([secondary("1×"), slider, secondary("5×")], spacing: 10)
         let sizeExplanation = secondary("O tamanho efetivo se ajusta ao espaço livre da barra. Janelas sem uma área segura mantêm seus controles originais.")
         let greenExplanation = secondary("O verde maximiza na área útil do monitor. Clique novamente para restaurar o tamanho anterior; passe o mouse para organizar a janela.")
+        let redExplanation = secondary("O vermelho fecha esta janela e encerra o app ao fechar a última. O Finder continua aberto. Se após 5 segundos o app ainda estiver aberto sem janelas, o Trio força o encerramento.")
+        let quitExceptionsButton = button("Escolher apps…", action: #selector(showQuitExceptions))
+        let quitExceptionsRow = horizontal([secondary("Manter abertos ao fechar a última janela"), NSView(), quitExceptionsButton], spacing: 8)
+        quitExclusionsSummary.font = .systemFont(ofSize: 11)
+        quitExclusionsSummary.textColor = .secondaryLabelColor
         autoMaximizeCheckbox.target = self
         autoMaximizeCheckbox.action = #selector(toggleAutoMaximize(_:))
-        autoMaximizeCheckbox.toolTip = "Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo."
-        let autoMaximizeExplanation = secondary("Quando o aplicativo permitir redimensionar. Não afeta alertas nem caixas de diálogo.")
+        autoMaximizeCheckbox.toolTip = "Só amplia janelas principais grandes. Janelas pequenas, auxiliares e aplicativos nas exceções mantêm o tamanho de abertura."
+        let autoMaximizeExplanation = secondary("Janelas pequenas, auxiliares e apps nas exceções mantêm seu tamanho. Só janelas principais grandes e redimensionáveis são ampliadas.")
         let exclusionsButton = button("Exceções…", action: #selector(showAutoMaximizeExceptions))
         let autoMaximizeRow = horizontal([autoMaximizeCheckbox, NSView(), exclusionsButton], spacing: 8)
         exclusionsSummary.font = .systemFont(ofSize: 11)
         exclusionsSummary.textColor = .secondaryLabelColor
-        let sizeSection = vertical([sizeHeading, sliderRow, sizeExplanation, greenExplanation,
+        let sizeSection = vertical([sizeHeading, sliderRow, sizeExplanation, greenExplanation, redExplanation,
+                                    quitExceptionsRow, quitExclusionsSummary,
                                     autoMaximizeRow, autoMaximizeExplanation, exclusionsSummary], spacing: 6)
 
         let statusTitle = sectionTitle("Estado do Trio")
@@ -221,6 +246,9 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         menuCheckbox.state = settings.showInMenuBar ? .on : .off
         dockCheckbox.state = settings.keepInDock ? .on : .off
         autoMaximizeCheckbox.state = settings.autoMaximizeNewWindows ? .on : .off
+        let quitNames = settings.quitExcludedBundleIDs.prefix(3).map { AutoMaximizeExceptionsController.appName(for: $0) }
+        quitExclusionsSummary.stringValue = quitNames.joined(separator: ", ") +
+            (settings.quitExcludedBundleIDs.count > 3 ? " e mais \(settings.quitExcludedBundleIDs.count - 3)." : ".")
         if summarizedExclusions != settings.autoMaximizeExcludedBundleIDs {
             let identifiers = settings.autoMaximizeExcludedBundleIDs
             let names = identifiers.prefix(3).map { AutoMaximizeExceptionsController.appName(for: $0) }
@@ -287,6 +315,13 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
     @objc private func showAutoMaximizeExceptions() {
         guard let window, window.attachedSheet == nil else { return }
         let editor = AutoMaximizeExceptionsController(settings: settings) { [weak self] in self?.refreshControls() }
+        exceptionsController = editor
+        editor.show(asSheetOf: window)
+    }
+
+    @objc private func showQuitExceptions() {
+        guard let window, window.attachedSheet == nil else { return }
+        let editor = AutoMaximizeExceptionsController(settings: settings, kind: .quit) { [weak self] in self?.refreshControls() }
         exceptionsController = editor
         editor.show(asSheetOf: window)
     }
@@ -358,21 +393,33 @@ private final class AutoMaximizeExceptionsWindow: NSWindow {
 
 @MainActor
 private final class AutoMaximizeExceptionsController: NSWindowController, NSWindowDelegate, NSTableViewDataSource, NSTableViewDelegate {
+    enum Kind { case autoMaximize, quit }
     private let settings: SettingsStore
+    private let kind: Kind
     private let onChange: () -> Void
     private let table = NSTableView()
+    private var identifiers: [String] {
+        get { kind == .quit ? settings.quitExcludedBundleIDs : settings.autoMaximizeExcludedBundleIDs }
+        set {
+            if kind == .quit { settings.quitExcludedBundleIDs = newValue }
+            else { settings.autoMaximizeExcludedBundleIDs = newValue }
+        }
+    }
 
-    init(settings: SettingsStore, onChange: @escaping () -> Void) {
+    init(settings: SettingsStore, kind: Kind = .autoMaximize, onChange: @escaping () -> Void) {
         self.settings = settings
+        self.kind = kind
         self.onChange = onChange
         let sheet = AutoMaximizeExceptionsWindow(contentRect: NSRect(x: 0, y: 0, width: 540, height: 390),
                              styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        sheet.title = "Exceções da maximização"
+        sheet.title = kind == .quit ? "Manter aplicativos abertos" : "Exceções da maximização"
         sheet.isReleasedWhenClosed = false
         super.init(window: sheet)
         sheet.delegate = self
         let content = sheet.contentView!
-        let explanation = NSTextField(wrappingLabelWithString: "Novas janelas destes aplicativos mantêm o tamanho escolhido por eles. Você continua podendo usar o botão verde do Trio.")
+        let explanation = NSTextField(wrappingLabelWithString: kind == .quit ?
+            "Ao fechar a última janela, estes aplicativos continuam abertos. O Finder permanece sempre nesta lista. Forçar encerramento continua sendo uma ação explícita para o aplicativo inteiro." :
+            "Novas janelas destes aplicativos mantêm o tamanho escolhido por eles. Você continua podendo usar o botão verde do Trio.")
         explanation.font = .systemFont(ofSize: 13)
         let application = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("application"))
         application.width = 385
@@ -413,15 +460,17 @@ private final class AutoMaximizeExceptionsController: NSWindowController, NSWind
 
     required init?(coder: NSCoder) { fatalError("Use init(settings:onChange:)") }
     func show(asSheetOf parent: NSWindow) { table.reloadData(); if let window { parent.beginSheet(window) } }
-    func numberOfRows(in tableView: NSTableView) -> Int { settings.autoMaximizeExcludedBundleIDs.count }
+    func numberOfRows(in tableView: NSTableView) -> Int { identifiers.count }
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard settings.autoMaximizeExcludedBundleIDs.indices.contains(row) else { return nil }
+        guard identifiers.indices.contains(row) else { return nil }
         if tableColumn?.identifier.rawValue == "remove" {
-            let button = NSButton(title: "Remover", target: self, action: #selector(removeApplication(_:)))
+            let fixed = kind == .quit && identifiers[row] == SettingsStore.finderBundleID
+            let button = NSButton(title: fixed ? "Sempre aberto" : "Remover", target: self, action: #selector(removeApplication(_:)))
             button.tag = row; button.bezelStyle = .rounded; button.controlSize = .small
+            button.isEnabled = !fixed
             return button
         }
-        let id = settings.autoMaximizeExcludedBundleIDs[row]
+        let id = identifiers[row]
         let name = NSTextField(labelWithString: Self.appName(for: id))
         name.font = .systemFont(ofSize: 13, weight: .medium)
         let identifier = NSTextField(labelWithString: id)
@@ -437,6 +486,7 @@ private final class AutoMaximizeExceptionsController: NSWindowController, NSWind
             return (FileManager.default.displayName(atPath: url.path) as NSString).deletingPathExtension
         }
         switch identifier {
+        case SettingsStore.finderBundleID: return "Finder"
         case "com.apple.ActivityMonitor": return "Monitor de Atividade"
         case "com.apple.Terminal": return "Terminal"
         default: return identifier
@@ -444,8 +494,9 @@ private final class AutoMaximizeExceptionsController: NSWindowController, NSWind
     }
 
     @objc private func removeApplication(_ sender: NSButton) {
-        guard settings.autoMaximizeExcludedBundleIDs.indices.contains(sender.tag) else { return }
-        settings.autoMaximizeExcludedBundleIDs.remove(at: sender.tag)
+        guard identifiers.indices.contains(sender.tag),
+              !(kind == .quit && identifiers[sender.tag] == SettingsStore.finderBundleID) else { return }
+        identifiers.remove(at: sender.tag)
         table.reloadData(); onChange()
     }
 
@@ -469,8 +520,8 @@ private final class AutoMaximizeExceptionsController: NSWindowController, NSWind
                 alert.beginSheetModal(for: window)
                 return
             }
-            if !self.settings.autoMaximizeExcludedBundleIDs.contains(id) {
-                self.settings.autoMaximizeExcludedBundleIDs.append(id)
+            if !self.identifiers.contains(id) {
+                self.identifiers.append(id)
                 self.table.reloadData(); self.onChange()
             }
         }

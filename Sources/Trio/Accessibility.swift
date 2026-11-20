@@ -107,7 +107,36 @@ struct WindowTarget {
     let frame: CGRect
     let buttons: [AXUIElement]
     let buttonFrames: [CGRect]
+    /// Compact arrays above retain these semantic indices, never their offsets:
+    /// close = 0, minimize = 1, zoom = 2. Disabled controls stay as obstacles.
+    let controlIndices: [Int]
+    let disabledButtonFrames: [CGRect]
     let name: String
+
+    init(pid: pid_t, window: AXUIElement, id: CGWindowID, frame: CGRect,
+         buttons: [AXUIElement], buttonFrames: [CGRect], name: String,
+         controlIndices: [Int]? = nil, disabledButtonFrames: [CGRect] = []) {
+        self.pid = pid; self.window = window; self.id = id; self.frame = frame
+        self.buttons = buttons; self.buttonFrames = buttonFrames; self.name = name
+        self.controlIndices = controlIndices ?? Array(buttons.indices)
+        self.disabledButtonFrames = disabledButtonFrames
+    }
+
+    func button(for semanticIndex: Int) -> AXUIElement? {
+        guard let offset = controlIndices.firstIndex(of: semanticIndex), buttons.indices.contains(offset) else { return nil }
+        return buttons[offset]
+    }
+
+    func buttonFrame(for semanticIndex: Int) -> CGRect? {
+        guard let offset = controlIndices.firstIndex(of: semanticIndex), buttonFrames.indices.contains(offset) else { return nil }
+        return buttonFrames[offset]
+    }
+
+    static func isSupportedWindow(_ window: AXUIElement, hasCloseButton: Bool) -> Bool {
+        WindowIdentity.supportsWindow(role: AX.string(window, kAXRoleAttribute),
+            subrole: AX.string(window, kAXSubroleAttribute),
+            isModal: AX.value(window, kAXModalAttribute) as? Bool, hasCloseButton: hasCloseButton)
+    }
 
     static func focused() -> WindowTarget? {
         guard let app = NSWorkspace.shared.frontmostApplication, app.processIdentifier != getpid(),
@@ -115,22 +144,40 @@ struct WindowTarget {
         let axApp = AXUIElementCreateApplication(app.processIdentifier)
         AXUIElementSetMessagingTimeout(axApp, 0.12)
         guard let window = AX.element(axApp, kAXFocusedWindowAttribute),
-              AX.string(window, kAXSubroleAttribute) == kAXStandardWindowSubrole,
-              !AX.flag(window, kAXMinimizedAttribute), let frame = AX.rect(window) else { return nil }
+              AX.string(window, kAXRoleAttribute) == kAXWindowRole,
+              !AX.flag(window, kAXMinimizedAttribute),
+              let frame = AX.rect(window) else { return nil }
         let attributes = [kAXCloseButtonAttribute, kAXMinimizeButtonAttribute, kAXZoomButtonAttribute]
-        let buttons = attributes.compactMap { AX.element(window, $0) }
-        guard buttons.count == 3, buttons.allSatisfy({
-            AX.pid($0) == app.processIdentifier && AX.string($0, kAXRoleAttribute) == kAXButtonRole &&
-            AX.flag($0, kAXEnabledAttribute)
-        }) else { return nil }
-        let rects = buttons.compactMap { AX.rect($0) }
-        guard rects.count == 3 else { return nil }
+        var buttons: [AXUIElement] = [], rects: [CGRect] = [], controlIndices: [Int] = []
+        var nativeButtons: [AXUIElement] = [], disabledFrames: [CGRect] = []
+        for (index, attribute) in attributes.enumerated() {
+            var raw: CFTypeRef?
+            let error = AXUIElementCopyAttributeValue(window, attribute as CFString, &raw)
+            // Only documented absence permits a partial control set. A timeout,
+            // broken AX object or untyped result must not silently remove a slot.
+            if error == .attributeUnsupported || error == .noValue { continue }
+            guard error == .success, let raw, CFGetTypeID(raw) == AXUIElementGetTypeID() else { return nil }
+            let button = raw as! AXUIElement
+            guard AX.pid(button) == app.processIdentifier, AX.string(button, kAXRoleAttribute) == kAXButtonRole,
+                  !nativeButtons.contains(where: { AX.same($0, button) }),
+                  let rect = AX.rect(button), frame.contains(rect),
+                  let enabled = AX.value(button, kAXEnabledAttribute) as? Bool else { return nil }
+            nativeButtons.append(button)
+            if enabled {
+                buttons.append(button); rects.append(rect); controlIndices.append(index)
+            } else {
+                disabledFrames.append(rect)
+            }
+        }
+        guard !buttons.isEmpty,
+              isSupportedWindow(window, hasCloseButton: controlIndices.contains(0)),
+              TrioLayout.availableRegion(window: frame, controls: rects, controlIndices: controlIndices) != nil else { return nil }
         let visible = SystemWindow.visible().filter { $0.layer == 0 }
         let matches = visible.filter { $0.pid == app.processIdentifier && SystemWindow.close($0.bounds, frame) }
         var verifiedControls = false
         if matches.count > 1 {
             // Public application-scoped AX hit testing ignores our own panel
-            // and identifies the app's topmost controls. Do not infer identity
+            // and identifies every exposed enabled control. Do not infer identity
             // from equal geometry or use the private AXWindowNumber attribute.
             verifiedControls = zip(buttons, rects).allSatisfy { button, rect in
                 let center = CGPoint(x: rect.midX, y: rect.midY)
@@ -150,15 +197,19 @@ struct WindowTarget {
               !children.contains(where: { AX.string($0, kAXRoleAttribute) == kAXSheetRole }) else { return nil }
         guard let screen = screen(for: frame), !SystemWindow.close(frame, toAX(screen.frame), tolerance: 1) else { return nil }
         return WindowTarget(pid: app.processIdentifier, window: window, id: windowID, frame: frame,
-                            buttons: buttons, buttonFrames: rects, name: app.localizedName ?? "Aplicativo")
+                            buttons: buttons, buttonFrames: rects, name: app.localizedName ?? "Aplicativo",
+                            controlIndices: controlIndices, disabledButtonFrames: disabledFrames)
     }
 
     func isCurrent() -> Bool {
         guard let current = WindowTarget.focused() else { return false }
         return current.pid == pid && current.id == id && AX.same(current.window, window) &&
             SystemWindow.close(current.frame, frame, tolerance: 1) &&
+            current.controlIndices == controlIndices && current.buttons.count == buttons.count &&
+            current.buttonFrames.count == buttonFrames.count && current.disabledButtonFrames.count == disabledButtonFrames.count &&
             zip(current.buttons, buttons).allSatisfy({ AX.same($0.0, $0.1) }) &&
-            zip(current.buttonFrames, buttonFrames).allSatisfy({ SystemWindow.close($0.0, $0.1, tolerance: 1) })
+            zip(current.buttonFrames, buttonFrames).allSatisfy({ SystemWindow.close($0.0, $0.1, tolerance: 1) }) &&
+            zip(current.disabledButtonFrames, disabledButtonFrames).allSatisfy({ SystemWindow.close($0.0, $0.1, tolerance: 1) })
     }
     // No AXWindowNumber or other undocumented attributes. CG matching must be unique.
     func ownsTopmostPoint(_ point: CGPoint) -> Bool {
@@ -176,7 +227,7 @@ struct WindowTarget {
         let windows = SystemWindow.visible()
         guard let index = windows.firstIndex(where: { $0.id == id && $0.pid == pid }),
               SystemWindow.close(windows[index].bounds, frame, tolerance: 1) else { return false }
-        // The complete mask must be unobscured, not only its three centers.
+        // The complete mask must be unobscured, not only its control centers.
         return !windows[..<index].contains(where: {
             $0.pid != getpid() && $0.layer == 0 && $0.bounds.intersects(proposedBounds)
         })
@@ -198,7 +249,10 @@ struct WindowTarget {
     /// be inspected safely; an empty array means a completed, clear survey.
     func obstacles(for proposedBounds: CGRect) -> [CGRect]? {
         guard AX.validRect(proposedBounds), frame.contains(proposedBounds) else { return nil }
-        var obstacles: [CGRect] = [], visited = 0, complete = true
+        // Some AX implementations omit disabled buttons from AXChildren even
+        // though their native circles remain visible. Preserve them explicitly.
+        var obstacles = disabledButtonFrames.filter { $0.intersects(proposedBounds) }.map { $0.insetBy(dx: -2, dy: -2) }
+        var visited = 0, complete = true
         let started = ProcessInfo.processInfo.systemUptime
         let maximumDuration: TimeInterval = 0.3
         var containers: Set<String> = [kAXWindowRole, kAXGroupRole, kAXToolbarRole, kAXSplitGroupRole,

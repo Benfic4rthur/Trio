@@ -1,0 +1,156 @@
+{
+  "normal": {
+    "passed": true,
+    "trioVersion": "0.2.0",
+    "trioBuild": "12",
+    "initiallyMinimizedIndex": 4,
+    "steps": [
+      {
+        "actualRemainingCount": 4,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 4,
+        "fixtureIndex": 0,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1498,
+        "trioOverlayCGWindowID": 1493
+      },
+      {
+        "actualRemainingCount": 3,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0
+        ],
+        "expectedRemainingCount": 3,
+        "fixtureIndex": 2,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1500,
+        "trioOverlayCGWindowID": 1493
+      },
+      {
+        "actualRemainingCount": 2,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 2,
+        "fixtureIndex": 4,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1502,
+        "trioOverlayCGWindowID": 1493
+      },
+      {
+        "actualRemainingCount": 1,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 1,
+        "fixtureIndex": 1,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1499,
+        "trioOverlayCGWindowID": 1493
+      },
+      {
+        "actualRemainingCount": 0,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 0,
+        "fixtureIndex": 3,
+        "fixtureRunningAfter": false,
+        "targetCGWindowID": 1501,
+        "trioOverlayCGWindowID": 1493
+      }
+    ],
+    "HIDPosted": false
+  },
+  "recusaDeEncerramento": {
+    "passed": true,
+    "trioVersion": "0.2.0",
+    "trioBuild": "12",
+    "initiallyMinimizedIndex": 4,
+    "steps": [
+      {
+        "actualRemainingCount": 4,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 4,
+        "fixtureIndex": 0,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1522,
+        "trioOverlayCGWindowID": 1517
+      },
+      {
+        "actualRemainingCount": 3,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0
+        ],
+        "expectedRemainingCount": 3,
+        "fixtureIndex": 2,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1524,
+        "trioOverlayCGWindowID": 1517
+      },
+      {
+        "actualRemainingCount": 2,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 2,
+        "fixtureIndex": 4,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1526,
+        "trioOverlayCGWindowID": 1517
+      },
+      {
+        "actualRemainingCount": 1,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 1,
+        "fixtureIndex": 1,
+        "fixtureRunningAfter": true,
+        "targetCGWindowID": 1523,
+        "trioOverlayCGWindowID": 1517
+      },
+      {
+        "actualRemainingCount": 0,
+        "AXPressResult": 0,
+        "controlIndices": [
+          0,
+          1,
+          2
+        ],
+        "expectedRemainingCount": 0,
+        "fixtureIndex": 3,
+        "fixtureRunningAfter": false,
+        "targetCGWindowID": 1525,
+        "trioOverlayCGWindowID": 1517
+      }
+    ],
+    "HIDPosted": false
+  }
+}

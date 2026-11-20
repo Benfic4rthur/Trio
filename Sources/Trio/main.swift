@@ -33,7 +33,7 @@ private final class InstanceLease {
 }
 
 @MainActor
-private final class AppDelegate: NSObject, NSApplicationDelegate {
+private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let lease: InstanceLease
     private let settings = SettingsStore()
     private var settingsController: SettingsWindowController?
@@ -147,11 +147,19 @@ private final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(menuItem("Esconder Trio", #selector(hideSettings)))
             menu.addItem(.separator())
             menu.addItem(menuItem("Encerrar Trio", #selector(quitTrio)))
+            menu.delegate = self
             statusItem?.menu = menu
         } else if let statusItem {
             NSStatusBar.system.removeStatusItem(statusItem)
             self.statusItem = nil
         }
+    }
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard menu === statusItem?.menu,
+              let quitIndex = menu.items.firstIndex(where: { $0.action == #selector(quitTrio) }) else { return }
+        while menu.numberOfItems > quitIndex + 1 { menu.removeItem(at: menu.numberOfItems - 1) }
+        engine.populateQuitItems(in: menu)
     }
 
     private func configureApplicationMenu() {
@@ -196,6 +204,7 @@ MainActor.assumeIsolated {
             "preferredScale": preferences.scale,
             "autoMaximizeNewWindows": preferences.autoMaximizeNewWindows,
             "autoMaximizeExcludedBundleIDs": preferences.autoMaximizeExcludedBundleIDs,
+            "quitExcludedBundleIDs": preferences.quitExcludedBundleIDs,
             "showInMenuBar": preferences.showInMenuBar,
             "keepInDock": preferences.keepInDock
         ]

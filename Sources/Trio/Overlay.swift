@@ -8,10 +8,15 @@ final class TrioPanel: NSPanel {
 
 final class ControlHitButton: NSButton {
     var context: (() -> Void)?
+    var targetWindow: (() -> CGWindowID?)?
+    private(set) var trackingWindow: CGWindowID?
     override func draw(_ dirtyRect: NSRect) {}
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
     override func mouseDown(with event: NSEvent) {
         if event.modifierFlags.contains(.control) { context?(); return }
+        guard let id = targetWindow?() else { return }
+        trackingWindow = id
+        defer { trackingWindow = nil }
         super.mouseDown(with: event)
     }
     override func rightMouseDown(with event: NSEvent) { context?() }
@@ -21,13 +26,15 @@ final class ControlHitButton: NSButton {
 /// their complete hit regions. Hover never invokes a window action.
 @MainActor final class TrioControlsView: NSView {
     var onAction: ((Int) -> Void)?
+    var targetWindow: (() -> CGWindowID?)?
     var onContext: (() -> Void)?
     var onGreenHover: (() -> Void)?
     var onHoverChange: ((Int?) -> Void)?
     var holdGreenHover = false
     var hover: Int? {
         didSet {
-            guard hover != oldValue, !resettingHover else { return }
+            guard hover != oldValue, !resettingHover,
+                  hover.map({ activeSlots.contains($0) }) ?? true else { return }
             startAnimation()
             onHoverChange?(hover)
             if hover == 2 { onGreenHover?() }
@@ -38,6 +45,9 @@ final class ControlHitButton: NSButton {
     private var resettingHover = false
     private var zoom = [CGFloat](repeating: 1, count: 3)
     private var hitButtons: [ControlHitButton] = []
+    /// Positions in `circles` are compact; actions and accessibility tags always
+    /// retain their native meaning: 0 close/quit, 1 minimize, 2 zoom/restore.
+    private var activeSlots: [Int] = []
     var circles: [CGRect] = []
     override var isFlipped: Bool { true }
     // The containing window supplies its rounded material. Declaring this
@@ -46,9 +56,11 @@ final class ControlHitButton: NSButton {
 
     override init(frame: NSRect) {
         super.init(frame: frame)
-        for (i,label) in ["Fechar pelo botão original", "Minimizar janela", "Maximizar ou restaurar janela"].enumerated() {
+        for (i,label) in ["Fechar janela", "Minimizar janela", "Maximizar ou restaurar janela"].enumerated() {
             let b = ControlHitButton(title: label, target: self, action: #selector(clicked(_:)))
             b.tag = i; b.isBordered = false; b.setAccessibilityLabel(label)
+            b.isHidden = true; b.isEnabled = false; b.setAccessibilityHidden(true)
+            b.targetWindow = { [weak self] in self?.targetWindow?() }
             b.context = { [weak self] in self?.onContext?() }
             addSubview(b); hitButtons.append(b)
         }
@@ -57,18 +69,42 @@ final class ControlHitButton: NSButton {
     deinit { timer?.invalidate() }
 
     func configure(layout: ControlLayout, mask: CGRect) {
+        let slots = layout.controlIndices
+        // Reject malformed mappings rather than exposing a control with an
+        // invented meaning or leaving a previous window's hit regions alive.
+        guard (1...3).contains(slots.count), slots.count == layout.circles.count,
+              Set(slots).count == slots.count, slots.allSatisfy({ (0...2).contains($0) }),
+              zip(slots, slots.dropFirst()).allSatisfy({ $0 < $1 }) else {
+            resetHover(); activeSlots = []; circles = []
+            for button in hitButtons {
+                button.isHidden = true; button.isEnabled = false
+                button.setAccessibilityHidden(true); button.frame = .zero
+            }
+            needsDisplay = true
+            return
+        }
+        if activeSlots != slots { resetHover() }
+        activeSlots = slots
         circles = layout.circles.map { $0.offsetBy(dx: -mask.minX, dy: -mask.minY) }
         // Re-establish the complete frame after a backing-store/session change.
         // Resizing only the size can preserve an old parent-relative origin.
         frame = CGRect(origin: .zero, size: mask.size)
-        for i in 0..<3 {
-            let start: CGFloat = i == 0 ? 0 : (circles[i-1].midX + circles[i].midX)/2
-            let end: CGFloat = i == 2 ? bounds.width : (circles[i].midX + circles[i+1].midX)/2
-            hitButtons[i].frame = CGRect(x: start, y: 0, width: end-start, height: bounds.height)
+        for (slot, button) in hitButtons.enumerated() {
+            guard let position = slots.firstIndex(of: slot) else {
+                button.isHidden = true; button.isEnabled = false
+                button.setAccessibilityHidden(true); button.frame = .zero
+                continue
+            }
+            let start: CGFloat = position == 0 ? 0 : (circles[position-1].midX + circles[position].midX)/2
+            let end: CGFloat = position == circles.count-1 ? bounds.width : (circles[position].midX + circles[position+1].midX)/2
+            button.frame = CGRect(x: start, y: 0, width: end-start, height: bounds.height)
+            button.isHidden = false; button.isEnabled = true; button.setAccessibilityHidden(false)
         }
         needsDisplay = true
     }
     @objc private func clicked(_ sender: NSButton) {
+        guard activeSlots.contains(sender.tag), sender.isEnabled, !sender.isHidden else { return }
+        if let downWindow = (sender as? ControlHitButton)?.trackingWindow, downWindow != targetWindow?() { return }
         // The enlarged, topmost light can cover a neighboring button's cell.
         // Route a physical click to what was drawn at the pointer; keyboard and
         // Accessibility presses continue to address the actual accessible button.
@@ -77,7 +113,7 @@ final class ControlHitButton: NSButton {
            event.window === window {
             let point = convert(event.locationInWindow, from: nil)
             guard bounds.contains(point) else { return }
-            if let hover, containsVisualCircle(hover, point: point) { onAction?(hover); return }
+            if let hover, activeSlots.contains(hover), containsVisualCircle(hover, point: point) { onAction?(hover); return }
         }
         onAction?(sender.tag)
     }
@@ -95,17 +131,18 @@ final class ControlHitButton: NSButton {
     }
     private func updateHover(_ event: NSEvent) {
         let p = convert(event.locationInWindow, from: nil)
-        guard bounds.contains(p), circles.count == 3 else { hover = nil; return }
+        guard bounds.contains(p), !circles.isEmpty, circles.count == activeSlots.count else { hover = nil; return }
         // Choose by the fixed centers so an enlarged red light cannot prevent
         // the pointer from reaching the yellow or green base control.
-        let next = (0..<3).min(by: { abs(circles[$0].midX-p.x) < abs(circles[$1].midX-p.x) })
+        let next = circles.indices.min(by: { abs(circles[$0].midX-p.x) < abs(circles[$1].midX-p.x) }).map { activeSlots[$0] }
         if next != hover { hover = next }
     }
     private func startAnimation() {
         timer?.invalidate()
         let to: [CGFloat] = (0..<3).map { index in
+            guard let position = activeSlots.firstIndex(of: index) else { return 1 }
             if hover == index { return 2.2 }
-            if let hover, abs(hover-index) == 1 { return 1.12 }
+            if let hover, let hoveredPosition = activeSlots.firstIndex(of: hover), abs(hoveredPosition-position) == 1 { return 1.12 }
             return 1
         }
         if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
@@ -136,8 +173,8 @@ final class ControlHitButton: NSButton {
     }
 
     private func visualCircle(_ index: Int) -> CGRect {
-        guard circles.indices.contains(index) else { return .zero }
-        let base = circles[index]
+        guard let position = activeSlots.firstIndex(of: index), circles.indices.contains(position) else { return .zero }
+        let base = circles[position]
         let d = max(0, min(base.width*zoom[index], bounds.height-4, bounds.width-4))
         let centerX = max(d/2+2, min(bounds.width-d/2-2, base.midX))
         let centerY = max(d/2+2, min(bounds.height-d/2-2, base.midY))
@@ -156,9 +193,9 @@ final class ControlHitButton: NSButton {
         // This transparent layer retains its backing store. Remove the previous
         // hover/frame before painting; otherwise old colored pixels can survive.
         NSGraphicsContext.current?.cgContext.clear(dirtyRect)
-        guard circles.count == 3 else { return }
-        var order = [0,1,2]
-        if let hover { order.removeAll(where: { $0 == hover }); order.append(hover) }
+        guard !circles.isEmpty, circles.count == activeSlots.count else { return }
+        var order = activeSlots
+        if let hover, activeSlots.contains(hover) { order.removeAll(where: { $0 == hover }); order.append(hover) }
         for i in order {
             // The enlarged light remains inside the measured safe mask. At the
             // two ends it moves inward rather than extending onto a toolbar.

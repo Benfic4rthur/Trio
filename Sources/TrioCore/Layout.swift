@@ -6,11 +6,14 @@ public struct ControlLayout: Equatable, Sendable {
     public let frame: CGRect
     public let circles: [CGRect]
     public let effectiveScale: Double
+    /// Semantic indices aligned with circles: close = 0, minimize = 1, zoom = 2.
+    public let controlIndices: [Int]
 
-    public init(frame: CGRect, circles: [CGRect], effectiveScale: Double) {
+    public init(frame: CGRect, circles: [CGRect], effectiveScale: Double, controlIndices: [Int]? = nil) {
         self.frame = frame
         self.circles = circles
         self.effectiveScale = effectiveScale
+        self.controlIndices = controlIndices ?? Array(circles.indices)
     }
 }
 
@@ -24,22 +27,22 @@ public struct LayoutFailure: Error, Equatable, Sendable {
 
 public enum TrioLayout {
     /// The complete reservation allowed by the user. Horizontal expansion ends
-    /// five points after the original green button; it never consumes the next
+    /// five points after the last exposed control; it never consumes the next
     /// toolbar item. Vertical growth stays symmetric around the native row.
-    public static func availableRegion(window: CGRect, controls: [CGRect]) -> CGRect? {
-        guard valid(window), controls.count == 3, controls.allSatisfy(valid) else { return nil }
+    public static func availableRegion(window: CGRect, controls: [CGRect], controlIndices: [Int]? = nil) -> CGRect? {
+        guard valid(window), semanticIndices(for: controls, provided: controlIndices) != nil,
+              controls.allSatisfy(valid) else { return nil }
         let nativeUnion = controls.dropFirst().reduce(controls[0]) { $0.union($1) }
         let centerY = nativeUnion.midY
         let diameter = controls.map(\.height).max()!
         let tolerance = max(2, diameter * 0.2)
         guard controls.allSatisfy({ abs($0.midY - centerY) <= tolerance }),
-              controls[0].maxX <= controls[1].minX,
-              controls[1].maxX <= controls[2].minX,
+              ordered(controls),
               window.contains(nativeUnion),
-              nativeUnion.minX - window.minX <= min(120, window.width * 0.25),
-              centerY - window.minY <= min(120, window.height * 0.25) else { return nil }
+              nativeUnion.minX - window.minX <= min(120, max(diameter * 2, window.width * 0.25)),
+              centerY - window.minY <= min(120, max(diameter * 2, window.height * 0.25)) else { return nil }
         let left = window.minX + 1
-        let right = min(window.maxX - 1, controls[2].maxX + 5)
+        let right = min(window.maxX - 1, controls.last!.maxX + 5)
         let halfHeight = min(centerY - (window.minY + 1), window.maxY - 1 - centerY)
         let region = CGRect(x: left, y: centerY - halfHeight, width: right - left, height: halfHeight * 2)
         return valid(region) ? region : nil
@@ -52,12 +55,13 @@ public enum TrioLayout {
         window: CGRect,
         controls: [CGRect],
         requestedScale: Double,
-        obstacles: [CGRect]
+        obstacles: [CGRect],
+        controlIndices: [Int]? = nil
     ) -> Result<ControlLayout, LayoutFailure> {
         guard valid(window) else { return failure("A geometria da janela é inválida.") }
         guard requestedScale.isFinite else { return failure("O tamanho solicitado é inválido.") }
-        guard controls.count == 3, controls.allSatisfy(valid) else {
-            return failure("Não foram encontrados três controles com geometria válida.")
+        guard let indices = semanticIndices(for: controls, provided: controlIndices), controls.allSatisfy(valid) else {
+            return failure("Não foram encontrados de um a três controles com identidade e geometria válidas.")
         }
         guard obstacles.allSatisfy(valid) else {
             return failure("A geometria de uma ferramenta próxima é inválida.")
@@ -68,17 +72,16 @@ public enum TrioLayout {
         let centerY = nativeUnion.midY
         let rowTolerance = max(2, nativeDiameter * 0.2)
         guard controls.allSatisfy({ abs($0.midY - centerY) <= rowTolerance }),
-              controls[0].maxX <= controls[1].minX,
-              controls[1].maxX <= controls[2].minX else {
+              ordered(controls) else {
             return failure("Os controles não formam uma linha na ordem esperada.")
         }
         guard window.contains(nativeUnion),
-              nativeUnion.minX - window.minX <= min(120, window.width * 0.25),
-              centerY - window.minY <= min(120, window.height * 0.25) else {
+              nativeUnion.minX - window.minX <= min(120, max(nativeDiameter * 2, window.width * 0.25)),
+              centerY - window.minY <= min(120, max(nativeDiameter * 2, window.height * 0.25)) else {
             return failure("Os controles não estão no canto superior esquerdo da janela.")
         }
 
-        guard let reservation = availableRegion(window: window, controls: controls) else {
+        guard let reservation = availableRegion(window: window, controls: controls, controlIndices: indices) else {
             return failure("Não há uma região segura para os controles nesta janela.")
         }
         let mask = nativeUnion.insetBy(dx: -2, dy: -2)
@@ -100,7 +103,7 @@ public enum TrioLayout {
             let panel = mask.union(envelope.insetBy(dx: -1, dy: -1))
             guard valid(panel), reservation.contains(panel),
                   !obstacles.contains(where: { overlaps(panel, $0) }) else { return nil }
-            return ControlLayout(frame: panel, circles: circles, effectiveScale: scale)
+            return ControlLayout(frame: panel, circles: circles, effectiveScale: scale, controlIndices: indices)
         }
 
         // Concentric circles form nested envelopes, allowing a bounded search.
@@ -121,6 +124,18 @@ public enum TrioLayout {
             }
         }
         return .success(best)
+    }
+
+    private static func semanticIndices(for controls: [CGRect], provided: [Int]?) -> [Int]? {
+        let indices = provided ?? Array(controls.indices)
+        guard (1...3).contains(controls.count), indices.count == controls.count,
+              indices.allSatisfy({ (0...2).contains($0) }),
+              zip(indices, indices.dropFirst()).allSatisfy({ $0 < $1 }) else { return nil }
+        return indices
+    }
+
+    private static func ordered(_ controls: [CGRect]) -> Bool {
+        zip(controls, controls.dropFirst()).allSatisfy { $0.maxX <= $1.minX }
     }
 
     private static func valid(_ rect: CGRect) -> Bool {

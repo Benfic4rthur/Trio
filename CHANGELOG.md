@@ -1,5 +1,12 @@
 # Histórico do Trio
 
+## 0.2.0 — build 12 · 20/11/2026
+
+- O vermelho aciona o fechar da janela selecionada. Quando ela é a última e o fechamento foi confirmado, o Trio pede ao aplicativo que encerre. Se a mesma instância ainda estiver rodando cinco segundos depois, o Trio pode forçar o encerramento após reconfirmar que ela segue sem janelas. Outras janelas abertas e minimizadas são preservadas.
+- Nova lista de aplicativos que devem continuar abertos após fechar a última janela. O Finder vem incluído. O pedido explícito de encerrar todas as janelas fica no menu do Trio.
+- Janelas com apenas o botão de fechar também podem receber o Trio. Se faltar espaço, o Trio pode apresentar só o vermelho e preservar as ferramentas vizinhas.
+- A maximização automática considera o tamanho inicial em pontos e a proporção da área útil do monitor. Janelas pequenas, folhas e diálogos conservam suas dimensões.
+
 ## 0.1.4 — build 11 · 18/11/2026
 
 - Corrige a recusa de janelas, como a do Claude, quando a árvore AX contém elementos vazios fora da região reservada aos controles.

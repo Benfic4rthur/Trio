@@ -4,7 +4,9 @@ import AppKit
 // because its last window closed, and records close/terminate as distinct events.
 final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var windows: [NSWindow] = []
+    private var windowIndices: [ObjectIdentifier: Int] = [:]
     let arguments = ProcessInfo.processInfo.arguments
+    var redLifecycleTest: Bool { arguments.contains("--red-lifecycle-test") }
     var logURL: URL {
         if let index = arguments.firstIndex(of: "--log"), arguments.indices.contains(index + 1) {
             return URL(fileURLWithPath: arguments[index + 1])
@@ -16,7 +18,10 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func record(_ event: String, window: NSWindow? = nil, extra: [String: Any] = [:]) {
         var entry: [String: Any] = ["event": event, "pid": ProcessInfo.processInfo.processIdentifier,
                                     "time": Date().timeIntervalSince1970]
-        if let window { entry["window"] = window.windowNumber; entry["title"] = window.title }
+        if let window {
+            entry["window"] = window.windowNumber; entry["title"] = window.title
+            entry["fixtureIndex"] = windowIndices[ObjectIdentifier(window)]
+        }
         extra.forEach { entry[$0.key] = $0.value }
         guard let data = try? JSONSerialization.data(withJSONObject: entry, options: .sortedKeys),
               let line = String(data: data, encoding: .utf8) else { return }
@@ -52,43 +57,59 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let requestedCount: Int? = arguments.firstIndex(of: "--window-count").flatMap { index in
             arguments.indices.contains(index+1) ? Int(arguments[index+1]) : nil
         }
-        let count = requestedCount.map { min(15,max(1,$0)) } ?? (arguments.contains("--two-windows") ? 2 : 1)
+        let count = redLifecycleTest ? 5 : requestedCount.map { min(15,max(1,$0)) } ?? (arguments.contains("--two-windows") ? 2 : 1)
         for index in 0..<count { makeWindow(index: index) }
-        record("launched", extra: ["customTitlebar": arguments.contains("--custom-titlebar"), "windowCount": windows.count])
+        if redLifecycleTest { windows[4].miniaturize(nil) }
+        record("launched", extra: ["customTitlebar": arguments.contains("--custom-titlebar"), "windowCount": windows.count,
+                                   "redLifecycleTest": redLifecycleTest])
         NSApp.activate()
-        windows.last?.makeKeyAndOrderFront(nil)
+        (redLifecycleTest ? windows.first : windows.last)?.makeKeyAndOrderFront(nil)
     }
 
     func makeWindow(index: Int) {
         var style: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
+        let closeOnly = redLifecycleTest && index == 2
+        if closeOnly { style = [.titled, .closable] }
         if arguments.contains("--custom-titlebar") { style.insert(.fullSizeContentView) }
         if arguments.contains("--no-resize") { style.remove(.resizable) }
-        let window = NSWindow(contentRect: NSRect(x: 260 + index * 45, y: 180 + index * 45, width: 680, height: 460),
+        let area = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        let contentRect = redLifecycleTest
+            ? NSRect(x: area.minX + 40 + CGFloat(index * 55), y: area.minY + 80 + CGFloat(index * 55), width: 420, height: 280)
+            : NSRect(x: 260 + index * 45, y: 180 + index * 45, width: 680, height: 460)
+        let window = NSWindow(contentRect: contentRect,
                               styleMask: style, backing: .buffered, defer: false)
+        windowIndices[ObjectIdentifier(window)] = index
+        if redLifecycleTest { window.setAccessibilityIdentifier("trio-fixture-red-lifecycle-\(index)") }
         window.title = arguments.contains("--custom-titlebar") ? "Trio Fixture • Barra personalizada \(index + 1)" : "Trio Fixture • Barra padrão \(index + 1)"
         window.delegate = self
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 360, height: 240)
+        window.minSize = redLifecycleTest ? NSSize(width: 300, height: 200) : NSSize(width: 360, height: 240)
+        if closeOnly {
+            for kind: NSWindow.ButtonType in [.miniaturizeButton, .zoomButton] {
+                let button = window.standardWindowButton(kind)
+                button?.isEnabled = false; button?.isHidden = true; button?.setAccessibilityHidden(true)
+            }
+        }
         if arguments.contains("--no-close") { window.standardWindowButton(.closeButton)?.isHidden = true }
         if arguments.contains("--no-buttons") {
             for kind: NSWindow.ButtonType in [.closeButton, .miniaturizeButton, .zoomButton] {
                 window.standardWindowButton(kind)?.isHidden = true
             }
         }
-        let content = NSView(frame: NSRect(x: 0, y: 0, width: 680, height: 460))
+        let content = NSView(frame: NSRect(origin: .zero, size: contentRect.size))
         content.autoresizingMask = [.width, .height]
         let headline = NSTextField(labelWithString: "Janela de teste do Trio")
-        headline.font = .systemFont(ofSize: 24, weight: .semibold)
+        headline.font = .systemFont(ofSize: redLifecycleTest ? 18 : 24, weight: .semibold)
         headline.translatesAutoresizingMaskIntoConstraints = false
         let body = NSTextField(wrappingLabelWithString: "Sem documentos ou dados pessoais.\n\nFechar a última janela mantém este processo ativo. Se o processo encerrar após um clique vermelho, o evento applicationWillTerminate ficará registrado.\n\nUse esta janela para testar minimizar, maximizar, restaurar, mover e redimensionar.")
-        body.font = .systemFont(ofSize: 14)
+        body.font = .systemFont(ofSize: redLifecycleTest ? 12 : 14)
         body.textColor = .secondaryLabelColor
         body.translatesAutoresizingMaskIntoConstraints = false
         content.addSubview(headline)
         content.addSubview(body)
         NSLayoutConstraint.activate([
             headline.leadingAnchor.constraint(equalTo: content.leadingAnchor, constant: 32),
-            headline.topAnchor.constraint(equalTo: content.topAnchor, constant: 84),
+            headline.topAnchor.constraint(equalTo: content.topAnchor, constant: redLifecycleTest ? 42 : 84),
             body.leadingAnchor.constraint(equalTo: headline.leadingAnchor),
             body.trailingAnchor.constraint(equalTo: content.trailingAnchor, constant: -32),
             body.topAnchor.constraint(equalTo: headline.bottomAnchor, constant: 16)
@@ -107,7 +128,7 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.contentView = content
         windows.append(window)
         window.makeKeyAndOrderFront(nil)
-        record("windowCreated", window: window)
+        record("windowCreated", window: window, extra: ["closeOnly": closeOnly, "principal": index == 0])
     }
 
     @objc func toolClicked(_ sender: NSButton) { record("nearbyToolClicked", window: sender.window) }
@@ -127,6 +148,7 @@ final class FixtureDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         record("applicationShouldTerminate")
+        if redLifecycleTest && arguments.contains("--decline-quit") { return .terminateCancel }
         return .terminateNow
     }
     func applicationWillTerminate(_ notification: Notification) { record("applicationWillTerminate") }

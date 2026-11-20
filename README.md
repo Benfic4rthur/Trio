@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.1.4 · build 11</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.2.0 · build 12</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -23,13 +23,13 @@ O instalador não pede administrador, não remove a quarentena nem desativa prot
 
 | Controle | O que faz |
 | --- | --- |
-| Vermelho | Encaminha o clique ao botão original, preservando a integração testada com Smart Close. |
+| Vermelho | Fecha a janela clicada. Depois da última janela confirmada, o Trio solicita o encerramento do aplicativo. O Finder e os apps da lista de exceções ficam dispensados desse pedido. |
 | Amarelo | Minimiza pelo controle original. |
 | Verde | Maximiza dentro da área útil do monitor, sem tela cheia; outro clique restaura a geometria anterior. |
 | Mouse sobre o verde | Abre opções para maximizar, organizar em metades ou centralizar. |
-| Botão direito | Abre o menu com **Abrir Trio**, sem executar uma ação da janela. |
+| Botão direito | Abre **Abrir Trio** e, quando aplicável, **Encerrar [aplicativo]** para sair de todas as janelas. O pedido manual de encerramento forçado exige confirmação. |
 
-Fechar e minimizar exigem clique. O tamanho solicitado pode ser configurado entre **1× e 5×**, com ajuste ao espaço disponível. A preferência inicial é **1,5×**, e atualizações preservam o tamanho já escolhido; no Codex medido, os controles de 16 pontos passam a 24 pontos. A área termina até cinco pontos depois do verde original, preservando ferramentas próximas.
+Fechar e minimizar exigem clique. O tamanho solicitado pode ser configurado entre **1× e 5×**, com ajuste ao espaço disponível. A preferência inicial é **1,5×**, e atualizações preservam o tamanho já escolhido; no Codex medido, os controles de 16 pontos passam a 24 pontos. A área termina até cinco pontos depois do último controle disponível, preservando ferramentas próximas.
 
 Os círculos em repouso ficam nos centros dos controles originais e cobrem os botões pequenos. O desenho usa cores explícitas em sRGB: vermelho `#FF5F57`, amarelo `#FFBC2E` e verde `#28C840`, sem a mistura branca usada em iterações anteriores. A área ao redor é quase transparente. Durante movimento que não possa ser acompanhado com segurança, o Trio oculta os controles e os reapresenta após confirmar a posição.
 
@@ -39,13 +39,20 @@ O Trio pode iniciar com a sessão sem abrir as configurações. Abrir o app manu
 
 Dock e barra de menus vêm desativados para o uso em segundo plano e podem ser habilitados nas configurações. Também é possível abrir os ajustes pelo botão direito na área dos controles.
 
-**Abrir novas janelas maximizadas** é uma preferência opcional, com lista de exceções por aplicativo. Alertas e janelas que não permitem redimensionamento recebem tratamento conservador.
+O Trio amplia os controles disponíveis na janela em primeiro plano, inclusive quando há apenas o vermelho. Seletores de arquivo em folha e janelas modais conservam os controles do sistema.
+
+**Abrir novas janelas maximizadas** considera as dimensões iniciais da janela e a área útil do monitor. Janelas pequenas conservam o tamanho original. Terminal e Monitor de Atividade já vêm na lista de exceções.
+
+**Manter abertos ao fechar a última janela** tem sua própria lista nos ajustes. Adicione, por exemplo, o Claude para que o Trio apenas feche suas janelas. A decisão do próprio aplicativo de sair quando a última janela fecha continua valendo. O Smart Close é opcional. O Trio aciona o botão acessível da janela e confere se ainda existem outras, inclusive minimizadas, antes de pedir o encerramento. Se a mesma instância continuar em segundo plano por cinco segundos depois do pedido, o Trio confere a lista de janelas e as exceções novamente antes de forçar a saída. Se a contagem for incerta, o aplicativo permanece aberto.
+
+Os critérios e exemplos por resolução estão no [estudo de tamanho das janelas](docs/AUTO_MAXIMIZE.md). O ensaio com cinco janelas está no [relatório da versão](docs/STATUS.md).
 
 ## Versão atual e últimas mudanças
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
-| **0.1.4** | **11** | **18/11/2026** | Compatibilidade com elementos invisíveis de barras personalizadas, incluindo o Claude. |
+| **0.2.0** | **12** | **20/11/2026** | Fechamento por janela com exceções, ampliação do vermelho sozinho e maximização automática por tamanho. |
+| 0.1.4 | 11 | 18/11/2026 | Compatibilidade com elementos invisíveis de barras personalizadas, incluindo o Claude. |
 | 0.1.3 | 10 | 15/11/2026 | Cliques parados na barra mantêm o Trio visível; ocultação apenas no arrasto. |
 | 0.1.2 | 9 | 15/11/2026 | Retomada após bloqueio, alinhamento quando a barra muda e limpeza do desenho da onda. |
 | **0.1.1** | **8** | **14/11/2026** | Identidade de janelas coincidentes, troca segura de foco e cores explícitas em sRGB. |

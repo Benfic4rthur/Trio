@@ -1,5 +1,8 @@
 # SmartClose: investigação de compatibilidade
 
+Desde a versão 0.2.0 o vermelho do Trio fecha a janela pelo botão acessível. Ao confirmar o fechamento da última janela, o Trio pode pedir o encerramento do aplicativo. As exceções são configuradas no próprio Trio. O estudo abaixo documenta o comportamento das versões anteriores.
+
+
 Data da inspeção: 14/11/2026. Nenhuma preferência, permissão ou processo do SmartClose foi alterado.
 
 ## Evidências locais observadas

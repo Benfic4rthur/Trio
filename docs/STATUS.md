@@ -1,20 +1,26 @@
 # Estado do Trio
 
-Atualizado em **18/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.1.4, build 11.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **20/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.2.0, build 12.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.1.4, build 11**, instalada em `/Applications/Trio.app`. |
+| Versão atual | **0.2.0, build 12**, instalada em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`. **1.868.484 bytes**. com instalador. guia 0.1.4 e app Universal; extração e assinatura conferidas localmente. |
-| Integridade do ZIP | SHA-256 `9af0e43f78d8f14be78404e45c970de67f1e362bfedce50104d1f50b0e4a1fdb`; pacote, checksum e metadados atualizados juntos. |
+| Pacote | `Trio-macOS-universal.zip`. 1.954.998 bytes. Inclui o instalador, o guia e o app Universal. |
+| Integridade do ZIP | SHA-256 `2cbace460392b0f2108d912ab6b7d99f9f717edcb5da8b58479984f011fe094a`; pacote, checksum e metadados atualizados juntos. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Fechamento e tamanho de janelas na build 12
+
+Foram usados cinco IDs distintos num aplicativo de teste AppKit, com uma janela minimizada e uma janela que disponibilizava somente fechar. Os quatro primeiros fechamentos preservaram o processo e as janelas esperadas. O último encerrou o aplicativo. Uma segunda rodada fez o aplicativo recusar o encerramento normal. O encerramento forçado passou na versão instalada e o Trio continuou em execução. [Resultados por janela](validation/0.2.0-build12/closing.json).
+
+O primeiro ensaio identificou superfícies que o WindowServer guardava depois de fechar a janela. A versão publicada usa o inventário de janelas acessíveis do aplicativo e verifica as janelas visíveis antes de encerrar. O teste de persistência usou preferências isoladas. Os 49 testes do núcleo passaram. A matriz de tamanhos inclui o monitor do ensaio e duas resoluções simuladas. [Critérios de tamanho](AUTO_MAXIMIZE.md).
 
 ## Compatibilidade do Claude — build 11
 
@@ -63,6 +69,6 @@ As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) id
 
 ## Limites de compatibilidade
 
-O Trio atende à **janela ativa compatível**. Controles ausentes, identidade ambígua, ferramentas próximas ou informações de Acessibilidade incompletas levam à preservação dos controles originais. A preferência de 5× é um limite solicitado e pode ser reduzida pelo espaço; não foi validada como tamanho efetivo em janelas comuns.
+O Trio atende à **janela ativa compatível**. O Trio pode ampliar apenas o vermelho. Identidade ambígua, ferramentas na área do vermelho ou informações de Acessibilidade insuficientes levam à preservação dos controles originais. A preferência de 5× é um limite solicitado e pode ser reduzida pelo espaço; não foi validada como tamanho efetivo em janelas comuns.
 
-As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. O vermelho não usa encerramento direto ou fallback silencioso por AXPress para imitar o Smart Close.
+As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. Na build 12, o vermelho fecha a janela pelo controle acessível e só pede o encerramento automático depois de confirmar a última janela e consultar as exceções. Se a instância ainda estiver rodando após cinco segundos, o Trio reconfirma que ela segue sem janelas antes de forçar o encerramento.

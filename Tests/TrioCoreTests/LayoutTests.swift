@@ -24,6 +24,90 @@ final class LayoutTests: XCTestCase {
         XCTAssertEqual(result.circles[0].midY, originals()[0].midY, accuracy: 0.0001)
     }
 
+    func testCloseOnlyLayoutEnlargesOneRealControlWithoutInventingOtherSlots() throws {
+        let close = originals()[0]
+        let result = try TrioLayout.calculate(window: window, controls: [close], requestedScale: 5,
+                                              obstacles: [], controlIndices: [0]).get()
+        XCTAssertEqual(result.controlIndices, [0])
+        XCTAssertEqual(result.circles.count, 1)
+        XCTAssertGreaterThan(result.effectiveScale, 1)
+        XCTAssertLessThanOrEqual(result.frame.maxX, close.maxX + 5)
+        XCTAssertTrue(result.frame.contains(close.insetBy(dx: -2, dy: -2)))
+        XCTAssertEqual(result.circles[0].midX, close.midX)
+        XCTAssertEqual(result.circles[0].midY, close.midY)
+    }
+
+    func testSmallAuxiliaryTitlebarCanFitCloseWithoutRequiringALargeDocumentArea() throws {
+        let small = CGRect(x: 100, y: 100, width: 40, height: 64)
+        let close = originals()[0]
+        let result = try TrioLayout.calculate(window: small, controls: [close], requestedScale: 3,
+                                              obstacles: [], controlIndices: [0]).get()
+        XCTAssertGreaterThan(result.effectiveScale, 1)
+        XCTAssertTrue(small.contains(result.frame))
+        XCTAssertLessThanOrEqual(result.frame.maxX, close.maxX + 5)
+    }
+
+    func testTwoControlsPreserveTheirDistinctSemanticsAndOriginalCenters() throws {
+        let native = originals()
+        for (frames, indices) in [([native[0], native[1]], [0, 1]),
+                                  ([native[0], native[2]], [0, 2]),
+                                  ([native[1], native[2]], [1, 2])] {
+            let result = try TrioLayout.calculate(window: window, controls: frames, requestedScale: 1.3,
+                                                  obstacles: [], controlIndices: indices).get()
+            XCTAssertEqual(result.controlIndices, indices)
+            XCTAssertEqual(result.circles.count, 2)
+            XCTAssertLessThanOrEqual(result.frame.maxX, frames.last!.maxX + 5)
+            for (circle, original) in zip(result.circles, frames) {
+                XCTAssertEqual(circle.midX, original.midX)
+                XCTAssertEqual(circle.midY, original.midY)
+            }
+        }
+    }
+
+    func testExplicitZoomOnlyDoesNotBecomeClose() throws {
+        let result = try TrioLayout.calculate(window: window, controls: [originals()[2]], requestedScale: 1.3,
+                                              obstacles: [], controlIndices: [2]).get()
+        XCTAssertEqual(result.controlIndices, [2])
+        XCTAssertEqual(result.circles.count, 1)
+    }
+
+    func testLegacyOneAndTwoControlCallsKeepLeadingSemanticIndices() throws {
+        XCTAssertEqual(try layout(controls: Array(originals().prefix(1))).controlIndices, [0])
+        XCTAssertEqual(try layout(controls: Array(originals().prefix(2))).controlIndices, [0, 1])
+        XCTAssertEqual(try layout().controlIndices, [0, 1, 2])
+    }
+
+    func testMalformedSemanticSlotsAndEmptyOrExcessControlsFailClosed() {
+        let native = originals()
+        for indices in [[], [0], [0, 0], [2, 0], [-1, 1], [0, 3], [0, 1, 2]] {
+            XCTAssertThrowsError(try TrioLayout.calculate(window: window, controls: Array(native.prefix(2)),
+                requestedScale: 1.3, obstacles: [], controlIndices: indices).get())
+            XCTAssertNil(TrioLayout.availableRegion(window: window, controls: Array(native.prefix(2)), controlIndices: indices))
+        }
+        XCTAssertThrowsError(try layout(controls: []))
+        XCTAssertThrowsError(try layout(controls: native + [native[2].offsetBy(dx: 20, dy: 0)]))
+    }
+
+    func testDisabledMiddleControlPreventsOnePanelButAllowsSafeCloseOnlyFallback() throws {
+        let native = originals()
+        let disabledMinimize = native[1].insetBy(dx: -2, dy: -2)
+        XCTAssertThrowsError(try TrioLayout.calculate(window: window, controls: [native[0], native[2]],
+            requestedScale: 1.3, obstacles: [disabledMinimize], controlIndices: [0, 2]).get())
+        let fallback = try TrioLayout.calculate(window: window, controls: [native[0]], requestedScale: 1.3,
+            obstacles: [disabledMinimize, native[2].insetBy(dx: -2, dy: -2)], controlIndices: [0]).get()
+        XCTAssertEqual(fallback.controlIndices, [0])
+        XCTAssertFalse(fallback.frame.intersects(disabledMinimize))
+        XCTAssertGreaterThan(fallback.effectiveScale, 1)
+    }
+
+    func testPartialControlsStillRejectWrongOrderRowsAndUnsafeCornerGeometry() {
+        let native = originals()
+        XCTAssertThrowsError(try layout(controls: [native[1], native[0]]))
+        XCTAssertThrowsError(try layout(controls: [native[0], native[1].offsetBy(dx: 0, dy: 30)]))
+        XCTAssertThrowsError(try layout(controls: [native[0].offsetBy(dx: 300, dy: 0)]))
+        XCTAssertThrowsError(try layout(controls: [native[0]], obstacles: [native[0]]))
+    }
+
     func testFiveTimesRequestClampsAtGreenBoundaryWithFixedCenters() throws {
         let controls = originals(centerY: 160, spacing: 90)
         let result = try layout(controls: controls)
