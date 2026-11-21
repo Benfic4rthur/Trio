@@ -1,6 +1,12 @@
 # SmartClose: investigação de compatibilidade
 
-Desde a versão 0.2.0 o vermelho do Trio fecha a janela pelo botão acessível. Ao confirmar o fechamento da última janela, o Trio pode pedir o encerramento do aplicativo. As exceções são configuradas no próprio Trio. O estudo abaixo documenta o comportamento das versões anteriores.
+## Fechamento na versão 0.2.3 — build 15 · 21/11/2026
+
+Com a última janela confirmada e o aplicativo fora das exceções, o Trio encaminha um clique ao botão original para que o SmartClose possa intervir quando ativo. Para várias janelas, contagem duvidosa ou aplicativos nas exceções, usa somente o fechamento direcionado por Acessibilidade. Janelas minimizadas e janelas separadas de aplicativos web continuam contando.
+
+O Trio acompanha o resultado. Se a mesma instância continuar viva sem janelas, pode usar `forceTerminate` e, se persistir, reconfirma identidade, ausência de janelas e exceções antes de escalar para `SIGKILL`. O Finder permanece protegido. Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos.
+
+Na build 15 instalada, com o SmartClose ativo, o registro do Antigravity confirmou um clique encaminhado ao botão original. O Trio confirmou que a janela desapareceu e pediu o encerramento da mesma instância. O processo saiu em 0,44 s. No Edge, um painel flutuante estava presente, o fechamento direcionado foi usado e o processo saiu em 0,45 s. O ensaio observou a saída do processo, sem atribuir a intervenção ao SmartClose. [Resultados](validation/0.2.3-build15/closing.json).
 
 
 Data da inspeção: 14/11/2026. Nenhuma preferência, permissão ou processo do SmartClose foi alterado.
@@ -28,7 +34,7 @@ O repositório público do próprio projeto possui a tag [v0.4.2](https://github
 - [ActionExecutor.swift](https://github.com/mahirozdin/SmartClose/blob/v0.4.2/SmartCloseApp/Core/Interception/ActionExecutor.swift): usa `NSRunningApplication.terminate()`, respeitando encerramento normal e avisos de documentos. Não força término.
 - [WindowClassifier.swift](https://github.com/mahirozdin/SmartClose/blob/v0.4.2/SmartCloseApp/Core/WindowModel/WindowClassifier.swift): exige janela normal com role `AXWindow` e subrole `AXStandardWindow`; diálogos e auxiliares têm tratamento conservador.
 
-## Implicação para o Trio
+## Implicação na investigação inicial do Trio (0.1.0)
 
 **Inferência de implementação:** `AXUIElementPerformAction(..., kAXPressAction)` não percorre o mouseDown global observado pelo SmartClose. Não deve ser tratado como equivalente ao clique original, nem usado como fallback silencioso para o vermelho.
 
@@ -36,7 +42,7 @@ O repositório público do próprio projeto possui a tag [v0.4.2](https://github
 
 Os controles desenhados pelo Trio não devem se anunciar como `AXCloseButton` de uma janela Trio: o clique físico inicial poderia acionar o SmartClose sobre o processo errado. O vermelho ampliado pode ter role de botão acessível e label clara, mantendo subrole genérica.
 
-Trio não deve chamar `terminate()` por conta própria para imitar o SmartClose. Isso duplicaria políticas e mudaria comportamento em apps com múltiplas janelas.
+Na proposta inicial, o Trio não deveria chamar `terminate()` por conta própria para imitar o SmartClose, pois isso duplicaria políticas e mudaria o comportamento em apps com múltiplas janelas. As versões 0.2.x passaram a ter uma política própria de última janela; a regra atual preparada está descrita no início deste documento.
 
 ## Teste necessário, sem dados do usuário
 

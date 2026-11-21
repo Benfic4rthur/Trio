@@ -2,7 +2,7 @@
 
 [Português](#português) · [English](#english) · [Español](#español)
 
-Guia da versão **0.2.2, build 14**, preparado em 20/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
+Guia da versão **0.2.3, build 15**, de 21/11/2026. **[Baixar Trio para macOS](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip)** · [Checksum SHA-256](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip.sha256) · [Histórico](../CHANGELOG.md).
 
 O pacote e o código-fonte são públicos e gratuitos. O ZIP é distribuído pela pasta `distribution/` do repositório; esse caminho não é uma GitHub Release. Não é necessário compilar o app para instalá-lo.
 
@@ -43,7 +43,9 @@ Depois de configurar, **Esconder Trio** mantém o auxiliar funcionando. Abra `Tr
 
 ### Fechar a última janela
 
-O vermelho fecha apenas a janela escolhida. Outras janelas, inclusive minimizadas, mantêm o aplicativo aberto. Depois de confirmar o fechamento da última, o Trio força diretamente a saída da mesma instância, sem um pedido normal antes. O Finder e os aplicativos da lista **Manter abertos ao fechar a última janela** ficam dispensados desse encerramento.
+O vermelho fecha apenas a janela escolhida. Com a última janela confirmada e fora das exceções, o Trio encaminha um clique ao botão original para que o Smart Close possa intervir quando ativo. Com várias janelas, contagem duvidosa ou aplicativos nas exceções, usa somente o fechamento direcionado por Acessibilidade. Outras janelas, inclusive minimizadas, impedem o encerramento automático. Se a mesma instância continuar viva sem janelas após a confirmação, o Trio pode forçar sua saída. O Finder e os aplicativos da lista **Manter abertos ao fechar a última janela** ficam dispensados desse encerramento.
+
+Uma janela separada do Primalith no navegador também é uma janela real e impede a saída. Os avisos temporários do navegador mantêm a verificação pendente, sem serem confundidos com outra janela de trabalho. Se `forceTerminate` não encerrar o processo, o Trio reconfirma a mesma instância, a ausência de janelas e as exceções antes de escalar para `SIGKILL`.
 
 Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos. Adicione às exceções os apps que precisam continuar trabalhando sem janelas. O acompanhamento do fechar nativo no Edge e no Antigravity aguarda a confirmação mesmo quando o evento chega cedo; a regra não depende de um número de versão específico.
 
@@ -73,7 +75,9 @@ Screen Recording is not needed for window geometry. Launch at login uses the sys
 
 ### Closing the last window
 
-The red button closes only the selected window. Other windows, including minimized ones, keep the app running. After confirming that its last window has closed, Trio directly forces that same app instance to quit, without a normal quit request first. Finder and apps in the **Manter abertos ao fechar a última janela** exception list are exempt.
+The red button closes only the selected window. For a confirmed last window outside your exceptions, Trio forwards a click to the original button so Smart Close can intervene when active. With multiple windows, an uncertain count, or an excluded app, it uses only a targeted Accessibility close. Other windows, including minimized ones, prevent automatic quitting. If that same instance remains alive with no windows after confirmation, Trio can force it to quit. Finder and apps in the **Manter abertos ao fechar a última janela** exception list are exempt.
+
+A separate Primalith browser window is also a real window and prevents quitting. Temporary browser notices keep the check pending without being mistaken for another work window. If `forceTerminate` does not stop the process, Trio rechecks the same instance, the absence of windows, and your exceptions before escalating to `SIGKILL`.
 
 Forcing an app to quit can interrupt background tasks and lose unsaved data. Add exceptions for apps that need to keep working without windows. Native-close tracking for Edge and Antigravity waits for confirmation even when the event arrives early; the rule does not require a specific app version.
 
@@ -103,7 +107,9 @@ No se necesita Grabación de Pantalla para obtener la geometría. El inicio de s
 
 ### Cerrar la última ventana
 
-El botón rojo cierra solo la ventana elegida. Otras ventanas, incluidas las minimizadas, mantienen abierta la aplicación. Tras confirmar el cierre de la última, Trio fuerza directamente la salida de esa misma instancia, sin solicitar antes un cierre normal. Finder y las apps de la lista de excepciones **Manter abertos ao fechar a última janela** quedan excluidos.
+El botón rojo cierra solo la ventana elegida. Con la última ventana confirmada y fuera de tus excepciones, Trio envía un clic al botón original para que Smart Close pueda intervenir cuando esté activo. Con varias ventanas, un recuento dudoso o una app excluida, usa únicamente el cierre dirigido por Accesibilidad. Otras ventanas, incluidas las minimizadas, impiden la salida automática. Si esa misma instancia sigue activa sin ventanas tras la confirmación, Trio puede forzar su salida. Finder y las apps de la lista de excepciones **Manter abertos ao fechar a última janela** quedan excluidos.
+
+Una ventana separada de Primalith en el navegador también es una ventana real e impide la salida. Los avisos temporales del navegador mantienen pendiente la comprobación, sin confundirse con otra ventana de trabajo. Si `forceTerminate` no detiene el proceso, Trio vuelve a comprobar la misma instancia, la ausencia de ventanas y tus excepciones antes de escalar a `SIGKILL`.
 
 Forzar la salida puede interrumpir tareas en segundo plano y perder datos sin guardar. Añade excepciones para las apps que deben seguir trabajando sin ventanas. El seguimiento del cierre nativo de Edge y Antigravity espera la confirmación aunque el evento llegue antes; la regla no exige una versión específica de la app.
 

@@ -1,5 +1,17 @@
 # Histórico do Trio
 
+## 0.2.3 — build 15 · 21/11/2026
+
+- Quando a última janela está confirmada e fora das exceções, encaminha um clique ao botão original para que o Smart Close possa intervir quando ativo. Com várias janelas, contagem duvidosa ou apps nas exceções, usa somente o fechamento direcionado por Acessibilidade.
+- Outras janelas, inclusive minimizadas ou de aplicativos web, continuam impedindo a saída do aplicativo. O Trio acompanha o resultado e pode forçar a mesma instância se continuar viva sem janelas.
+- Mantém a verificação de fechamento pendente quando aparecem superfícies temporárias do navegador. Um aviso temporário não é confundido com outra janela de trabalho nem descarta as tentativas limitadas de confirmação.
+- Se a mesma instância persistir após `forceTerminate`, reconfirma a identidade, a ausência de janelas e as exceções antes de escalar para `SIGKILL`.
+- Preserva o Finder e as exceções personalizadas. O encerramento forçado continua podendo interromper tarefas em segundo plano e perder dados ainda não salvos.
+
+- Identifica cada instância pelo instante de criação do processo informado pelo macOS. Corrige o caso em que o Edge fechava a última janela e permanecia em execução por falta de confirmação do AppKit.
+
+**Validação:** consulte o [estado da versão](docs/STATUS.md) para os resultados da build 15. Os resultados de builds anteriores não são atribuídos a esta versão.
+
 ## 0.2.2 — build 14 · 20/11/2026
 
 - Depois de confirmar que a última janela fechou, o Trio usa `forceTerminate` diretamente na mesma instância do aplicativo, sem pedir um encerramento normal antes.

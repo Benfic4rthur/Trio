@@ -71,6 +71,23 @@ struct SystemWindow {
     let pid: pid_t
     let bounds: CGRect
     let layer: Int
+    /// Quitting depends on the owner's windows alone. An unrelated app's
+    /// incomplete geometry must not invalidate a known empty owner inventory.
+    static func hasNoVisibleWindow(ownedBy pid: pid_t) -> Bool {
+        guard let rows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], 0) as? [[String: Any]],
+              !rows.isEmpty else { return false }
+        for row in rows {
+            guard let owner = row[kCGWindowOwnerPID as String] as? pid_t else { return false }
+            guard owner == pid else { continue }
+            guard let layer = row[kCGWindowLayer as String] as? Int else { return false }
+            if layer == 0 {
+                guard let raw = row[kCGWindowBounds as String] as? NSDictionary,
+                      let bounds = CGRect(dictionaryRepresentation: raw),
+                      bounds.width == 0 || bounds.height == 0 else { return false }
+            }
+        }
+        return true
+    }
     /// Includes minimized windows and windows on other Spaces. Ask only for
     /// the IDs so this check doesn't depend on screen recording permission.
     static func noLongerExists(_ id: CGWindowID) -> Bool {
@@ -103,6 +120,11 @@ struct SystemWindow {
             windows.append(SystemWindow(id: id, pid: pid, bounds: bounds, layer: layer))
         }
         return windows
+    }
+    static func isFloatingSurface(_ element: AXUIElement, ownedBy pid: pid_t) -> Bool {
+        guard let frame = AX.rect(element) else { return false }
+        let matches = visible().filter { $0.pid == pid && close($0.bounds, frame, tolerance: 1) }
+        return matches.count == 1 && matches[0].layer == Int(CGWindowLevelForKey(.floatingWindow))
     }
     static func close(_ a: CGRect, _ b: CGRect, tolerance: CGFloat = 2) -> Bool {
         abs(a.minX-b.minX) <= tolerance && abs(a.minY-b.minY) <= tolerance &&

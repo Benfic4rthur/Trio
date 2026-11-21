@@ -1,6 +1,6 @@
 ![Trio — Controles maiores. Janelas mais fáceis.](Resources/GitHubBanner.svg)
 
-<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.2.2 · build 14</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
+<p align="center"><strong>Aplicativo gratuito para macOS · versão 0.2.3 · build 15</strong><br>Swift · AppKit · Apple Silicon e Intel</p>
 
 <img align="right" src="Resources/TrioIcon.png" width="104" alt="Ícone do Trio">
 
@@ -23,7 +23,7 @@ O instalador não pede administrador, não remove a quarentena nem desativa prot
 
 | Controle | O que faz |
 | --- | --- |
-| Vermelho | Fecha a janela clicada. Depois de confirmar o fechamento da última, força diretamente o encerramento daquela mesma instância do aplicativo. O Finder e os apps da lista de exceções permanecem abertos. |
+| Vermelho | Fecha a janela clicada. Se a mesma instância continuar viva sem janelas após confirmar a última, pode forçar sua saída. O Finder e os apps da lista de exceções ficam protegidos. |
 | Amarelo | Minimiza pelo controle original. |
 | Verde | Maximiza dentro da área útil do monitor, sem tela cheia; outro clique restaura a geometria anterior. |
 | Mouse sobre o verde | Abre opções para maximizar, organizar em metades ou centralizar. |
@@ -43,11 +43,17 @@ O Trio amplia os controles disponíveis na janela em primeiro plano, inclusive q
 
 **Abrir novas janelas maximizadas** considera as dimensões iniciais da janela e a área útil do monitor. Janelas pequenas conservam o tamanho original. Terminal e Monitor de Atividade já vêm na lista de exceções.
 
-**Manter abertos ao fechar a última janela** tem sua própria lista nos ajustes. Adicione, por exemplo, o Claude para que o Trio apenas feche suas janelas. A decisão do próprio aplicativo de sair quando a última janela fecha continua valendo. O Smart Close é opcional. O Trio aciona o botão acessível da janela e confere se ainda existem outras, inclusive minimizadas. Depois de confirmar o fechamento da última e consultar as exceções, força diretamente a saída da mesma instância, sem um pedido normal de encerramento antes. Se a contagem for incerta, o aplicativo permanece aberto.
+**Manter abertos ao fechar a última janela** tem sua própria lista nos ajustes. Adicione, por exemplo, o Claude para que o Trio apenas feche suas janelas. A decisão do próprio aplicativo de sair quando a última janela fecha continua valendo. O Smart Close é opcional.
+
+Quando a última janela está confirmada e o app está fora das exceções, o Trio encaminha um clique ao botão original para que o Smart Close possa intervir quando ativo. Com várias janelas, contagem duvidosa ou apps nas exceções, usa somente o fechamento direcionado por Acessibilidade. Janelas minimizadas também contam. Se, após confirmar o fechamento da última e consultar as exceções, a mesma instância continuar viva sem janelas, o Trio força sua saída.
+
+Uma janela separada de um aplicativo web também conta como janela do navegador. Ela impede a saída do navegador e não é tratada como um aviso temporário.
+
+Se o processo persistir após `forceTerminate`, o Trio reconfirma a mesma instância, a ausência de janelas e as exceções antes de escalar o encerramento com `SIGKILL`.
 
 **Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos.** Adicione às exceções os aplicativos que precisam continuar trabalhando sem janelas.
 
-No Edge e no Antigravity, o Trio também acompanha o fechamento nativo da última janela identificada. Um evento que chega antes da atualização das janelas mantém a verificação pendente por tentativas limitadas. Essa regra usa a identidade do aplicativo e da janela, sem filtrar pelo número da versão.
+No Edge e no Antigravity, o Trio também acompanha o fechamento nativo da última janela identificada. Um evento que chega antes da atualização das janelas mantém a verificação pendente por tentativas limitadas. Superfícies temporárias do navegador não descartam essa verificação nem são confundidas com outra janela de trabalho. Essa regra usa a identidade do aplicativo e da janela, sem filtrar pelo número da versão.
 
 Os critérios e exemplos por resolução estão no [estudo de tamanho das janelas](docs/AUTO_MAXIMIZE.md). O ensaio com cinco janelas está no [relatório da versão](docs/STATUS.md).
 
@@ -55,7 +61,8 @@ Os critérios e exemplos por resolução estão no [estudo de tamanho das janela
 
 | Versão | Build | Data | Destaques |
 | --- | --- | --- | --- |
-| **0.2.2** | **14** | **20/11/2026** | Saída forçada direta da mesma instância após confirmar a última janela; correção de eventos precoces no fechar nativo de Edge e Antigravity. |
+| **0.2.3** | **15** | **21/11/2026** | Retoma o clique original na última janela confirmada, mantém a verificação entre avisos temporários e reconfirma processos persistentes antes de SIGKILL. |
+| 0.2.2 | 14 | 20/11/2026 | Saída forçada direta da mesma instância após confirmar a última janela; correção de eventos precoces no fechar nativo de Edge e Antigravity. |
 | 0.2.1 | 13 | 20/11/2026 | Encerramento imediato após confirmar a última janela e acompanhamento do fechar nativo no Edge. |
 | 0.2.0 | 12 | 20/11/2026 | Fechamento por janela com exceções, ampliação do vermelho sozinho e maximização automática por tamanho. |
 | 0.1.4 | 11 | 18/11/2026 | Compatibilidade com elementos invisíveis de barras personalizadas, incluindo o Claude. |
@@ -76,7 +83,7 @@ O ZIP em [`distribution/`](distribution/) é o pacote real compilado localmente,
 
 ## Validação e compatibilidade
 
-Consulte o [estado da versão](docs/STATUS.md) para as evidências de validação, instalação e pacote da build 14. Os resultados abaixo identificam as builds efetivamente exercitadas e não são atribuídos automaticamente à versão 0.2.2.
+Consulte o [estado da versão](docs/STATUS.md) para as evidências de validação, instalação e pacote da build 15. Os resultados abaixo identificam as builds efetivamente exercitadas e não são atribuídos automaticamente à versão 0.2.3.
 
 - **25 testes passaram.** Incluem geometria, limites de espaço, obstáculos, dimensões inválidas, coordenadas negativas, cobertura concêntrica e identificação conservadora de janelas coincidentes.
 - **Build 8 instalada e exercitada** em macOS 27.2.1, M1 Pro. O pacote e o auxiliar contêm arm64 e x86_64; hardware Intel ainda não foi testado.

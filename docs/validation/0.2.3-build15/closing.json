@@ -1,0 +1,43 @@
+{
+  "version": "0.2.3",
+  "build": "15",
+  "macOS": "27.2.1",
+  "architecturesInPackage": [
+    "arm64",
+    "x86_64"
+  ],
+  "date": "2026-11-21",
+  "smartCloseWasRunning": true,
+  "tests": [
+    {
+      "app": "Edge",
+      "versionTested": "158.0.4370.33",
+      "userData": "isolated",
+      "input": "Trio red accessibility action",
+      "forwardedClickToOriginalButton": false,
+      "terminationRequestedAfterWindowDisappeared": true,
+      "processExitedBeforeCleanup": true,
+      "observedExitSeconds": 0.446,
+      "trioRemainedRunning": true,
+      "temporaryProfileRemoved": true
+    },
+    {
+      "app": "Antigravity",
+      "versionTested": "2.34.0",
+      "userData": "isolated",
+      "input": "Trio red accessibility action",
+      "forwardedClickToOriginalButton": true,
+      "terminationRequestedAfterWindowDisappeared": true,
+      "processExitedBeforeCleanup": true,
+      "observedExitSeconds": 0.443,
+      "trioRemainedRunning": true,
+      "temporaryProfileRemoved": true
+    }
+  ],
+  "realBrowserProfile": {
+    "observedTargetedWindowCloseWithOtherWindowStillOpen": true,
+    "lastWindowQuitExercised": false
+  },
+  "smartCloseInterceptionIndependentlyAttributed": false,
+  "intelHardwareTested": false
+}

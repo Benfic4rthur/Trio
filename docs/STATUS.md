@@ -1,22 +1,34 @@
 # Estado do Trio
 
-Atualizado em **20/11/2026**, horário de São Paulo. **Versão instalada e validada no Mac de teste, 0.2.2 (build 14).** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **21/11/2026**. A versão instalada e empacotada é a **0.2.3, build 15**. [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão instalada | **0.2.2, build 14**, em `/Applications/Trio.app`. |
+| Versão instalada | **0.2.3, build 15** |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
-| Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip` com 1.956.918 bytes. Inclui o instalador, o guia e o app Universal. |
-| Integridade do ZIP | SHA-256 `e27156f9deb75f18b92abfd88763ea467f5d35269e7ea9911d2b33b444c1420f`. |
+| Arquiteturas verificadas na build 15 | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
+| Pacote verificado | `Trio-macOS-universal.zip` com 1.979.535 bytes. Inclui instalador, guia e app Universal. |
+| Integridade do pacote | SHA-256 `b6c19ffe918d9f26f4215ce9e5b5c639900c8ccfa30dd696a9dc6634c222efc4`. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
 
-## Fechar a última janela — implementação da build 14
+## Superfícies temporárias e processo persistente — implementação da build 15
+
+Com a última janela confirmada e fora das exceções, o vermelho encaminha um clique ao botão original para que o Smart Close possa intervir quando ativo. Com várias janelas, contagem duvidosa ou apps nas exceções, usa somente o fechamento direcionado por Acessibilidade. Outras janelas reais, inclusive minimizadas ou de aplicativos web, continuam impedindo a saída do aplicativo. O Trio acompanha o resultado e pode forçar a mesma instância se continuar viva sem janelas.
+
+Superfícies temporárias do navegador não descartam a verificação pendente nem são confundidas com outra janela de trabalho. O acompanhamento mantém as tentativas limitadas até confirmar o fechamento, inclusive no caminho nativo de Edge e Antigravity, sem filtrar pelo número da versão.
+
+Se o processo persistir após `forceTerminate`, o Trio reconfirma que é a mesma instância, continua sem janelas e segue fora das exceções antes de escalar para `SIGKILL`. O Finder permanece protegido. O risco de interromper tarefas em segundo plano e perder dados ainda não salvos continua existindo.
+
+O Edge podia fechar todas as janelas e continuar ativo quando a identificação da instância pelo AppKit falhava. O Trio agora registra o instante de criação do processo informado pelo kernel ao identificar o alvo e confere esse valor novamente antes de encerrá-lo. Um diálogo flutuante sem controles pode desaparecer junto com a barra. A lista de janelas precisa estar vazia para autorizar a saída.
+
+Na build instalada, com Smart Close ativo e perfis de teste isolados, o processo do Edge encerrou em 0,45 s e o do Antigravity em 0,44 s após acionar o vermelho do Trio. No Edge havia um diálogo flutuante e o Trio acionou diretamente o fechar da janela. No Antigravity o registro confirmou o clique encaminhado ao botão original. A última janela do perfil pessoal do Edge não fez parte desse ensaio. [Resultados](validation/0.2.3-build15/closing.json).
+
+## Fechar a última janela — implementação e ensaios da build 14
 
 Depois de confirmar o fechamento da última janela, o Trio chama `forceTerminate` diretamente na mesma instância do aplicativo, sem pedir antes uma saída normal. Outras janelas, inclusive minimizadas, impedem esse encerramento. O Finder e as exceções personalizadas continuam protegidos. Uma identidade ou contagem incerta não autoriza encerrar outro processo.
 
@@ -83,4 +95,4 @@ As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) id
 
 O Trio atende à **janela ativa compatível**. O Trio pode ampliar apenas o vermelho. Identidade ambígua, ferramentas na área do vermelho ou informações de Acessibilidade insuficientes levam à preservação dos controles originais. A preferência de 5× é um limite solicitado e pode ser reduzida pelo espaço; não foi validada como tamanho efetivo em janelas comuns.
 
-As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. Na build 14, o vermelho fecha a janela pelo controle acessível e só força diretamente a saída depois de confirmar a última janela, a mesma instância do processo e as exceções. Esse encerramento pode interromper tarefas em segundo plano; apps que precisam continuar ativos sem janelas devem ser adicionados às exceções.
+As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. Na build 15, o clique original fica reservado à última janela confirmada e fora das exceções; os demais casos usam fechamento direcionado por Acessibilidade. Forçar a saída exige confirmar a última janela, a mesma instância do processo e as exceções; o processo persistente é reconfirmado antes da escalada. Esse encerramento pode interromper tarefas em segundo plano; apps que precisam continuar ativos sem janelas devem ser adicionados às exceções.

@@ -753,11 +753,16 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         guard running, !sessionSuspended, !forwarding, panel.isVisible, let target, settings.enabled, target.controlIndices.contains(index), target.isCurrent() else { diagnostic("rejected: no current target"); hide(); scheduleRefresh(); return }
         if index == 2 { greenMenu?.cancel(); toggleMaximize(target); return }
         if index == 0 {
-            if !closing.close(target) { onStatus("O aplicativo não permitiu fechar esta janela.") }
-            scheduleRefresh(after: 0.06)
+            if closing.shouldForwardLastClose(target) && CGPreflightPostEventAccess() {
+                forwardOriginalClick(index, target: target)
+            } else {
+                if !closing.close(target) { onStatus("O aplicativo não permitiu fechar esta janela.") }
+                scheduleRefresh(after: 0.06)
+            }
         } else if index == 1 { forwardOriginalClick(index, target: target) }
     }
     private final class ForwardClickState {
+        let index: Int
         let button: AXUIElement
         let rect: CGRect
         let target: WindowTarget
@@ -771,7 +776,8 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         var localMonitor: Any?
         var globalMonitor: Any?
 
-        init(button: AXUIElement, rect: CGRect, target: WindowTarget) {
+        init(index: Int, button: AXUIElement, rect: CGRect, target: WindowTarget) {
+            self.index = index
             self.button = button
             self.rect = rect
             self.target = target
@@ -782,15 +788,21 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     }
 
     private func forwardOriginalClick(_ index: Int, target: WindowTarget) {
-        guard !forwarding, running, settings.enabled, index == 1, let button = target.button(for: index),
+        guard !forwarding, running, settings.enabled, (index == 0 || index == 1), let button = target.button(for: index),
               let rect = target.buttonFrame(for: index),
               CGPreflightPostEventAccess() else {
+            if index == 0, !forwarding, running, !sessionSuspended, settings.enabled,
+               let button = target.button(for: 0), let rect = target.buttonFrame(for: 0) {
+                let state = ForwardClickState(index: 0, button: button, rect: rect, target: target)
+                fallbackForwardedRedToAX(state, failure: "O envio do clique original não está disponível.")
+                return
+            }
             diagnostic("rejected: event posting not authorized or forwarding unavailable")
             onStatus("O macOS não autorizou o envio do clique. O botão original foi preservado.")
             hide()
             return
         }
-        let state = ForwardClickState(button: button, rect: rect, target: target)
+        let state = ForwardClickState(index: index, button: button, rect: rect, target: target)
         forwarding = true
         AXUIElementSetMessagingTimeout(AXUIElementCreateSystemWide(), 0.015)
         hide()
@@ -823,9 +835,10 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
     }
 
     private func attemptOriginalClick(_ state: ForwardClickState) {
+        guard !state.posted else { return }
         guard forwarding, running, !sessionSuspended, settings.enabled,
               ProcessInfo.processInfo.systemUptime < state.deadline else {
-            finishOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
+            failOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
             return
         }
         state.attempts += 1
@@ -836,7 +849,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
               originalClickTargetIsCurrent(state, windows: windows),
               ProcessInfo.processInfo.systemUptime < state.deadline else {
             diagnostic("forward attempt=\(state.attempts) rejected current/top/deadline ownCG=\(ownCG.map { $0.id })")
-            finishOriginalClick(state, failure: "A janela mudou antes do clique. Nenhuma ação foi enviada.")
+            failOriginalClick(state, failure: "A janela mudou antes do clique. Nenhuma ação foi enviada.")
             return
         }
         guard ownCG.isEmpty else {
@@ -853,7 +866,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         let same = hit.map { AX.same($0, state.button) } ?? false
         diagnostic("forward attempt=\(state.attempts) current=true top=true ownCG=[] hitError=\(hitError.rawValue) hitPID=\(hitPID) same=\(same) nudged=\(state.nudged)")
         guard ProcessInfo.processInfo.systemUptime < state.deadline else {
-            finishOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
+            failOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
             return
         }
         if hitPID == getpid() {
@@ -861,7 +874,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                 guard let source = CGEventSource(stateID: .hidSystemState),
                       let move = CGEvent(mouseEventSource: source, mouseType: .mouseMoved,
                                          mouseCursorPosition: state.point, mouseButton: .left) else {
-                    finishOriginalClick(state, failure: "Não foi possível atualizar a posição do controle original.")
+                    failOriginalClick(state, failure: "Não foi possível atualizar a posição do controle original.")
                     return
                 }
                 state.nudged = true
@@ -883,18 +896,65 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                                  mouseCursorPosition: state.point, mouseButton: .left),
               let up = CGEvent(mouseEventSource: source, mouseType: .leftMouseUp,
                                mouseCursorPosition: state.point, mouseButton: .left) else {
-            finishOriginalClick(state, failure: "O controle sob o ponteiro mudou. Nenhuma ação foi enviada.")
+            failOriginalClick(state, failure: "O controle sob o ponteiro mudou. Nenhuma ação foi enviada.")
             return
         }
         down.flags = []
         up.flags = []
         down.setIntegerValueField(.mouseEventClickState, value: 1)
         up.setIntegerValueField(.mouseEventClickState, value: 1)
+
+        var afterForwardedClose: (() -> Void)?
+        if state.index == 0 {
+            // A real red click can also be intercepted by Smart Close. Permit
+            // it only while this is still the proven last eligible window;
+            // siblings, minimized windows and exceptions use native AX close.
+            let refreshedWindows = SystemWindow.visible()
+            guard originalClickTargetIsCurrent(state, windows: refreshedWindows),
+                  ProcessInfo.processInfo.systemUptime < state.deadline else {
+                failOriginalClick(state, failure: "A janela mudou antes do clique. Nenhuma ação foi enviada.")
+                return
+            }
+            // Authorization itself checks the current window inventory and
+            // exceptions. Keep it after the longer AX geometry validation,
+            // without repeating the same inventory query via shouldForward.
+            guard let authorized = closing.authorizeForwardedLastClose(state.target) else {
+                fallbackForwardedRedToAX(state, failure: "A regra de fechamento mudou antes do clique.")
+                return
+            }
+            afterForwardedClose = authorized
+            // Refresh hit/top ownership and deadline after authorization's
+            // potentially slow AX queries; no request is armed until the up.
+            var finalHit: AXUIElement?
+            let finalHitError = AXUIElementCopyElementAtPosition(system, Float(state.point.x), Float(state.point.y), &finalHit)
+            guard finalHitError == .success, let finalHit, AX.pid(finalHit) == state.target.pid,
+                  AX.same(finalHit, state.button), AX.flag(finalHit, kAXEnabledAttribute) else {
+                failOriginalClick(state, failure: "O controle sob o ponteiro mudou. Nenhuma ação foi enviada.")
+                return
+            }
+            let finalWindows = SystemWindow.visible()
+            let finalTop = finalWindows.first { $0.pid != getpid() && $0.layer == 0 && $0.bounds.contains(state.point) }
+            guard forwarding, running, !sessionSuspended, settings.enabled,
+                  ProcessInfo.processInfo.systemUptime < state.deadline,
+                  NSWorkspace.shared.frontmostApplication?.processIdentifier == state.target.pid,
+                  finalTop?.pid == state.target.pid, finalTop?.id == state.target.id,
+                  finalTop.map({ SystemWindow.close($0.bounds, state.target.frame, tolerance: 1) }) == true,
+                  !finalWindows.contains(where: { $0.pid == getpid() && $0.layer >= 0 && $0.bounds.contains(state.point) }),
+                  CGPreflightPostEventAccess() else {
+                failOriginalClick(state, failure: "Não foi possível confirmar o controle original. Nenhuma ação foi enviada.")
+                return
+            }
+        }
+        let didPostForwardedClose = afterForwardedClose
         state.posted = true
         diagnostic("forward attempt=\(state.attempts) posting HID down/up to original button")
         down.post(tap: .cghidEventTap)
-        // Always release the synthetic down, even if minimization changes focus.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) { up.post(tap: .cghidEventTap) }
+        // Always release the synthetic down, even if close/minimize changes
+        // focus. Arm close observation only after both events were posted.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) {
+            up.post(tap: .cghidEventTap)
+            didPostForwardedClose?()
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) { [weak self] in
             self?.finishOriginalClick(state, failure: nil)
         }
@@ -913,17 +973,46 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
               !AX.flag(focused, kAXMinimizedAttribute), withinBudget(),
               let frame = AX.rect(focused), SystemWindow.close(frame, target.frame, tolerance: 1),
               withinBudget() else { return false }
-        guard let button = AX.element(focused, kAXMinimizeButtonAttribute),
+        let attribute = state.index == 0 ? kAXCloseButtonAttribute : kAXMinimizeButtonAttribute
+        guard let button = AX.element(focused, attribute),
               AX.same(button, state.button), withinBudget(),
               let rect = AX.rect(button), SystemWindow.close(rect, state.rect, tolerance: 1),
               AX.flag(button, kAXEnabledAttribute), withinBudget(),
               let children = AX.value(focused, kAXChildrenAttribute) as? [AXUIElement],
               withinBudget() else { return false }
+        if state.index == 0 {
+            guard AX.pid(button) == target.pid, AX.string(button, kAXRoleAttribute) == kAXButtonRole,
+                  AX.string(button, kAXSubroleAttribute) == kAXCloseButtonSubrole,
+                  withinBudget() else { return false }
+        }
         for child in children {
             guard withinBudget(), let role = AX.string(child, kAXRoleAttribute), role != kAXSheetRole else { return false }
         }
         guard withinBudget() else { return false }
         return NSWorkspace.shared.frontmostApplication?.processIdentifier == target.pid
+    }
+
+    private func failOriginalClick(_ state: ForwardClickState, failure: String) {
+        if state.index == 0 && !state.posted {
+            fallbackForwardedRedToAX(state, failure: failure)
+        } else {
+            finishOriginalClick(state, failure: failure)
+        }
+    }
+
+    private func fallbackForwardedRedToAX(_ state: ForwardClickState, failure: String) {
+        guard state.index == 0, !state.posted else { return }
+        // No down/up was posted, so this is the single close action, not a
+        // second click. Restore forwarding state before revalidating its target.
+        diagnostic("red forward fallback before mouseDown: \(failure)")
+        finishOriginalClick(state, failure: nil)
+        guard running, !sessionSuspended, settings.enabled, state.target.isCurrent(),
+              state.target.ownsTopmostFrame(state.rect) else {
+            onStatus(failure)
+            return
+        }
+        if !closing.close(state.target) { onStatus("O aplicativo não permitiu fechar esta janela.") }
+        scheduleRefresh(after: 0.06)
     }
 
     private func finishOriginalClick(_ state: ForwardClickState, failure: String?) {
