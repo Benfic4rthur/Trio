@@ -6,6 +6,7 @@ import ApplicationServices
 // AX inventory and process termination fully deterministic. No IPC is sent.
 final class FakeElement {
     let id: Int
+    var minimized = false
     init(_ id: Int) { self.id = id }
 }
 typealias AXUIElement = FakeElement
@@ -25,6 +26,9 @@ func AXUIElementPerformAction(_ element: AXUIElement, _ action: CFString) -> AXE
     static func same(_ first: AXUIElement, _ second: AXUIElement) -> Bool { first === second }
     static func string(_ element: AXUIElement, _ attribute: String) -> String? {
         attribute == kAXSubroleAttribute ? kAXStandardWindowSubrole : nil
+    }
+    static func flag(_ element: AXUIElement, _ attribute: String) -> Bool {
+        attribute == kAXMinimizedAttribute && element.minimized
     }
 }
 
@@ -124,13 +128,21 @@ private func expect(_ condition: @autoclosure () -> Bool, _ message: String = "R
 
 @main struct WindowClosingRegressionTests {
     @MainActor static func main() {
-        earlyDestructionAndDelayedCleanup()
+        earlyDestructionEventuallyForcesOnce()
         anotherMinimizedWindowCancelsPermanently()
-        edgeFallbackRequiresDisappearedWindowID()
-        print("PASS: delayed original close, permanent minimized-window veto and Edge CG-ID fallback; no apps opened or real AX actions")
+        for (index, identifier) in ["com.microsoft.edgemac", "com.google.antigravity"].enumerated() {
+            let pid = pid_t(97100 + index)
+            singleEventEventuallyForces(identifier: identifier, pid: pid)
+            minimizedBrowserSurvives(identifier: identifier, pid: pid)
+            hiddenBrowserIsProtected(identifier: identifier, pid: pid)
+            browserExceptionIsProtected(identifier: identifier, pid: pid)
+            newBrowserWindowCancelsPendingClose(identifier: identifier, pid: pid)
+        }
+        unavailableRedInventoryNeedsProof()
+        print("PASS: direct forced exit with zero normal quit requests; early destruction; Edge/Antigravity single-event delayed cleanup; retained IDs, minimized/hidden/excluded apps and new windows protected; unavailable red inventory confirmed safely. No UI or real AX actions.")
     }
 
-    @MainActor private static func earlyDestructionAndDelayedCleanup() {
+    @MainActor private static func earlyDestructionEventuallyForcesOnce() {
         DispatchQueue.main.reset()
         let pid: pid_t = 97001
         let app = NSRunningApplication(ownedPID: pid)
@@ -146,16 +158,15 @@ private func expect(_ condition: @autoclosure () -> Bool, _ message: String = "R
         closing.windowDestroyed(window)
         // Destruction was announced, but AX and the compositor still retain it.
         DispatchQueue.main.advance(to: 0.46)
-        expect(app.terminateCalls == 0)
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 0)
         DispatchQueue.main.advance(to: 0.70)
         inventories[pid] = []
         SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
         SystemWindow.existingIDs = [999]
         DispatchQueue.main.advance(to: 4.0)
-        expect(app.terminateCalls == 1, "An early AX destruction must not expire the pending close")
-        expect(app.forceTerminateCalls == 0)
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 1, "An early AX destruction must eventually force once, without a normal quit")
         DispatchQueue.main.advance(to: 5.5)
-        expect(app.terminateCalls == 1, "Stale surveys must not send another quit")
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 1, "Stale surveys must not repeat forced termination")
     }
 
     @MainActor private static func anotherMinimizedWindowCancelsPermanently() {
@@ -176,7 +187,7 @@ private func expect(_ condition: @autoclosure () -> Bool, _ message: String = "R
         SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
         SystemWindow.existingIDs = [202, 999]
         DispatchQueue.main.advance(to: 0.7)
-        expect(app.terminateCalls == 0, "Another minimized AX window must veto quitting even when CG has none visible")
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 0, "Another minimized AX window must veto quitting even when CG has none visible")
         inventories[pid] = []
         SystemWindow.existingIDs = [999]
         closing.windowDestroyed(minimized)
@@ -185,26 +196,116 @@ private func expect(_ condition: @autoclosure () -> Bool, _ message: String = "R
                "Discovering another window must permanently cancel the earlier last-window authorization")
     }
 
-    @MainActor private static func edgeFallbackRequiresDisappearedWindowID() {
+    @MainActor private static func observedBrowser(identifier: String, pid: pid_t,
+                                                  mayQuit: @escaping (NSRunningApplication) -> Bool = { _ in true })
+        -> (app: NSRunningApplication, window: AXUIElement, closing: WindowClosing) {
         DispatchQueue.main.reset()
-        let pid: pid_t = 97004
-        let app = NSRunningApplication(ownedPID: pid, bundleIdentifier: "com.microsoft.edgemac")
+        let app = NSRunningApplication(ownedPID: pid, bundleIdentifier: identifier)
         let window = AXUIElement(20)
         applicationElements[pid] = AXUIElement(21)
         inventories[pid] = [window]
         NSWorkspace.shared.frontmostApplication = app
         SystemWindow.snapshot = [SystemWindow(id: 301, pid: pid, layer: 0), SystemWindow(id: 999, pid: 97002, layer: 0)]
         SystemWindow.existingIDs = [301, 999]
-        let closing = WindowClosing(mayQuitOnLastWindow: { _ in true })
+        let closing = WindowClosing(mayQuitOnLastWindow: mayQuit)
         closing.observeBrowserWindow(WindowTarget(id: 301, pid: pid, window: window))
+        return (app, window, closing)
+    }
+
+    @MainActor private static func singleEventEventuallyForces(identifier: String, pid: pid_t) {
+        let scenario = observedBrowser(identifier: identifier, pid: pid)
+        // Exactly one event arrives while both inventories still retain the
+        // target. All subsequent transitions below have no event or callback.
+        scenario.closing.browserWindowMayHaveClosed(in: pid)
+        DispatchQueue.main.advance(to: 0.2)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0, "\(identifier): initial event cannot close a surviving window")
+        inventories[pid] = []
+        DispatchQueue.main.advance(to: 0.6)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0, "\(identifier): visible WindowServer window vetoes empty AX")
+        SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
+        DispatchQueue.main.advance(to: 1.3)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0, "\(identifier): retained CG ID still vetoes quitting")
+        SystemWindow.existingIDs = [999]
+        DispatchQueue.main.advance(to: 4.8)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 1,
+               "\(identifier): first event must force once after delayed cleanup, without a second event or normal quit")
+    }
+
+    @MainActor private static func minimizedBrowserSurvives(identifier: String, pid: pid_t) {
+        let scenario = observedBrowser(identifier: identifier, pid: pid)
+        scenario.window.minimized = true
+        SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
+        scenario.closing.browserWindowMayHaveClosed(in: pid)
+        DispatchQueue.main.advance(to: 0.3)
+        inventories[pid] = [] // A transient incomplete AX inventory is not closure.
+        DispatchQueue.main.advance(to: 1.3)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0, "\(identifier): minimized window with a retained ID must survive transient empty AX")
+        inventories[pid] = [scenario.window]
+        DispatchQueue.main.advance(to: 6)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0,
+               "\(identifier): minimizing is not a close")
+    }
+
+    @MainActor private static func hiddenBrowserIsProtected(identifier: String, pid: pid_t) {
+        let scenario = observedBrowser(identifier: identifier, pid: pid)
+        scenario.closing.browserWindowMayHaveClosed(in: pid)
+        scenario.app.isHidden = true
         inventories[pid] = []
         SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
-        closing.browserWindowMayHaveClosed(in: pid)
-        expect(app.terminateCalls == 0, "An empty AX inventory alone cannot prove that the observed CG window closed")
         SystemWindow.existingIDs = [999]
-        closing.browserWindowMayHaveClosed(in: pid)
-        DispatchQueue.main.advance(to: 2)
-        expect(app.terminateCalls == 1 && app.forceTerminateCalls == 0,
-               "A disappeared observed Edge window plus empty AX/visible inventories should request one normal quit")
+        DispatchQueue.main.advance(to: 6)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0,
+               "\(identifier): hiding the app must protect it after the initial event")
+    }
+
+    @MainActor private static func browserExceptionIsProtected(identifier: String, pid: pid_t) {
+        var allowed = true
+        let scenario = observedBrowser(identifier: identifier, pid: pid, mayQuit: { _ in allowed })
+        scenario.closing.browserWindowMayHaveClosed(in: pid)
+        allowed = false
+        inventories[pid] = []
+        SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
+        SystemWindow.existingIDs = [999]
+        DispatchQueue.main.advance(to: 6)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0,
+               "\(identifier): current app exceptions override an already queued close")
+    }
+
+    @MainActor private static func newBrowserWindowCancelsPendingClose(identifier: String, pid: pid_t) {
+        let scenario = observedBrowser(identifier: identifier, pid: pid)
+        scenario.closing.browserWindowMayHaveClosed(in: pid)
+        let newWindow = AXUIElement(30)
+        inventories[pid] = [newWindow]
+        scenario.closing.windowOpened(newWindow, in: pid)
+        DispatchQueue.main.advance(to: 0.5)
+        inventories[pid] = []
+        SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
+        SystemWindow.existingIDs = [999]
+        DispatchQueue.main.advance(to: 6)
+        expect(scenario.app.terminateCalls == 0 && scenario.app.forceTerminateCalls == 0,
+               "\(identifier): opening a different window permanently cancels the earlier close")
+    }
+
+    @MainActor private static func unavailableRedInventoryNeedsProof() {
+        DispatchQueue.main.reset()
+        let pid: pid_t = 97200
+        let app = NSRunningApplication(ownedPID: pid)
+        let window = AXUIElement(40)
+        NSWorkspace.shared.frontmostApplication = app
+        inventories[pid] = nil
+        SystemWindow.snapshot = [SystemWindow(id: 401, pid: pid, layer: 0), SystemWindow(id: 999, pid: 97002, layer: 0)]
+        SystemWindow.existingIDs = [401, 999]
+        let closing = WindowClosing(mayQuitOnLastWindow: { _ in true })
+        expect(closing.close(WindowTarget(id: 401, pid: pid, window: window)))
+        DispatchQueue.main.advance(to: 0.3)
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 0, "Unavailable AX cannot authorize quitting")
+        inventories[pid] = []
+        DispatchQueue.main.advance(to: 0.6)
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 0, "A successful red action alone cannot replace CG disappearance proof")
+        SystemWindow.existingIDs = [999]
+        SystemWindow.snapshot = [SystemWindow(id: 999, pid: 97002, layer: 0)]
+        DispatchQueue.main.advance(to: 4.8)
+        expect(app.terminateCalls == 0 && app.forceTerminateCalls == 1,
+               "An initially unavailable red inventory can force once only after empty AX and a disappeared CG ID")
     }
 }

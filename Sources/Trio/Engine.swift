@@ -167,6 +167,13 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
                 }
             }
         })
+        tokens.append(center.addObserver(forName: NSWorkspace.didDeactivateApplicationNotification, object: nil, queue: .main) { [weak self] note in
+            MainActor.assumeIsolated {
+                guard let self, self.running, !self.sessionSuspended,
+                      let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
+                self.closing.browserWindowMayHaveClosed(in: app.processIdentifier)
+            }
+        })
         tokens.append(center.addObserver(forName: NSWorkspace.didTerminateApplicationNotification, object: nil, queue: .main) { [weak self] note in
             MainActor.assumeIsolated {
                 guard let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication else { return }
@@ -191,6 +198,7 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
             MainActor.assumeIsolated {
                 guard let self, self.running, !self.forwarding, self.animatingWindow == nil else { return }
                 if event.type == .leftMouseDown {
+                    self.noteNativeClosePress(event)
                     self.pendingNativeDrag = nil
                     if self.target == nil || !self.panel.isVisible {
                         self.scheduleRefresh(after: 0.02)
@@ -446,6 +454,41 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         DispatchQueue.main.asyncAfter(deadline: .now()+delay, execute: work)
     }
 
+    /// Native title bars can receive a red click before the overlay or its
+    /// AX observer is ready. Watch that original click without replaying it.
+    private func noteNativeClosePress(_ event: NSEvent) {
+        guard !sessionSuspended, settings.enabled, let cg = event.cgEvent,
+              let app = NSWorkspace.shared.frontmostApplication, WindowClosing.canQuit(app) else { return }
+        let number = cg.getIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent)
+        guard let id = CGWindowID(exactly: number), id != kCGNullWindowID else { return }
+        if let target, target.pid == app.processIdentifier {
+            guard target.id == id, target.buttonFrame(for: 0)?.contains(cg.location) == true else { return }
+        }
+        recordNativeCloseWindow(of: app, click: (id, cg.location))
+    }
+
+    private func recordNativeCloseWindow(of app: NSRunningApplication, click: (id: CGWindowID, point: CGPoint)? = nil) {
+        guard WindowClosing.canQuit(app), let bundleID = app.bundleIdentifier,
+              !settings.quitExcludedBundleIDs.contains(bundleID),
+              click != nil || WindowClosing.observesNativeClosure(of: app) else { return }
+        let ax = AXUIElementCreateApplication(app.processIdentifier)
+        AXUIElementSetMessagingTimeout(ax, 0.12)
+        guard let window = AX.element(ax, kAXFocusedWindowAttribute),
+              let close = AX.element(window, kAXCloseButtonAttribute), AX.flag(close, kAXEnabledAttribute),
+              let button = AX.rect(close) else { return }
+        if let click {
+            guard button.contains(click.point),
+                  AX.at(click.point, in: ax).map({ AX.same($0, close) }) == true else { return }
+        }
+        guard let frame = AX.rect(window), frame.contains(button) else { return }
+        let matches = SystemWindow.visible().filter {
+            $0.layer == 0 && $0.pid == app.processIdentifier && SystemWindow.close($0.bounds, frame)
+        }
+        guard matches.count == 1, let id = matches.first?.id, click == nil || click?.id == id else { return }
+        closing.observeNativeWindow(app: app, window: window, id: id)
+        if click != nil { closing.browserWindowMayHaveClosed(in: app.processIdentifier) }
+    }
+
     private func armNativeGeometryDrag(_ event: NSEvent) {
         guard settings.enabled, let current = target, panel.isVisible,
               NSWorkspace.shared.frontmostApplication?.processIdentifier == current.pid,
@@ -636,8 +679,9 @@ private func trioAXEvent(_ observer: AXObserver, _ element: AXUIElement, _ name:
         }
         for app in NSWorkspace.shared.runningApplications { observe(app) }
         guard let candidate = WindowTarget.focused() else {
-            if let pid = NSWorkspace.shared.frontmostApplication?.processIdentifier {
-                closing.browserWindowMayHaveClosed(in: pid)
+            if let app = NSWorkspace.shared.frontmostApplication {
+                closing.browserWindowMayHaveClosed(in: app.processIdentifier)
+                recordNativeCloseWindow(of: app)
             }
             diagnostic("tracking candidate-unavailable attempt=\(attempt) kept=\(panel.isVisible)")
             retryDrawing("candidate-unavailable", attempt: attempt)

@@ -33,6 +33,11 @@ import ApplicationServices
 
     func run() {
         report["generatedAt"] = ISO8601DateFormatter().string(from: Date())
+        report["expectedTerminationMode"] = "forced-direct-after-verified-last-window-close"
+        // Retain the historical command-line flag as a compatibility no-op.
+        // The current product policy applies direct Force Quit by default;
+        // declining a normal quit is no longer a prerequisite of this test.
+        report["legacyExpectForceFlag"] = arguments.contains("--expect-force")
         guard let log = argument("--fixture-log"), let output = argument("--output"),
               log.hasPrefix("/"), output.hasPrefix("/") else {
             stop("Use --fixture-log ABSOLUTE.jsonl --output ABSOLUTE.json; no action performed")
@@ -121,7 +126,7 @@ import ApplicationServices
             let press = AXUIElementPerformAction(red, kAXPressAction as CFString)
             guard press == .success else { stop("AXPress was refused by the verified Trio red control") }
             remaining.remove(index)
-            let closeDeadline = Date().addingTimeInterval(remaining.isEmpty && arguments.contains("--expect-force") ? 9 : 3)
+            let closeDeadline = Date().addingTimeInterval(remaining.isEmpty ? 9 : 3)
             while Date() < closeDeadline {
                 if !fixtureRunning() { break }
                 if !remaining.isEmpty, let after = ownedWindows(), Set(after.keys) == remaining { break }
@@ -150,14 +155,21 @@ import ApplicationServices
                 .contains(where: { $0.processIdentifier == trio.processIdentifier && !$0.isTerminated }) else { stop("Trio unexpectedly stopped") }
         }
         let terminalEvents = fixtureEvents().filter { ($0["time"] as? Double ?? 0) >= initialLaunchTime }
-        guard terminalEvents.contains(where: { $0["event"] as? String == "applicationShouldTerminate" }),
-              terminalEvents.contains(where: { $0["event"] as? String == "applicationWillTerminate" }) == !arguments.contains("--expect-force") else {
-            stop("Fixture exited without the expected graceful-termination events")
+        let normalQuitRequested = terminalEvents.contains { $0["event"] as? String == "applicationShouldTerminate" }
+        let normalQuitCompleted = terminalEvents.contains { $0["event"] as? String == "applicationWillTerminate" }
+        report["gracefulTerminationRequested"] = normalQuitRequested
+        report["gracefulTerminationCompleted"] = normalQuitCompleted
+        guard !normalQuitRequested, !normalQuitCompleted else {
+            stop("Expected direct forced termination, but graceful-termination delegate events were observed")
         }
         report["fixtureEvents"] = terminalEvents.filter {
             ["windowDidMiniaturize", "windowDidDeminiaturize", "windowWillClose", "applicationShouldTerminate", "applicationWillTerminate"].contains($0["event"] as? String ?? "")
         }.map { event in event.filter { ["event", "fixtureIndex", "pid", "time", "window"].contains($0.key) } }
-        report["terminationMode"] = arguments.contains("--expect-force") ? "forced-after-refusal" : "graceful"
+        // This process did not launch the fixture, so it cannot inspect its
+        // wait status or claim a specific terminating signal. Keep the actual
+        // evidence separate from the requested product policy.
+        report["terminationMode"] = "forced-direct"
+        report["terminationEvidence"] = "fixture-exited-without-graceful-delegate-events"
         report["passed"] = true; finish(0)
     }
 

@@ -1,19 +1,24 @@
 import AppKit
 import ApplicationServices
 
-/// One visible, empty Edge window in an exclusively owned temporary profile.
-/// Refuses to launch while any normal Edge instance exists. No HID, AppleScript,
-/// browsing, personal-profile access, or Trio changes. --native-close presses
-/// only the verified original AXCloseButton of the disposable Edge instance.
+/// One visible empty window in an exclusively owned temporary profile.
+/// Default: Edge about:blank. --antigravity: a new empty Antigravity window,
+/// with its own user-data-dir/extensions-dir and extensions disabled.
+/// Refuses to launch while any instance of the selected app already exists.
+/// No HID, AppleScript, browsing, personal folders or Trio changes.
+/// --native-close presses only this disposable window's original AXCloseButton.
 @main @MainActor struct VerifyEdgeClose {
     static func main() { EdgeCloseVerification().run() }
 }
 
 @MainActor private final class EdgeCloseVerification {
-    private let edgeID = "com.microsoft.edgemac"
+    private var antigravity: Bool { arguments.contains("--antigravity") }
+    private var appName: String { antigravity ? "Antigravity" : "Edge" }
+    private var appID: String { antigravity ? "com.google.antigravity" : "com.microsoft.edgemac" }
+    private var appURL: URL { URL(fileURLWithPath: antigravity ? "/Applications/Antigravity.app" : "/Applications/Microsoft Edge.app") }
+    private var executable: URL { appURL.appendingPathComponent("Contents/MacOS/" + (antigravity ? "Antigravity" : "Microsoft Edge")) }
+    private var temporaryPrefix: String { antigravity ? "trio-antigravity-close-" : "trio-edge-close-" }
     private let trioID = "com.allm4.Trio"
-    private let edgeURL = URL(fileURLWithPath: "/Applications/Microsoft Edge.app")
-    private let executable = URL(fileURLWithPath: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")
     private let arguments = ProcessInfo.processInfo.arguments
     private let process = Process()
     private var testApp: NSRunningApplication?
@@ -33,28 +38,40 @@ import ApplicationServices
 
     func run() {
         report["generatedAt"] = ISO8601DateFormatter().string(from: Date())
+        report["targetApplication"] = appName
+        report["targetBundleID"] = appID
+        report["emptyWindowRequested"] = true
+        if antigravity {
+            report["test"] = "owned-empty-antigravity-close"
+            report["URLRequested"] = nil
+            report["pressedOriginalEdgeButton"] = nil
+            report["pressedOriginalAntigravityButton"] = false
+        }
         let nativeClose = arguments.contains("--native-close")
-        report["requestedAction"] = nativeClose ? "original-owned-Edge-close-AXPress" : "Trio-red-AXPress"
+        report["requestedAction"] = nativeClose ? "original-owned-\(appName)-close-AXPress" : "Trio-red-AXPress"
         guard let output = argument("--output"), output.hasPrefix("/") else { finish("Use --output ABSOLUTE.json", code: 2) }
         outputURL = URL(fileURLWithPath: output)
+        guard !arguments.contains("--physical-red") else {
+            finish("--physical-red is not supported by this AXPress-only harness; no launch or pointer movement", code: 2)
+        }
         guard AXIsProcessTrusted() else { finish("Accessibility is not already authorized; no permission requested", code: 2) }
-        guard NSRunningApplication.runningApplications(withBundleIdentifier: edgeID).isEmpty else {
-            finish("An Edge instance already exists; no launch or action attempted", code: 2)
+        guard NSRunningApplication.runningApplications(withBundleIdentifier: appID).isEmpty else {
+            finish("An \(appName) instance already exists; no launch or action attempted", code: 2)
         }
         let trios = NSRunningApplication.runningApplications(withBundleIdentifier: trioID)
         guard trios.count == 1, trios[0].bundleURL?.resolvingSymlinksInPath().path == "/Applications/Trio.app",
               FileManager.default.isExecutableFile(atPath: executable.path),
-              Bundle(url: edgeURL)?.bundleIdentifier == edgeID else { finish("Installed Trio or Edge identity unavailable", code: 2) }
+              Bundle(url: appURL)?.bundleIdentifier == appID else { finish("Installed Trio or \(appName) identity unavailable", code: 2) }
         trio = trios[0]
         let trioInfo = Bundle(url: trio.bundleURL!)?.infoDictionary ?? [:]
         let version = trioInfo["CFBundleShortVersionString"] as? String ?? "unknown"
         let build = trioInfo["CFBundleVersion"] as? String ?? "unknown"
         report["trioVersion"] = version; report["trioBuild"] = build; report["trioPID"] = trio.processIdentifier
-        report["edgeVersion"] = Bundle(url: edgeURL)?.infoDictionary?["CFBundleShortVersionString"]
+        report[antigravity ? "antigravityVersion" : "edgeVersion"] = Bundle(url: appURL)?.infoDictionary?["CFBundleShortVersionString"]
         if let expected = argument("--expected-version"), version != expected { finish("Installed Trio version differs from expectation; no launch", code: 2) }
         if let expected = argument("--expected-build"), build != expected { finish("Installed Trio build differs from expectation; no launch", code: 2) }
         do {
-            let root = FileManager.default.temporaryDirectory.appendingPathComponent("trio-edge-close-" + ownershipToken, isDirectory: true)
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent(temporaryPrefix + ownershipToken, isDirectory: true)
             try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
             temporaryRoot = root
             try ownershipToken.write(to: root.appendingPathComponent(".trio-owned"), atomically: true, encoding: .utf8)
@@ -63,26 +80,53 @@ import ApplicationServices
             // Unique user-data-dir prevents Chromium's existing-profile singleton
             // routing. Additional flags only affect this disposable invocation.
             process.executableURL = executable
-            process.arguments = ["--user-data-dir=" + profile.path, "--no-first-run", "--no-default-browser-check",
-                                 "--disable-sync", "--disable-extensions",
-                                 "--disable-background-networking", "--disable-component-update", "--new-window", "about:blank"]
-            report["launchFlags"] = ["--user-data-dir=<owned-temporary-profile>"] + Array(process.arguments!.dropFirst())
+            process.currentDirectoryURL = root
+            if antigravity {
+                let extensions = root.appendingPathComponent("Extensions", isDirectory: true)
+                try FileManager.default.createDirectory(at: extensions, withIntermediateDirectories: false)
+                let settingsDirectory = profile.appendingPathComponent("User", isDirectory: true)
+                try FileManager.default.createDirectory(at: settingsDirectory, withIntermediateDirectories: false)
+                // No path or URI is passed to the editor. This fresh isolated
+                // workbench is configured not to restore workspaces or editors.
+                let settings: [String: Any] = ["window.restoreWindows": "none", "workbench.startupEditor": "none"]
+                try JSONSerialization.data(withJSONObject: settings, options: [.sortedKeys])
+                    .write(to: settingsDirectory.appendingPathComponent("settings.json"), options: .atomic)
+                process.arguments = ["--user-data-dir=" + profile.path, "--extensions-dir=" + extensions.path,
+                                     "--disable-extensions", "--new-window"]
+                var environment = ProcessInfo.processInfo.environment
+                for key in ["ELECTRON_RUN_AS_NODE", "VSCODE_IPC_HOOK_CLI", "VSCODE_CWD", "VSCODE_PORTABLE",
+                            "ANTIGRAVITY_IPC_HOOK_CLI", "ANTIGRAVITY_CWD", "ANTIGRAVITY_PORTABLE"] {
+                    environment.removeValue(forKey: key)
+                }
+                process.environment = environment
+                report["temporaryExtensionsOwned"] = true
+                report["workspaceOrFileArguments"] = [] as [String]
+            } else {
+                process.arguments = ["--user-data-dir=" + profile.path, "--no-first-run", "--no-default-browser-check",
+                                     "--disable-sync", "--disable-extensions",
+                                     "--disable-background-networking", "--disable-component-update", "--new-window", "about:blank"]
+            }
+            report["launchFlags"] = process.arguments!.map { flag in
+                if flag.hasPrefix("--user-data-dir=") { return "--user-data-dir=<owned-temporary-profile>" }
+                if flag.hasPrefix("--extensions-dir=") { return "--extensions-dir=<owned-temporary-extensions>" }
+                return flag
+            }
             report["backgroundModeForcedOff"] = false
             process.standardOutput = FileHandle.nullDevice; process.standardError = FileHandle.nullDevice
             // Recheck at the last boundary before launching our own instance.
-            guard NSRunningApplication.runningApplications(withBundleIdentifier: edgeID).isEmpty else { finish("Edge appeared before launch; no launch", code: 2) }
+            guard NSRunningApplication.runningApplications(withBundleIdentifier: appID).isEmpty else { finish("\(appName) appeared before launch; no launch", code: 2) }
             try process.run()
             report["launchedMainPID"] = process.processIdentifier
             report["temporaryProfileOwned"] = true
-        } catch { finish("Could not prepare/launch the disposable Edge instance: \(error.localizedDescription)", code: 2) }
+        } catch { finish("Could not prepare/launch the disposable \(appName) instance: \(error.localizedDescription)", code: 2) }
 
         let axEdge = AXUIElementCreateApplication(process.processIdentifier)
         AXUIElementSetMessagingTimeout(axEdge, 0.2)
         let startupDeadline = Date().addingTimeInterval(15)
         var proof: (AXUIElement, AXUIElement, Row, Row)?
         while process.isRunning, Date() < startupDeadline {
-            let running = NSRunningApplication.runningApplications(withBundleIdentifier: edgeID)
-            guard running.allSatisfy({ $0.processIdentifier == process.processIdentifier }) else { finish("Another Edge instance appeared; no press", code: 2) }
+            let running = NSRunningApplication.runningApplications(withBundleIdentifier: appID)
+            guard running.allSatisfy({ $0.processIdentifier == process.processIdentifier }) else { finish("Another \(appName) instance appeared; no press", code: 2) }
             if let app = running.first, app.processIdentifier == process.processIdentifier,
                app.executableURL?.resolvingSymlinksInPath() == executable.resolvingSymlinksInPath() {
                 testApp = app
@@ -95,9 +139,10 @@ import ApplicationServices
         }
         guard let (window, red, edgeRow, trioRow) = proof else {
             observations.append(snapshot(axEdge: axEdge, elapsed: 0))
-            finish("One foreground empty-profile Edge window and its Trio red control could not be proven; no press", code: 2)
+            finish("One foreground empty-profile \(appName) window and its Trio red control could not be proven; no press", code: 2)
         }
-        report["edgeTargetCGWindowID"] = edgeRow.id
+        report[antigravity ? "antigravityTargetCGWindowID" : "edgeTargetCGWindowID"] = edgeRow.id
+        report["targetCGWindowID"] = edgeRow.id
         report["trioOverlayCGWindowID"] = trioRow.id
         observations.append(snapshot(axEdge: axEdge, elapsed: 0))
         guard ownAppIsForeground(), let recheck = verifyRed(axEdge: axEdge),
@@ -117,14 +162,14 @@ import ApplicationServices
                     .map({CFEqual($0,original)}) == true,
                   ownAppIsForeground(),
                   element(axEdge,kAXFocusedWindowAttribute).map({CFEqual($0,window)}) == true else {
-                finish("Original owned Edge close button identity changed; no press", code: 2)
+                finish("Original owned \(appName) close button identity changed; no press", code: 2)
             }
             actionButton = original
         } else { actionButton = red }
         let pressedAt = ProcessInfo.processInfo.systemUptime
         let pressed = AXUIElementPerformAction(actionButton, kAXPressAction as CFString)
         report[nativeClose ? "nativeCloseAXPressResult" : "trioRedAXPressResult"] = pressed.rawValue
-        report["pressedOriginalEdgeButton"] = nativeClose
+        report[antigravity ? "pressedOriginalAntigravityButton" : "pressedOriginalEdgeButton"] = nativeClose
         report["pressedTrioRedButton"] = !nativeClose
         guard pressed == .success else { finish("Verified action button refused AXPress", code: 1) }
         while process.isRunning, ProcessInfo.processInfo.systemUptime - pressedAt < 9 {
@@ -206,7 +251,7 @@ import ApplicationServices
     private func ownAppIsForeground()->Bool {
         guard process.isRunning, let testApp, testApp.processIdentifier == process.processIdentifier,
               !testApp.isTerminated, testApp.executableURL?.resolvingSymlinksInPath() == executable.resolvingSymlinksInPath(),
-              NSRunningApplication.runningApplications(withBundleIdentifier:edgeID).allSatisfy({$0.processIdentifier == process.processIdentifier}) else{return false}
+              NSRunningApplication.runningApplications(withBundleIdentifier:appID).allSatisfy({$0.processIdentifier == process.processIdentifier}) else{return false}
         return NSWorkspace.shared.frontmostApplication?.processIdentifier == process.processIdentifier
     }
     private func cleanup() {
@@ -233,7 +278,7 @@ import ApplicationServices
         guard !process.isRunning else { report["temporaryProfileRemoved"]=false;report["retainedOwnedProfileRoot"]=root.path;return }
         settle(0.4)
         let marker=root.appendingPathComponent(".trio-owned")
-        guard root.lastPathComponent == "trio-edge-close-"+ownershipToken,
+        guard root.lastPathComponent == temporaryPrefix+ownershipToken,
               (try? String(contentsOf:marker,encoding:.utf8)) == ownershipToken,
               (try? root.resourceValues(forKeys:[.isSymbolicLinkKey]).isSymbolicLink) == false else {
             report["temporaryProfileRemoved"]=false;return

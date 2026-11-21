@@ -175,7 +175,7 @@ final class SettingsWindowController: NSWindowController, NSWindowDelegate {
         let sliderRow = horizontal([secondary("1×"), slider, secondary("5×")], spacing: 10)
         let sizeExplanation = secondary("O tamanho efetivo se ajusta ao espaço livre da barra. Janelas sem uma área segura mantêm seus controles originais.")
         let greenExplanation = secondary("O verde maximiza na área útil do monitor. Clique novamente para restaurar o tamanho anterior; passe o mouse para organizar a janela.")
-        let redExplanation = secondary("O vermelho fecha esta janela e encerra o app ao fechar a última. O Finder continua aberto. Se o app continuar rodando após a confirmação do fechamento, o Trio verifica as exceções e força a saída.")
+        let redExplanation = secondary("O vermelho fecha esta janela. Depois de confirmar a última, força diretamente a saída da mesma instância do app, exceto Finder e apps nas exceções. Outras janelas, inclusive minimizadas, mantêm o app aberto. Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos.")
         let quitExceptionsButton = button("Escolher apps…", action: #selector(showQuitExceptions))
         let quitExceptionsRow = horizontal([secondary("Manter abertos ao fechar a última janela"), NSView(), quitExceptionsButton], spacing: 8)
         quitExclusionsSummary.font = .systemFont(ofSize: 11)
@@ -418,7 +418,7 @@ private final class AutoMaximizeExceptionsController: NSWindowController, NSWind
         sheet.delegate = self
         let content = sheet.contentView!
         let explanation = NSTextField(wrappingLabelWithString: kind == .quit ?
-            "Ao fechar a última janela, estes aplicativos continuam abertos. O Finder permanece sempre nesta lista. Forçar encerramento continua sendo uma ação explícita para o aplicativo inteiro." :
+            "Estes aplicativos ficam dispensados da saída forçada automática ao fechar a última janela. O Finder permanece sempre nesta lista. Adicione apps que precisam continuar trabalhando em segundo plano. A opção de encerrar o aplicativo inteiro no menu é uma ação separada." :
             "Novas janelas destes aplicativos mantêm o tamanho escolhido por eles. Você continua podendo usar o botão verde do Trio.")
         explanation.font = .systemFont(ofSize: 13)
         let application = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("application"))

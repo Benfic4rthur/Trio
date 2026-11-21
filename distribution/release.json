@@ -1,15 +1,15 @@
 {
   "bundleIdentifier": "com.allm4.Trio",
-  "version": "0.2.1",
-  "build": "13",
+  "version": "0.2.2",
+  "build": "14",
   "minOS": "13.0",
   "architectures": [
     "arm64",
     "x86_64"
   ],
   "assetName": "Trio-macOS-universal.zip",
-  "sha256": "e379c3c7778a82e9c0fa5dc5bbf374af6254de8183cb6b13d8de12c00edcd6a4",
-  "size": 1951648,
+  "sha256": "e27156f9deb75f18b92abfd88763ea467f5d35269e7ea9911d2b33b444c1420f",
+  "size": 1956918,
   "url": "https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip",
   "distribution": "repository-distribution",
   "publicDownload": true,

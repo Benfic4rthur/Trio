@@ -1,20 +1,28 @@
 # Estado do Trio
 
-Atualizado em **20/11/2026**, horário de São Paulo. **Aplicativo gratuito e funcional: versão 0.2.1, build 13.** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
+Atualizado em **20/11/2026**, horário de São Paulo. **Versão instalada e validada no Mac de teste, 0.2.2 (build 14).** [Download Universal](https://raw.githubusercontent.com/Benfic4rthur/Trio/main/distribution/Trio-macOS-universal.zip) · [Instalação](INSTALLATION.md) · [Histórico](../CHANGELOG.md).
 
 ## Versão, distribuição e instalação
 
 | Item | Estado verificado |
 | --- | --- |
-| Versão atual | **0.2.1, build 13**, instalada em `/Applications/Trio.app`. |
+| Versão instalada | **0.2.2, build 14**, em `/Applications/Trio.app`. |
 | Ambiente físico | macOS 27.2.1 (26B131), M1 Pro, Swift 6.4.2. |
 | Arquiteturas | App e auxiliar Universal **arm64 + x86_64**, compilados e verificados localmente. Intel físico não testado. |
-| Pacote | `Trio-macOS-universal.zip`. 1.951.648 bytes. Inclui o instalador, o guia e o app Universal. |
-| Integridade do ZIP | SHA-256 `e379c3c7778a82e9c0fa5dc5bbf374af6254de8183cb6b13d8de12c00edcd6a4`; pacote, checksum e metadados atualizados juntos. |
+| Pacote | `Trio-macOS-universal.zip` com 1.956.918 bytes. Inclui o instalador, o guia e o app Universal. |
+| Integridade do ZIP | SHA-256 `e27156f9deb75f18b92abfd88763ea467f5d35269e7ea9911d2b33b444c1420f`. |
 | Distribuição | Repositório `Benfic4rthur/Trio` público, conforme alteração feita pelo proprietário. ZIP, checksum e metadados em `distribution/`; esse caminho não é uma GitHub Release. |
 | Assinatura | Local, sem notarização Apple. O usuário não precisa de Xcode nem conta Apple Developer para usar o pacote pronto; Gatekeeper pode exigir a aprovação manual descrita no guia. |
 | Instalador | `Install.command` confere identidade e assinatura, preserva a versão anterior e a quarentena, sem solicitar administrador ou desativar proteções. Recebeu revisão estática e `bash -n`; a atualização por esse script em outro Mac ainda precisa de ensaio. |
 | Compilação e envios | Locais; código e distribuição enviados por MCP do GitHub. Sem Actions, tarefas de IA no GitHub ou builds remotos. |
+
+## Fechar a última janela — implementação da build 14
+
+Depois de confirmar o fechamento da última janela, o Trio chama `forceTerminate` diretamente na mesma instância do aplicativo, sem pedir antes uma saída normal. Outras janelas, inclusive minimizadas, impedem esse encerramento. O Finder e as exceções personalizadas continuam protegidos. Uma identidade ou contagem incerta não autoriza encerrar outro processo.
+
+O acompanhamento do fechar nativo no Edge e no Antigravity mantém as verificações pendentes quando o evento chega antes da atualização da Acessibilidade e do WindowServer. As tentativas são limitadas e a regra não filtra por número de versão do aplicativo.
+
+Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos. Na versão instalada, o controle nativo da última janela do Antigravity 2.34.0 e o vermelho do Trio no Edge 158.0.4370.33 foram acionados por Acessibilidade, com perfis temporários. Os processos encerraram em 0,56 s e 0,53 s, respectivamente, antes da limpeza. Treze cenários simulados verificaram a política de força direta e a proteção de outras janelas, inclusive minimizadas. Os 49 testes do núcleo passaram. [Resultados dos aplicativos](validation/0.2.2-build14/closing.json).
 
 ## Última janela do Edge na build 13
 
@@ -24,7 +32,7 @@ No Edge 157.0.4341.60, a última janela podia desaparecer e o navegador continua
 
 Foram usados cinco IDs distintos num aplicativo de teste AppKit, com uma janela minimizada e uma janela que disponibilizava somente fechar. Os quatro primeiros fechamentos preservaram o processo e as janelas esperadas. O último encerrou o aplicativo. Uma segunda rodada fez o aplicativo recusar o encerramento normal. O encerramento forçado passou na versão instalada e o Trio continuou em execução. [Resultados por janela](validation/0.2.0-build12/closing.json).
 
-O primeiro ensaio identificou superfícies que o WindowServer guardava depois de fechar a janela. A versão publicada usa o inventário de janelas acessíveis do aplicativo e verifica as janelas visíveis antes de encerrar. O teste de persistência usou preferências isoladas. Os 49 testes do núcleo passaram. A matriz de tamanhos inclui o monitor do ensaio e duas resoluções simuladas. [Critérios de tamanho](AUTO_MAXIMIZE.md).
+O primeiro ensaio identificou superfícies que o WindowServer guardava depois de fechar a janela. A build 12 usou o inventário de janelas acessíveis do aplicativo e verificou as janelas visíveis antes de encerrar. Nessa build, o vermelho pedia o encerramento normal após confirmar a última janela; se a mesma instância ainda estivesse rodando cinco segundos depois, as janelas e exceções eram reconfirmadas antes de forçar a saída. O teste de persistência usou preferências isoladas. Os 49 testes do núcleo passaram. A matriz de tamanhos inclui o monitor do ensaio e duas resoluções simuladas. [Critérios de tamanho](AUTO_MAXIMIZE.md).
 
 ## Compatibilidade do Claude — build 11
 
@@ -75,4 +83,4 @@ As evidências detalhadas em [PIPELINE-VALIDATION.md](PIPELINE-VALIDATION.md) id
 
 O Trio atende à **janela ativa compatível**. O Trio pode ampliar apenas o vermelho. Identidade ambígua, ferramentas na área do vermelho ou informações de Acessibilidade insuficientes levam à preservação dos controles originais. A preferência de 5× é um limite solicitado e pode ser reduzida pelo espaço; não foi validada como tamanho efetivo em janelas comuns.
 
-As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. Na build 12, o vermelho fecha a janela pelo controle acessível e só pede o encerramento automático depois de confirmar a última janela e consultar as exceções. Se a instância ainda estiver rodando após cinco segundos, o Trio reconfirma que ela segue sem janelas antes de forçar o encerramento.
+As APIs são públicas. O aplicativo não injeta código, altera os botões internos de outros processos nem desativa proteções do macOS. Na build 14, o vermelho fecha a janela pelo controle acessível e só força diretamente a saída depois de confirmar a última janela, a mesma instância do processo e as exceções. Esse encerramento pode interromper tarefas em segundo plano; apps que precisam continuar ativos sem janelas devem ser adicionados às exceções.

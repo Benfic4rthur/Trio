@@ -1,5 +1,14 @@
 # Histórico do Trio
 
+## 0.2.2 — build 14 · 20/11/2026
+
+- Depois de confirmar que a última janela fechou, o Trio usa `forceTerminate` diretamente na mesma instância do aplicativo, sem pedir um encerramento normal antes.
+- Outras janelas, inclusive minimizadas, impedem a saída. O Finder e as exceções escolhidas pelo usuário continuam protegidos; uma identidade ou contagem incerta não autoriza encerrar outro processo.
+- Corrige o acompanhamento do fechar nativo no Edge e no Antigravity quando o evento chega antes de a janela desaparecer dos inventários. A verificação aguarda a confirmação por tentativas limitadas, sem condicionar a regra ao número da versão desses aplicativos.
+- Forçar a saída pode interromper tarefas em segundo plano e perder dados ainda não salvos. Aplicativos que precisam continuar trabalhando sem janelas devem ser adicionados às exceções.
+
+**Validação:** consulte o [estado da versão](docs/STATUS.md) para os resultados da build 14. Os ensaios das versões anteriores permanecem identificados abaixo.
+
 ## 0.2.1 — build 13 · 20/11/2026
 
 - O Trio pede o encerramento assim que confirma que a última janela fechou. Se a mesma instância permanecer sem janelas na verificação seguinte, força sua saída. O intervalo fixo de cinco segundos foi removido.

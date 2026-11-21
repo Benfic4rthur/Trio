@@ -1,0 +1,30 @@
+{
+  "version": "0.2.2",
+  "build": "14",
+  "scenarios": [
+    {
+      "targetApplication": "Antigravity",
+      "antigravityVersion": "2.34.0",
+      "requestedAction": "original-owned-Antigravity-close-AXPress",
+      "HIDPosted": false,
+      "mainExitDelaySeconds": 0.5554158750001079,
+      "mainExitedBeforeCleanup": true,
+      "mainTerminationReasonBeforeCleanup": "signal",
+      "mainTerminationStatusBeforeCleanup": 15,
+      "trioProcessRunningAfter": true,
+      "temporaryProfileRemoved": true
+    },
+    {
+      "targetApplication": "Edge",
+      "edgeVersion": "158.0.4370.33",
+      "requestedAction": "Trio-red-AXPress",
+      "HIDPosted": false,
+      "mainExitDelaySeconds": 0.5283761250002499,
+      "mainExitedBeforeCleanup": true,
+      "mainTerminationReasonBeforeCleanup": "exit",
+      "mainTerminationStatusBeforeCleanup": 0,
+      "trioProcessRunningAfter": true,
+      "temporaryProfileRemoved": true
+    }
+  ]
+}
